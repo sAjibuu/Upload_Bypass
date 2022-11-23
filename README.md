@@ -1,6 +1,6 @@
 # upload_bypass_carnival
 
-File upload restrictions bypass, by using different bug bounty techniques!
+File upload restrictions bypass by using different bug bounty techniques!
 Tool must be running with all its assets!
 
 Usage: upload_bypass.py [options]
