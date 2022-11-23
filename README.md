@@ -52,3 +52,11 @@ Options:
   -v, --verbose
     
     (Optional) - Printing the http response in terminal
+    
+  -U , --username
+  
+    (Optional) - Username for authentication. For exmaple: --username admin
+  
+  -P , --password 
+  
+    (Optional) - - Password for authentication. For exmaple: --username 12345
