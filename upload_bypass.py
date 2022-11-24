@@ -600,7 +600,7 @@ def main():
                       default="optional")
 
     parser.add_option('-d', "--data", type="string", dest="data",
-                      help='(Optional) - for example: \'"submit": "submit"\' - Use double quotes and wrapp it with single quotes. Use comma to separate multi headers.',
+                      help='(Optional) - for example: \'"submit": "submit"\' - Use double quotes and wrapp it with single quotes. Use comma to separate multi data.',
                       default="optional")
 
     parser.add_option('-l', "--location", type="string", dest="location",
