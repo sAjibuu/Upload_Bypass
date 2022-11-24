@@ -34,7 +34,7 @@ Options:
 
   -d , --data= 
   
-     (Optional) - for example: '"submit": "submit"' - Use double quotes and wrapp it with single quotes. Use comma to separate multi headers.
+     (Optional) - for example: '"submit": "submit"' - Use double quotes and wrapp it with single quotes. Use comma to separate multi data.
   
   -l , --location
         
