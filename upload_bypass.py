@@ -15,7 +15,9 @@ from urllib import request
 
 
 def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location, username,
-         password, data):
+         password, data, file_attr):
+    # Basic Authentication 
+
     sauce = urllib.request.urlopen(URL).read()
     soup = bs.BeautifulSoup(sauce, "html.parser")
     form = soup.find('form')
@@ -35,12 +37,12 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
     session.post(URL, data=payload)
 
     file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
-                   session, data)
+                   session, data, file_attr)
 
 
 def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
-                   session, data):
-    # Brute forcing different extensions
+                   session, data, file_attr):
+    # Brute forcing different extensions and uppercase extensions
 
     try:
         php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm",
@@ -58,15 +60,21 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
         coldfusion = [".cfm", ".cfml", ".cfc", ".dbm", ".cFm", ".cFml", ".cFc", ".dBm"]
         perl = [".pl", ".cgi", ".pL", ".cGi"]
 
+        if file_attr == 'optional':
+
+            response = session.get(URL, allow_redirects=False)
+            sauce = response.text
+            soup = bs.BeautifulSoup(sauce, "html.parser")
+            form = soup.find('form')
+            file_attr = form.find('input', type='file').get('name')
+            file_attr = str(file_attr)
+
+            if file_attr == "None":
+                file_attr = 'image'
+
         counter = 0
 
         print("[-] Trying different file extensions. Please be patient!")
-
-        response = session.get(URL, allow_redirects=False)
-        sauce = response.text
-        soup = bs.BeautifulSoup(sauce, "html.parser")
-        form = soup.find('form')
-        file_attr = form.find('input', type='file').get('name')
 
         for ext in eval(EXTENSION):
 
@@ -340,7 +348,7 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
 
 def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
                 session, file_attr, data):
-    # Uploading files with
+    # Uploading files with image Magic Bytes
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
            ".pgif", ".shtml", ".htaccess", ".phar", ".inc", ".hphp", ".ctp", ".module", ".pHp", ".PhP2", ".PhP3",
@@ -499,12 +507,14 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                 else:
                     sys.exit()
 
-    upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location, session,
-                file_attr, data)
+    content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location, session,
+                 file_attr, data)
 
 
-def upload_file(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location, session,
-                file_attr, data):
+def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location, session,
+                 file_attr, data):
+    # Trying different content types
+
     print("[-] Trying different content-type headers. Please be patient!")
 
     with open("./content-type.txt", encoding='latin-1') as file:
@@ -600,7 +610,11 @@ def main():
                       default="optional")
 
     parser.add_option('-d', "--data", type="string", dest="data",
-                      help='(Optional) - for example: \'"submit": "submit"\' - Use double quotes and wrapp it with single quotes. Use comma to separate multi data.',
+                      help='(Optional) - Form data for example: \'"submit": "submit"\' - Use double quotes and wrapp it with single quotes. Use comma to separate multi data.',
+                      default="optional")
+
+    parser.add_option('-f', "--file", type="string", dest="file_attr",
+                      help='(Optional) - File type attribute name for example: -f myfile. Some website might check that (You check the browser page source).',
                       default="optional")
 
     parser.add_option('-l', "--location", type="string", dest="location",
@@ -636,6 +650,7 @@ def main():
     proxy = options.proxy
     TLS = options.ssl
     brute_force = options.continue_brute
+    file_attr = options.file_attr
     username = options.username
     password = options.password
     data = options.data
@@ -707,12 +722,12 @@ def main():
             if username != 'optional' and password != 'optional':
 
                 auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
-                     location, username, password, data)
+                     location, username, password, data, file_attr)
 
             else:
                 session = requests.Session()
                 file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
-                               location, session, data)
+                               location, session, data, file_attr)
 
 
 if __name__ == "__main__":
