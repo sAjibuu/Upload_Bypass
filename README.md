@@ -1,4 +1,4 @@
-# upload_bypass_carnival
+# upload_bypass_carnage
 
 File upload restrictions bypass by using different bug bounty techniques!
 Tool must be running with all its assets!
