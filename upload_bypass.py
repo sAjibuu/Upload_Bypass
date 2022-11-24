@@ -16,6 +16,7 @@ from urllib import request
 
 def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location, username,
          password, data, file_attr):
+
     # Basic Authentication 
 
     sauce = urllib.request.urlopen(URL).read()
@@ -42,6 +43,7 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
 
 def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
                    session, data, file_attr):
+    
     # Brute forcing different extensions and uppercase extensions
 
     try:
@@ -153,6 +155,7 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
 
 def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS, headers, brute_force, verbosity,
                      location, session, file_attr, data):
+    
     # Doubling the extension
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
@@ -243,6 +246,7 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
 
 def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
                session, file_attr, data):
+    
     # Adds null bytes to the end of extensions
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
@@ -348,6 +352,7 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
 
 def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
                 session, file_attr, data):
+    
     # Uploading files with image Magic Bytes
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
@@ -508,11 +513,12 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                     sys.exit()
 
     content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location, session,
-                 file_attr, data)
+                file_attr, data)
 
 
 def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location, session,
-                 file_attr, data):
+                file_attr, data):
+    
     # Trying different content types
 
     print("[-] Trying different content-type headers. Please be patient!")
@@ -687,8 +693,8 @@ def main():
 
     if HEADER != 'optional':
 
-        temp = "{" + str(HEADER) + "}"
-        headers = json.loads(temp)
+        temp_header = "{" + str(HEADER) + "}"
+        headers = json.loads(temp_header)
 
     else:
         headers = {
@@ -697,8 +703,8 @@ def main():
 
     if data != 'optional':
 
-        temp = "{" + str(HEADER) + "}"
-        headers = json.loads(temp)
+        temp_data = "{" + str(data) + "}"
+        data = json.loads(temp_data)
 
     else:
         data = {
