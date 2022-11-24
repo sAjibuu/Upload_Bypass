@@ -12,8 +12,7 @@ Options:
   
   -u URL, --url=URL    
   
-      Supply the login page, for example:
-      -u http://192.168.98.200/login.php'
+      Supply the login page, for example: -u http://192.168.98.200/login.php'
   
   -s , --success
   
