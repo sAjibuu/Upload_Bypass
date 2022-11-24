@@ -567,7 +567,7 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                 else:
                     sys.exit(1)
 
-    print("[*] Some websites check Form elements so if everything fails, you may want to supply these parameters:\n[*] Supply the name for the type=\"file\" attribute with --file option.\n [*] Supply form data with -d option. \n [*] Change the URL to the value of Action attribute.\n If you don't know where to find these parameters, check the page source.")
+    print("[*] Some websites check specific form elements and attributes so if everything fails, you may want to supply these parameters:\n[*] Supply the name for the type=\"file\" attribute with --file option.\n [*] Supply form data with -d option. \n [*] Change the URL to the value of Action attribute.\n If you don't know where to find these parameters, check the page source.")
 
 
 def main():
