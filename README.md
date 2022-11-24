@@ -17,12 +17,11 @@ Options:
   
   -s , --success
   
-      Success message when upload an image, example: -s 'Image
-      uploaded successfully.'
+     Success message when upload an image, example: -s 'Image uploaded successfully.'
       
   -e , --extension 
   
-    Provide server backend extension, for example: --extension php (Supported extensions: php,asp,jsp,perl,coldfusion)
+     Provide server backend extension, for example: --extension php (Supported extensions: php,asp,jsp,perl,coldfusion)
       
    -a , --allowed
    
@@ -32,11 +31,12 @@ Options:
        
      (Optional) - for example: '"X-Forwarded-For":"10.10.10.10"' - Use double quotes and wrapp it with single. Use comma to separate multi headers.
 
-  -d , --data= 
+  -d , --data 
   
      (Optional) - for example: '"submit": "submit"' - Use double quotes and wrapp it with single quotes. Use comma to separate multi data.
-
+     
   -f , --file
+  
      (Optional) - File type attribute name for example: -f myfile. Some website might check that (You check the browser page source).
   
   -l , --location
@@ -53,17 +53,16 @@ Options:
   
   -c, --continue
       
-      (Optional) - If set, the brute force will continue
-                   even if one or more methods found!
+     (Optional) - If set, the brute force will continue even if one or more methods found!
   
   -v, --verbose
     
-    (Optional) - Printing the http response in terminal
+     (Optional) - Printing the http response in terminal
     
   -U , --username
   
-    (Optional) - Username for authentication. For exmaple: --username admin
+     (Optional) - Username for authentication. For exmaple: --username admin
   
   -P , --password 
   
-    (Optional) - - Password for authentication. For exmaple: --username 12345
+     (Optional) - - Password for authentication. For exmaple: --username 12345
