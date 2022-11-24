@@ -1,5 +1,9 @@
 # upload_bypass_carnage
 
+POC video:
+
+   https://www.youtube.com/watch?v=quFoDysbDto&ab_channel=SagivMichael
+
 File upload restrictions bypass by using different bug bounty techniques!
 Tool must be running with all its assets!
 
