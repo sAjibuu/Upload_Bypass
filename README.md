@@ -35,6 +35,9 @@ Options:
   -d , --data= 
   
      (Optional) - for example: '"submit": "submit"' - Use double quotes and wrapp it with single quotes. Use comma to separate multi data.
+
+  -f , --file
+     (Optional) - File type attribute name for example: -f myfile. Some website might check that (You check the browser page source).
   
   -l , --location
         
