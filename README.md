@@ -31,6 +31,10 @@ Options:
   -H , --header 
        
      (Optional) - for example: '"X-Forwarded-For":"10.10.10.10"' - Use double quotes and wrapp it with single. Use comma to separate multi headers.
+
+  -d , --data= 
+  
+     (Optional) - for example: '"submit": "submit"' - Use double quotes and wrapp it with single quotes. Use comma to separate multi headers.
   
   -l , --location
         
