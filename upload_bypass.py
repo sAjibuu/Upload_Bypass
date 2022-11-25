@@ -41,19 +41,30 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
     try:
         # Basic Authentication
 
+        print("[-] Trying to get HTML form elements and attribute for authentication, please wait!")
         session = HTMLSession()
         sauce = session.get(URL)
         soup = bs.BeautifulSoup(sauce.html.html, "html.parser")
         form = soup.find('form')
-        username_attr = form.find('input', type='text').get('name')
-        password_attr = form.find('input', type='password').get('name')
-        submit_attr = form.find('input', type='submit').get('name')
 
-        data = {
-            f'{username_attr}': f'{username}',
-            f'{password_attr}': f'{password}',
-            f'{submit_attr}': f'submit'
-        }
+        try:
+            submit_attr = form.find('input', type='submit').get('name')
+            username_attr = form.find('input', type='text').get('name')
+            password_attr = form.find('input', type='password').get('name')
+            data = {
+                f'{username_attr}': f'{username}',
+                f'{password_attr}': f'{password}',
+                f'{submit_attr}': f'submit'
+            }
+
+        except:
+            username_attr = form.find('input', type='text').get('name')
+            password_attr = form.find('input', type='password').get('name')
+            data = {
+                f'{username_attr}': f'{username}',
+                f'{password_attr}': f'{password}',
+                'submit': f'submit'
+            }
 
         session = requests.Session()
         response = session.post(URL, allow_redirects=True)
@@ -133,10 +144,13 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
 
                 if "name" in j:
                     name = j[j.find(start_value) + len(start_value):j.rfind(end_value)]
+                    attribute_dictionary = "{" + '"' + str(name) + '"' + ": " + '"' + "submit" + '"' + "}"
+                    submit = json.loads(attribute_dictionary)
+                    data.update(submit)
 
-            attribute_dictionary = "{" + '"' + str(name) + '"' + ": " + '"' + "submit" + '"' + "}"
-            submit = json.loads(attribute_dictionary)
-            data.update(submit)
+                else:
+                    attribute_dictionary = {"submit": "submit"}
+                    data.update(attribute_dictionary)
 
     file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
                    session, file_attr, data)
@@ -663,6 +677,7 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                     sys.exit(1)
 
     print("If everything fails, check if you need to login first and supply username and password!")
+
 
 def main():
     # Main function with all its arguments parsing
