@@ -701,7 +701,7 @@ def main():
                       default="required_to_be_true")
 
     parser.add_option('-H', "--header", type="string", dest="header",
-                      help='(Optional) - for example: \'"X-Forwarded-For": "10.10.10.10"\' - Use double quotes and wrapp it with single quotes. Use comma to separate multi headers.',
+                      help='(Optional) - for example: \'"X-Forwarded-For": "10.10.10.10"\' - Use double quotes around the data and wrapp it all with single quotes. Use comma to separate multi headers.',
                       default="optional")
 
     parser.add_option('-l', "--location", type="string", dest="location",
