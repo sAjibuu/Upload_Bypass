@@ -125,8 +125,6 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                 if "name" in j:
                     file_attr = j[j.find(start_name) + len(start_name):j.rfind(end_name)]
 
-    print(data)
-    exit()
     file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
                    session, file_attr, data)
 
