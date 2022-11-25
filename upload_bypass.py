@@ -665,7 +665,7 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                 else:
                     sys.exit(1)
 
-    print("second", session.cookies.get_dict())
+    print("If everything fails, check if you need to login first and supply username and password!")
 
 
 def main():
