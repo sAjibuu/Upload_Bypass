@@ -85,7 +85,6 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
     response = request.text
     soup = bs.BeautifulSoup(response, "html.parser")
     slicing = soup.find_all("input")
-    soup.find('input', type='submit').get('name')
     slicing = str(slicing).replace("[", "").replace("]", "")
     slicing = slicing.split(", ")
     data = {}
