@@ -7,6 +7,10 @@ POC video:
 File upload restrictions bypass by using different bug bounty techniques!
 Tool must be running with all its assets!
 
+ Installation:
+
+    pip3 install -r requirements.txt
+
 Usage: upload_bypass.py [options]
 
 Options:
@@ -34,14 +38,6 @@ Options:
        
      (Optional) - for example: '"X-Forwarded-For":"10.10.10.10"' - Use double quotes and wrapp it with single. Use comma to separate multi headers.
 
-  -d , --data 
-  
-     (Optional) - for example: '"submit": "submit"' - Use double quotes and wrapp it with single quotes. Use comma to separate multi data.
-     
-  -f , --file
-  
-     (Optional) - File type attribute name for example: -f myfile. Some website might check that (You check the browser page source).
-  
   -l , --location
         
      (Optional) - Supply a remote path where the webshell suppose to be. For exmaple: /uploads/
