@@ -104,9 +104,9 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
             # Basic Authentication
             basic = HTTPBasicAuth(username, password)
             response = session.get(URL, auth=basic)
-            scraper = response.text
 
-            if scraper != "":
+            if response.text != "":
+                print(response.text)
                 print("[*] Authentication worked!")
                 save_cookies(session, "cookies.txt")
                 load_cookies(session, "cookies.txt")
@@ -117,9 +117,8 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
             else:
                 # Digest Authentication
                 response = requests.get(URL, auth=HTTPDigestAuth(username, password))
-                scraper = response.text
 
-                if scraper != "":
+                if response.text != "":
                     print("[*] Authentication worked!")
                     save_cookies(session, "cookies.txt")
                     load_cookies(session, "cookies.txt")
