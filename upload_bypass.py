@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Made by Sagiv
-# Brute forcing technique to bypass file upload restrictions
+# Brute forcing techniques to bypass file upload restrictions
 # The tool requires all its assets, do not try to use it without it
 
 import requests
