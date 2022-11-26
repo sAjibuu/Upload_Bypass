@@ -313,7 +313,7 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                 URL = "https://" + domain + action
 
     else:
-        print("[-] Couldn't upload files, please check if the url is correct!.")
+        print("[-] Couldn't upload files, please check if the url is correct!")
         sys.exit(1)
 
     file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
