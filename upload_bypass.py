@@ -301,9 +301,6 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                     action = '"' + action + '"'
                     action = eval(action)     
 
-                else:
-                    pass
-
         data.update(submit_dic)
         data.update(hidden_dic)
 
@@ -315,12 +312,8 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
             else:
                 URL = "https://" + domain + action
 
-        else:
-            print("Couldn't upload files...")
-            sys.exit(1)
-
     else:
-        print("Couldn't upload files...")
+        print("[-] Couldn't upload files, please check if the url is correct!.")
         sys.exit(1)
 
     file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
