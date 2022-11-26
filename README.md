@@ -64,4 +64,4 @@ Options:
   
   -P , --password 
   
-     (Optional) - - Password for authentication. For exmaple: --username 12345
+     (Optional) - - Password for authentication. For exmaple: --password 12345
