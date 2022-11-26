@@ -105,11 +105,8 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
             basic = HTTPBasicAuth(username, password)
             response = session.get(URL, auth=basic)
             scraper = response.text
-            soup = bs.BeautifulSoup(scraper, "html.parser")
-            form = soup.find('body')
-            auth = str(form)
 
-            if auth != "None" and auth != "":
+            if scraper != "":
                 print("[*] Authentication worked!")
                 save_cookies(session, "cookies.txt")
                 load_cookies(session, "cookies.txt")
@@ -121,11 +118,8 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
                 # Digest Authentication
                 response = requests.get(URL, auth=HTTPDigestAuth(username, password))
                 scraper = response.text
-                soup = bs.BeautifulSoup(scraper, "html.parser")
-                form = soup.find('body')
-                auth = str(form)
 
-                if auth != "None" and auth != "":
+                if scraper != "":
                     print("[*] Authentication worked!")
                     save_cookies(session, "cookies.txt")
                     load_cookies(session, "cookies.txt")
