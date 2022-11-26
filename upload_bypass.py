@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Made by Sagiv
-# Brute forcing techniques to bypass file upload restrictions
+# Brute forcing technique to bypass file upload restrictions
 # The tool requires all its assets, do not try to use it without it
 
 import requests
@@ -295,6 +295,12 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                     action = action.replace(' + ', '" + "')
                     action = '"' + action + '"'
                     action = eval(action)
+
+                elif "+" in action:
+                    action = action.replace('+', '"+"')
+                    action = '"' + action + '"'
+                    action = eval(action)     
+
                 else:
                     pass
 
