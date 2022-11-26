@@ -944,7 +944,7 @@ def main():
                       default="optional")
 
     parser.add_option('-P', "--password", type="string", dest="password",
-                      help='(Optional) - - Password for authentication. For exmaple: --username 12345',
+                      help='(Optional) - - Password for authentication. For exmaple: --password 12345',
                       default="optional")
 
     parser.add_option('-S', "--ssl", action="store_true", dest="ssl", help="(Optional) - No checks for TLS or SSL")
