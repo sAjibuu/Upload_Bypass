@@ -46,9 +46,9 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
         scraper = response.text
         soup = bs.BeautifulSoup(scraper, "html.parser")
         form = soup.find('body')
-        auth = str(form)
+        authentication = str(form)
 
-        if auth != "None":
+        if authentication != "None":
 
             # Form authentication
             session = HTMLSession()
@@ -104,7 +104,7 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
             # Basic Authentication
             basic = HTTPBasicAuth(username, password)
             response = session.get(URL, auth=basic)
-            
+
             if response.text != "" and response.status_code == 200 or response.text == 302:
                 print("[*] Authentication worked!")
                 save_cookies(session, "cookies.txt")
@@ -114,12 +114,12 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
                            session)
 
             elif response.status_code == 404:
-                    print("[-] Server responded with 404!")  
-                    sys.exit(1)
+                print("[-] Server responded with 404!")
+                sys.exit(1)
 
             else:
                 # Digest Authentication
-                response = requests.get(URL, auth=HTTPDigestAuth(username, password))
+                response = session.get(URL, auth=HTTPDigestAuth(username, password))
                 if response.text != "" and response.status_code == 200 or response.text == 302:
                     print("[*] Authentication worked!")
                     save_cookies(session, "cookies.txt")
@@ -142,7 +142,6 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
 
 def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
                session):
-    
     # HTML Scraper for applying all attributes for a website for better accuracy
 
     request = session.post(URL, allow_redirects=False)
@@ -213,13 +212,13 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                     attribute_dictionary = {"submit": "submit"}
                     data.update(attribute_dictionary)
 
-        for k in form_slicing:             
-            
+        for k in form_slicing:
+
             if 'action' in k:
                 action_value = k[k.find(action_start) + len(action_start):k.rfind(action_end)]
                 action = action_value
                 action = action.replace("'", "").replace('"', "")
-    
+
                 if action != '#':
 
                     if " + " in action:
@@ -230,7 +229,7 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                     elif "+" in action:
                         action = action.replace('+', '"+"')
                         action = '"' + action + '"'
-                        action = eval(action)      
+                        action = eval(action)
 
     if action != "" and action != "#":
         domain = urlparse(URL).netloc
@@ -274,13 +273,9 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
         action_start = 'action="'
         action_end = '" '
 
-        attribute_dictionary = ""
-
         name = ""
         value = ""
-        submit = ""
         action = ""
-        submit_value = ""
 
         for i in new_form:
 
@@ -294,7 +289,7 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                         name = j[j.find(start_name) + len(start_name):j.rfind(end_name)]
 
                     if "value" in j:
-                        value = j[j.find(submit_start) + len(submit_start):j.rfind(end_value)]
+                        value = j[j.find(start_value) + len(start_value):j.rfind(end_value)]
 
                     if name != "" and value != "":
                         attribute_dictionary = "{" + '"' + str(name) + '"' + ": " + '"' + str(value) + '"' + "}"
@@ -333,7 +328,7 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                     elif "+" in action:
                         action = action.replace('+', '"+"')
                         action = '"' + action + '"'
-                        action = eval(action)     
+                        action = eval(action)
 
         data.update(submit_dic)
         data.update(hidden_dic)
