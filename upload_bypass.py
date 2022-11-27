@@ -113,16 +113,24 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
                            location,
                            session)
 
+            elif response.status_code == 404:
+                    print("[-] Server responded with 404!")  
+                    sys.exit(1)
+
             else:
                 # Digest Authentication
                 response = requests.get(URL, auth=HTTPDigestAuth(username, password))
-                if response.text != "" and respose.status_code == 200 or response.text == 302:
+                if response.text != "" and response.status_code == 200 or response.text == 302:
                     print("[*] Authentication worked!")
                     save_cookies(session, "cookies.txt")
                     load_cookies(session, "cookies.txt")
                     attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
                                location,
                                session)
+
+                elif response.status_code == 404:
+                    print("[-] Server responded with 404!")
+                    sys.exit(1)
 
                 else:
                     print("[-] Username or password is incorrect!")
@@ -134,25 +142,33 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
 
 def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
                session):
+    
     # HTML Scraper for applying all attributes for a website for better accuracy
 
-    request = session.post(URL)
+    request = session.post(URL, allow_redirects=False)
     response = request.text
     soup = bs.BeautifulSoup(response, "html.parser")
     slicing = soup.find_all("input")
     slicing = str(slicing).replace("[", "").replace("]", "")
     slicing = slicing.split(", ")
+
+    form_slicing = soup.find_all("form")
+    form_slicing = str(form_slicing).replace("[", "").replace("]", "")
+    form_slicing = form_slicing.split(" ")
+
     data = {}
     file_attr = ""
     form_check = ""
-
     start_name = 'name="'
     end_name = '"'
     start_value = 'value="'
     end_value = '"'
+    action_start = 'action="'
+    action_end = '" '
 
     name = ""
     value = ""
+    action = ""
 
     for i in slicing:
 
@@ -197,22 +213,47 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                     attribute_dictionary = {"submit": "submit"}
                     data.update(attribute_dictionary)
 
+        for k in form_slicing:             
+            
+            if 'action' in k:
+                action_value = k[k.find(action_start) + len(action_start):k.rfind(action_end)]
+                action = action_value
+                action = action.replace("'", "").replace('"', "")
+    
+                if action != '#':
+
+                    if " + " in action:
+                        action = action.replace(' + ', '" + "')
+                        action = '"' + action + '"'
+                        action = eval(action)
+
+                    elif "+" in action:
+                        action = action.replace('+', '"+"')
+                        action = '"' + action + '"'
+                        action = eval(action)      
+
+    if action != "" and action != "#":
+        domain = urlparse(URL).netloc
+
+        if 'http://' in URL:
+            URL = "http://" + domain + action
+        else:
+            URL = "https://" + domain + action
+
     if data != {}:
         file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
                        session, file_attr, data)
+
     # Form scraper inside javascript tags
     elif data == {}:
-
-        request = requests.get(URL)
+        request = session.get(URL)
         response = request.text
-
         soup = bs.BeautifulSoup(response, "html.parser")
         form = soup.find('script')
 
         temp = str(form)
         new_form = temp.split("<")
         form_check = str(new_form)
-
     if '/form' in form_check:
 
         hidden_dic = {}
@@ -282,20 +323,22 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                 action = action_value
                 action = action.replace("'", "").replace('"', "")
 
-                if " + " in action:
-                    action = action.replace(' + ', '" + "')
-                    action = '"' + action + '"'
-                    action = eval(action)
+                if action != '#':
 
-                elif "+" in action:
-                    action = action.replace('+', '"+"')
-                    action = '"' + action + '"'
-                    action = eval(action)     
+                    if " + " in action:
+                        action = action.replace(' + ', '" + "')
+                        action = '"' + action + '"'
+                        action = eval(action)
+
+                    elif "+" in action:
+                        action = action.replace('+', '"+"')
+                        action = '"' + action + '"'
+                        action = eval(action)     
 
         data.update(submit_dic)
         data.update(hidden_dic)
 
-        if action != "":
+        if action != "" and action != "#":
             domain = urlparse(URL).netloc
 
             if 'http://' in URL:
