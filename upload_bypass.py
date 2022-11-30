@@ -67,7 +67,7 @@ def load_cookies(session, filename):
 def success(success, response, url, filename_ext, counter, brute_force, location, session, headers, proxies, tls):
     if success in response.text:
 
-        print(termcolor.colored(f"[+] try {counter} with: {filename_ext}", 'green'))
+        print(termcolor.colored(f"[+] Try {counter} with: {filename_ext}", 'green'))
 
         if location != 'optional':
 
@@ -704,9 +704,9 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
             if verbosity:
                 print(response.text)
 
-            if success in response.text:
+            if SUCCESS in response.text:
 
-                print(termcolor.colored(f"[+] try {counter} with: {wordlist}", 'green'))
+                print(termcolor.colored(f"[+] Try {counter} with: {wordlist}", 'green'))
 
                 if location != 'optional':
 
@@ -771,10 +771,10 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                     else:
                         sys.exit(1)
             else:
-                print(termcolor.colored(f"[-] Try {counter} with: {filename_ext}", 'red'))
+                print(termcolor.colored(f"[-] Try {counter} with: {wordlist}", 'red'))
 
     print(termcolor.colored("If everything fails, check if you need to login first and supply username and password!",
-                            'red'))
+                            'blue'))
 
 
 def main():
