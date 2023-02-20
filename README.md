@@ -32,7 +32,7 @@ Options:
       
    -a , --allowed
    
-     Provide allowed extensions to be uploaded, for example: php,asp,jsp,perl
+     Provide allowed extensions to be uploaded, for example: jpeg,png
   
   -H , --header 
        
