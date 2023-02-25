@@ -1,6 +1,7 @@
 requests==2.28.1
 urllib3==1.26.13
 jsonlib==1.6.1
+requests-html==0.10.0
 bs4==0.0.1
 pickle5==0.0.12
 beautifulsoup4==4.11.2
