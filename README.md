@@ -12,6 +12,17 @@
 #### Developed by Sagiv
 ![2023-06-26_16h08_23](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/aa95a6e1-b0ca-4aa0-8711-c3baddf6a073)
 
+## Disclaimer
+
+**Please note that the use of Upload_Bypass and any actions taken with it are solely at your own risk. The tool is provided for educational and testing purposes only. The developer of Upload_Bypass is not responsible for any misuse, damage, or illegal activities caused by its usage.**
+
+While Upload_Bypass aims to assist Pentesters and Bug Hunters in testing file upload mechanisms, it is essential to obtain proper authorization and adhere to applicable laws and regulations before performing any security assessments. Always ensure that you have the necessary permissions from the relevant stakeholders before conducting any testing activities.
+
+The results and findings obtained from using Upload_Bypass should be communicated responsibly and in accordance with established disclosure processes. It is crucial to respect the privacy and integrity of the tested systems and refrain from causing harm or disruption.
+
+By using Upload_Bypass, you acknowledge that the developer cannot be held liable for any consequences resulting from its use. Use the tool responsibly and ethically to promote the security and integrity of web applications.
+
+
 # Features 
     1. Webshell mode:
        The tool will try to upload a Webshell with a random name, and if the user specifies the location of the uploaded file, the tool enters an "Interactive shell".
