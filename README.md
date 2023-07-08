@@ -2,7 +2,7 @@
 ## Python Tool for bypassing upload restriction by different bug bounty techniques covered in Hacktricks website
 ### Developed by: Sagiv
 
-![2023-06-26_16h08_23](https://github.com/ClearGate-Int/Upload_Bypass/assets/129657113/84200647-f460-4e8e-93fa-ab188cfd89d1)
+![2023-06-26_16h08_23](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/aa95a6e1-b0ca-4aa0-8711-c3baddf6a073)
 
 
 # Features 
@@ -27,7 +27,7 @@ Before saving the Burp file, replace the file content with the string \*content\
 
 How a request should look before the changes:
 
-![2023-06-26_15h42_14](https://github.com/ClearGate-Int/Upload_Bypass/assets/129657113/e1656e1a-9920-4dec-ad1c-c8c7f62b40b3)
+![2023-06-26_15h42_52](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/a4732cd8-1e51-4cc8-b542-b0bee01f2e58)
 
 How it should look after the changes:
 
