@@ -24,12 +24,12 @@ By using Upload_Bypass, you acknowledge that the developer cannot be held liable
 
 
 # Features 
-    1. Webshell mode:
+1. Webshell mode:
        The tool will try to upload a Webshell with a random name, and if the user specifies the location of the uploaded file, the tool enters an "Interactive shell".
-    2. Eicar mode:
+2. Eicar mode:
        The tool will try to upload an Eicar(Anti-Malware test file) instead of a Webshell, and if the user specifies the location of the uploaded file, the tool will check if the file 
        uploaded successfully and exists in the system in order to determine if an Anti-Malware is present on the system. 
-    3. A directory with the name of the tested host will be created in the Tool's directory upon success, with the results saved in Excel and Text files.
+3. A directory with the name of the tested host will be created in the Tool's directory upon success, with the results saved in Excel and Text files.
   
 # Installation:
 
