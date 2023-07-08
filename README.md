@@ -1,10 +1,16 @@
-# About
-## Python Tool for bypassing upload restriction by different bug bounty techniques
-### The tool is designed to assist Pentesters and Bug Hunters in testing file upload mechanisms. It simplifies the process of identifying and exploiting vulnerabilities, ensuring thorough assessments of web applications.
-### Developed by: Sagiv
+# Upload_Bypass
 
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
+**Upload_Bypass** is a powerful tool designed to assist Pentesters and Bug Hunters in testing file upload mechanisms. It leverages various bug bounty techniques to simplify the process of identifying and exploiting vulnerabilities, ensuring thorough assessments of web applications.
+
+- Simplifies the identification and exploitation of vulnerabilities in file upload mechanisms.
+- Leverages bug bounty techniques to maximize testing effectiveness.
+- Enables thorough assessments of web applications.
+- Provides an intuitive and user-friendly interface.
+- Enhances security assessments and helps protect critical systems.
+#### Developed by Sagiv
 ![2023-06-26_16h08_23](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/aa95a6e1-b0ca-4aa0-8711-c3baddf6a073)
-
 
 # Features 
     1. Webshell mode:
