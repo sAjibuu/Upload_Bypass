@@ -1,5 +1,6 @@
 # About
-## Python Tool for bypassing upload restriction by different bug bounty techniques covered in Hacktricks website
+## Python Tool for bypassing upload restriction by different bug bounty techniques
+### The tool is designed to assist Pentesters and Bug Hunters in testing file upload mechanisms. It simplifies the process of identifying and exploiting vulnerabilities, ensuring thorough assessments of web applications.
 ### Developed by: Sagiv
 
 ![2023-06-26_16h08_23](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/aa95a6e1-b0ca-4aa0-8711-c3baddf6a073)
