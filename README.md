@@ -30,11 +30,19 @@ By using Upload_Bypass, you acknowledge that the developer cannot be held liable
        The tool will try to upload an Eicar(Anti-Malware test file) instead of a Webshell, and if the user specifies the location of the uploaded file, the tool will check if the file 
        uploaded successfully and exists in the system in order to determine if an Anti-Malware is present on the system. 
 3. A directory with the name of the tested host will be created in the Tool's directory upon success, with the results saved in Excel and Text files.
-  
+
+# Download:
+  Download the latest version from Releases page.
+
 # Installation:
 
     pip install -r requirements.txt
+
+# Limitations: 
+  The tool will not function properly if the file upload mechanism includes CAPTCHA implementation.
   
+  Perhaps in the future the tool will include an OCR.
+
 # Usage:
 
 ## ***Attension***
@@ -45,7 +53,7 @@ Before saving the Burp file, replace the file content with the string \*content\
 
 How a request should look before the changes:
 
-![2023-06-26_15h42_14](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/77161ab2-848a-4a90-8821-6ae063150e49)
+![2023-06-26_15h42_14](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/acfbe9bc-16d3-4960-884a-e6706317dbbd)
 
 How it should look after the changes:
 
