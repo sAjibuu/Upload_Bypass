@@ -9,8 +9,8 @@
 - Enables thorough assessments of web applications.
 - Provides an intuitive and user-friendly interface.
 - Enhances security assessments and helps protect critical systems.
-#### PoC Video:
-<a href="https://www.youtube.com/watch?v=MqVAABLNAa8&ab_channel=SagivMichael" target="_blank" rel="noopener noreferrer">Click me to redirect to the video</a>
+#### New PoC Video:
+<a href="https://www.youtube.com/watch?v=MqVAABLNAa8&ab_channel=SagivMichael" target="_blank" rel="noopener noreferrer">Click me to be redirected to the video</a>
 
 #### Developed by Sagiv
 ![Untitled video - Made with Clipchamp (3)](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/6d5c5f2e-2cb0-42cd-bfcf-d8eceeff5054)
