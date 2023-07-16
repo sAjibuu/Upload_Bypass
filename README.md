@@ -9,9 +9,11 @@
 - Enables thorough assessments of web applications.
 - Provides an intuitive and user-friendly interface.
 - Enhances security assessments and helps protect critical systems.
-#### Developed by Sagiv
-![2023-06-26_16h08_23](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/aa95a6e1-b0ca-4aa0-8711-c3baddf6a073)
+#### PoC Video:
+<a href="https://www.youtube.com/watch?v=MqVAABLNAa8&ab_channel=SagivMichael" target="_blank" rel="noopener noreferrer">Click me to redirect to the video</a>
 
+#### Developed by Sagiv
+![Untitled video - Made with Clipchamp (3)](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/6d5c5f2e-2cb0-42cd-bfcf-d8eceeff5054)
 ## Disclaimer
 
 **Please note that the use of Upload_Bypass and any actions taken with it are solely at your own risk. The tool is provided for educational and testing purposes only. The developer of Upload_Bypass is not responsible for any misuse, damage, or illegal activities caused by its usage.**
