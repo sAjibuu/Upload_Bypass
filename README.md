@@ -1,4 +1,4 @@
-# Upload_Bypass v2.0.0
+# Upload_Bypass v2
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
