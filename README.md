@@ -113,10 +113,10 @@ Options:
       Channel the HTTP requests via proxy client (i.e Burp Suite).
       Usage: -p / --proxy http://127.0.0.1:8080
       
-   -S, --ssl 
+   -S, --insecure
   
       If set, the tool will not validate TLS/SSL certificate.
-      Usage: -S / --ssl
+      Usage: -S / --insecure
       
    -c, --continue  
   
@@ -152,4 +152,4 @@ Options:
   ### Running the tool with Webshell mode along with a verbose output     
      python upload_bypass.py -b ~/Desktop/burp_output -s 'file upload successfully!' -e asp -a zip -v
   ### Running the tool with a Proxy client   
-     python upload_bypass.py -b ~/Desktop/burp_output -s 'file upload successfully!' -e jsp -a png -v --proxy http://127.0.0.1:8080
+     python upload_bypass.py -b ~/Desktop/burp_output -s 'file upload successfully!' -e jsp -a png -v --proxy http://127.0.0.1:8080 --insecure
