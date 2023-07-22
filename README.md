@@ -34,7 +34,7 @@ By using Upload_Bypass, you acknowledge that the developer cannot be held liable
 3. A directory with the name of the tested host will be created in the Tool's directory upon success, with the results saved in Excel and Text files.
 
 # Download:
-  Download the latest version from Releases page.
+  Download the latest version from the Releases page.
 
 # Installation:
 
@@ -95,9 +95,14 @@ Options:
         
    -l WEBSHELL_LOCATION, --location WEBSHELL_LOCATION 
   
-      Provide a remote path where the WebShell will be uploaded (won't work if the file will be uploaded with a UUID).
-      Usage: -l / --location /uploads/  
+      Provide a state file from which to resume a partially complete scan.
+      Usage: --resume example.com_state.json
 
+   --resume RESUME_STATE
+  
+      Provide an output directory (not a file) to save the results in - Default is the current directory.
+      Usage: -o / --output ~/Desktop/example.com
+      
    -o OUTPUT_DIRECTORY, --output OUTPUT_DIRECTORY 
   
       Provide an output directory (not a file) to save the results in - Default is the current directory.
@@ -110,7 +115,7 @@ Options:
         
    -p PROXY_NUM, --proxy PROXY_NUM
   
-      Channel the HTTP requests via proxy client (i.e Burp Suite).
+      Channel the HTTP requests via a proxy client (i.e Burp Suite).
       Usage: -p / --proxy http://127.0.0.1:8080
       
    -S, --insecure
@@ -135,7 +140,7 @@ Options:
       
   -r, --response
   
-      If set, HTTP response will be printed on the screen
+      If set, the HTTP response will be printed on the screen
       Usage: -r / --response
 
   --version  
