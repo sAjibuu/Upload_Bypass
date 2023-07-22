@@ -97,7 +97,12 @@ Options:
   
       Provide a remote path where the WebShell will be uploaded (won't work if the file will be uploaded with a UUID).
       Usage: -l / --location /uploads/  
-        
+
+   -o OUTPUT_DIRECTORY, --output OUTPUT_DIRECTORY 
+  
+      Provide an output directory (not a file) to save the results in - Default is the current directory.
+      Usage: -o / --output ~/Desktop/example.com
+      
    -rl NUMBER, --rate-limit NUMBER
   
       Set rate-limiting with milliseconds between each request.
