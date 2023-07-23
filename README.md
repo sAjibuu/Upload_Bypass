@@ -100,8 +100,8 @@ Options:
 
    --resume RESUME_STATE
   
-      Provide an output directory (not a file) to save the results in - Default is the current directory.
-      Usage: -o / --output ~/Desktop/example.com
+      Provide a state file from which to resume a partially complete scan.
+      Usage: --resume example.com_state.json
       
    -o OUTPUT_DIRECTORY, --output OUTPUT_DIRECTORY 
   
