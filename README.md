@@ -41,9 +41,9 @@ By using Upload_Bypass, you acknowledge that the developer cannot be held liable
     pip install -r requirements.txt
 
 # Limitations: 
-  The tool will not function properly if the file upload mechanism includes CAPTCHA implementation.
-  
-  Perhaps in the future the tool will include an OCR.
+  The tool will not function properly with the following:
+  1. CAPTCHA implementation is in place.
+  2. A requirement for a CSRF token for each request.
 
 # Usage:
 
