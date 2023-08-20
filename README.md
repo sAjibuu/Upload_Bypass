@@ -34,7 +34,7 @@ By using Upload_Bypass, you acknowledge that the developer cannot be held liable
 3. A directory with the name of the tested host will be created in the Tool's directory upon success, with the results saved in Excel and Text files.
 
 # Download:
-  Download the latest version from the Releases page.
+  Download the latest version from the [Releases](https://github.com/sAjibuu/Upload_Bypass/releases/latest) page.
 
 # Installation:
 
