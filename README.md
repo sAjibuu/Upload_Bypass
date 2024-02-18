@@ -119,9 +119,6 @@ Resume settings:
 Update settings:
   -u, --update  Update the program to the latest version
 ```
-# Credits
-- Hacktricks - Special thanks for providing valuable techniques and insights used in this tool.  
-- Artemixer - Thank you for inspiring me with your lighter version of my tool to rewrite the entire code and make it modular!
 
 # Examples
   ### Detection mode
@@ -136,3 +133,7 @@ Update settings:
 
 # Contribution
 #### If you would like to contirute to my code, please specify exactly what you added to the code and why, and make sure you performed multiple tests.
+
+# Credits
+- Hacktricks - Special thanks for providing valuable techniques and insights used in this tool.  
+- Artemixer - Thank you for inspiring me with your lighter version of my tool to rewrite the entire code and make it modular!
