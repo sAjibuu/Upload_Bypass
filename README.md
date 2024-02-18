@@ -17,12 +17,13 @@
 - New UI for an easy view.
 - Docker file for an easy deployment.
 - Various test files provided for internal testing.
+- Debug mode. If you encounter a bug, you can save the stack trace and share it with me for further analysis.
 
 # Features 
 ### Detection Mode:
-   Suitable for real-world penetration tests or for exams, such as the OSCP (Offensive Security Professional). This mode will upload harmless files and will not attempt to exploit the target.
+   Suitable for real-world penetration tests or exams, such as the OSCP (Offensive Security Professional). This mode will upload harmless files and will not attempt to exploit the target.
 ### Exploitation Mode:
-   Suitable when you want to exploit the target and upload an interactive Web-Shell, it uploads the file with a random UUID, so it will be harder  for fuzzers to guess.    
+   Suitable when you want to exploit the target and upload an interactive Web-Shell, it uploads the file with a random UUID, so it will be harder for fuzzers to guess.    
 ### Eicar mode:
    Suitable for an Anti-Malware presence test. Upload an Eicar(Anti-Malware test file) to the system, and if the user specifies the location of the uploaded file, the tool will check if the file uploaded successfully and exists in the system in order to determine if an Anti-Malware is present on the system. 
 
@@ -129,3 +130,9 @@ Update settings:
      python upload_bypass.py -r test -s 'File uploaded successfully' -E php -D /uploads --burp --exploit
   ### Anti_Malware mode
      python upload_bypass.py -r test -s 'File uploaded successfully' -E php -D /uploads --burp --anti_malware   
+
+# Issues
+#### If you encounter an issue, please use the debug mode with a flag of 2 and share it with me. If the file you are working with is a sensitive, use flag of 1.
+
+# Contribution
+#### If you would like to contirute to my code, please specify exactly what you added to the code and why, and make sure you performed multiple tests.
