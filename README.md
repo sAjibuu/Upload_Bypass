@@ -21,9 +21,9 @@
 
 # Features 
 ### Detection Mode:
-   Suitable for real-world penetration tests or exams, such as the OSCP (Offensive Security Professional). This mode will upload harmless files and will not attempt to exploit the target.
+   Suitable for real-world penetration tests or exams, such as the OSCP (Offensive Security Certified Professional). This mode will upload harmless files and will not attempt to exploit the target.
 ### Exploitation Mode:
-   Suitable when you want to exploit the target and upload an interactive Web-Shell, it uploads the file with a random UUID, so it will be harder for fuzzers to guess.    
+   Suitable when you want to exploit the target and upload an interactive Web-Shell (If an upload directory is provided), it will upload the file with a random UUID, so it will be harder for fuzzers to guess.    
 ### Eicar mode:
    Suitable for an Anti-Malware presence test. Upload an Eicar(Anti-Malware test file) to the system, and if the user specifies the location of the uploaded file, the tool will check if the file uploaded successfully and exists in the system in order to determine if an Anti-Malware is present on the system. 
 
