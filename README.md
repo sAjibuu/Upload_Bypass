@@ -16,6 +16,7 @@
 - New state feature, you can now pause the code and resume from where you left off!
 - New UI for an easy view.
 - Docker file for an easy deployment.
+- Various test files provided for internal testing.
 
 # Features 
 ### Detection Mode:
