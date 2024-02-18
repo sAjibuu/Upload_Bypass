@@ -1,40 +1,41 @@
-# Upload_Bypass v2
+# Upload_Bypass v3
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/) ![287245591-b1f3cdd6-3d00-4bbb-94c1-38a9204add71](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/d654bec4-134b-4396-8a02-2480984e5aa7)
+
+# About
 
 **Upload_Bypass** is a powerful tool designed to assist Pentesters and Bug Hunters in testing file upload mechanisms. It leverages various bug bounty techniques to simplify the process of identifying and exploiting vulnerabilities, ensuring thorough assessments of web applications.
 
-- Simplifies the identification and exploitation of vulnerabilities in file upload mechanisms.
-- Leverages bug bounty techniques to maximize testing effectiveness.
-- Enables thorough assessments of web applications.
-- Provides an intuitive and user-friendly interface.
-- Enhances security assessments and helps protect critical systems.
-#### New PoC Video:
-<a href="https://www.youtube.com/watch?v=MqVAABLNAa8&ab_channel=SagivMichael" target="_blank" rel="noopener noreferrer">Click me to be redirected to the video</a>
-
 #### Developed by Sagiv
-![Untitled video - Made with Clipchamp (3)](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/6d5c5f2e-2cb0-42cd-bfcf-d8eceeff5054)
-## Disclaimer
+![2024-02-18_20h04_06](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/46251ded-e89d-4ce6-b2a5-c229850fdf06)
 
-**Please note that the use of Upload_Bypass and any actions taken with it are solely at your own risk. The tool is provided for educational and testing purposes only. The developer of Upload_Bypass is not responsible for any misuse, damage, or illegal activities caused by its usage.**
-
-While Upload_Bypass aims to assist Pentesters and Bug Hunters in testing file upload mechanisms, it is essential to obtain proper authorization and adhere to applicable laws and regulations before performing any security assessments. Always ensure that you have the necessary permissions from the relevant stakeholders before conducting any testing activities.
-
-The results and findings obtained from using Upload_Bypass should be communicated responsibly and in accordance with established disclosure processes. It is crucial to respect the privacy and integrity of the tested systems and refrain from causing harm or disruption.
-
-By using Upload_Bypass, you acknowledge that the developer cannot be held liable for any consequences resulting from its use. Use the tool responsibly and ethically to promote the security and integrity of web applications.
-
+### 🚀 Updates
+- The code was almost written from scratch, which now utilizes better file parsing and eliminates most of the bugs.
+- Modular code! Now you can contribute to the code and add your own modules.
+- Introducing 3 different modes, detection, exploitation and anti_malware check, choose your weapon!
+- New state feature, you can now pause the code and resume from where you left off!
+- New UI for an easy view.
+- Docker file for an easy deployment.
 
 # Features 
-1. Webshell mode:
-       The tool will try to upload a Webshell with a random name, and if the user specifies the location of the uploaded file, the tool enters an "Interactive shell".
-2. Eicar mode:
-       The tool will try to upload an Eicar(Anti-Malware test file) instead of a Webshell, and if the user specifies the location of the uploaded file, the tool will check if the file 
-       uploaded successfully and exists in the system in order to determine if an Anti-Malware is present on the system. 
-3. A directory with the name of the tested host will be created in the Tool's directory upon success, with the results saved in Excel and Text files.
+### Detection Mode:
+   Suitable for real-world penetration tests or for exams, such as the OSCP (Offensive Security Professional). This mode will upload harmless files and will not attempt to exploit the target.
+### Exploitation Mode:
+   Suitable when you want to exploit the target and upload an interactive Web-Shell, it uploads the file with a random UUID, so it will be harder  for fuzzers to guess.    
+### Eicar mode:
+   Suitable for an Anti-Malware presence test. Upload an Eicar(Anti-Malware test file) to the system, and if the user specifies the location of the uploaded file, the tool will check if the file uploaded successfully and exists in the system in order to determine if an Anti-Malware is present on the system. 
+
+# Customisation
+
+###
+Check out config.py in lib directory, you can add new extensions, mimetypes, magicbytes, configure your HTTP method and etc'...
+###
+To add a new module, simply add a function with your desired functionality to modules.py then add the function by name into the list "active_modules" in config.py
+###
+To add a new file extension, add a sample.{ext} file to assets/sample_files, then add the extension and its mimetype/magic bytes to config.py
 
 # Download:
-  Download the latest version from the [Releases](https://github.com/sAjibuu/Upload_Bypass/releases/latest) page.
+    git clone https://github.com/sAjibuu/Upload_Bypass.git
 
 # Installation:
 
@@ -45,116 +46,85 @@ By using Upload_Bypass, you acknowledge that the developer cannot be held liable
   1. CAPTCHA implementation is in place.
   2. A requirement for a CSRF token for each request.
 
+## Disclaimer
+
+**Please note that the use of Upload_Bypass and any actions taken with it are solely at your own risk. The tool is provided for educational and testing purposes only. The developer of Upload_Bypass is not responsible for any misuse, damage, or illegal activities caused by its usage.**
+
 # Usage:
 
 ## ***Attension***
 
-The Tool is compatible exclusively with output file requests generated by Burp Suite.
+The Tool is compatible exclusively with output file requests generated by Burp Suite or ZAP OWASP.
 
-Before saving the Burp file, replace the file content with the string \*content\* and filename.ext with the string \*filename\* and Content-Type header with \*mimetype\*(only if the tool is not able to recognize it automatically).
+Before saving the Burp file, replace the file content with the string \*data\* and filename.ext with the string \*filename\* and Content-Type header with \*mimetype\*.
 
-How a request should look before the changes:
+How it should look like:
 
-![2023-06-26_15h42_14](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/acfbe9bc-16d3-4960-884a-e6706317dbbd)
+![image](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/2d230bc7-38e6-4a78-a3ba-95678e15a704)
 
-How it should look after the changes:
+# User Options:
 
-![2023-06-26_15h42_52](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/a1dc86df-5914-4f88-a2f9-b514647621f7)
-
-If the tool fails to recognize the mime type automatically, you can add \*mimetype\* in the parameter's value of the Content-Type header.
+```console
 
 Options:
-  -h, --help            
-  
-     show this help message and exit
+  -h, --help     Print help (see more with '--help')
+  -v, --version  Print version
 
-  -b BURP_FILE, --burp-file BURP_FILE
-  
-     Required - Read from a Burp Suite file
-     Usage: -b / --burp-file ~/Desktop/output
-        
-  -s SUCCESS_MESSAGE, --success SUCCESS_MESSAGE
-  
-     Required if -f is not set - Provide the success message when a file is uploaded
-     Usage: -s /--success 'File uploaded successfully.'
-        
-  -f FAILURE_MESSAGE, --failure FAILURE_MESSAGE
-  
-     Required if -s is not set - Provide a failure message when a file is uploaded
-     Usage: -f /--failure 'File is not allowed!'     
-        
-  -e FILE_EXTENSION, --extension FILE_EXTENSION
-  
-     Required - Provide server backend extension
-     Usage: -e / --extension php (Supported extensions: php,asp,jsp,perl,coldfusion)
-      
-  -a ALLOWED_EXTENSIONS, --allowed ALLOWED_EXTENSIONS 
-  
-     Required - Provide allowed extensions to be uploaded
-     Usage: -a /--allowed jpeg, png, zip, etc'
-        
-   -l WEBSHELL_LOCATION, --location WEBSHELL_LOCATION 
-  
-      Provide a state file from which to resume a partially complete scan.
-      Usage: --resume example.com_state.json
+Required Arguments: 
+  -r, --request_file <REQUEST_FILE>    Provide a request file to be proccessed
+  -E, --extension    <EXTENSION>       Forbidden extension to check (ex: php)
 
-   --resume RESUME_STATE
-  
-      Provide a state file from which to resume a partially complete scan.
-      Usage: --resume example.com_state.json
-      
-   -o OUTPUT_DIRECTORY, --output OUTPUT_DIRECTORY 
-  
-      Provide an output directory (not a file) to save the results in - Default is the current directory.
-      Usage: -o / --output ~/Desktop/example.com
-      
-   -rl NUMBER, --rate-limit NUMBER
-  
-      Set rate-limiting with milliseconds between each request.
-      Usage: -r / --rate-limit 700  
-        
-   -p PROXY_NUM, --proxy PROXY_NUM
-  
-      Channel the HTTP requests via a proxy client (i.e Burp Suite).
-      Usage: -p / --proxy http://127.0.0.1:8080
-      
-   -S, --insecure
-  
-      If set, the tool will not validate TLS/SSL certificate.
-      Usage: -S / --insecure
-      
-   -c, --continue  
-  
-      If set, the brute force will continue even if one of the methods gets a hit!
-      Usage: -C /--continue  
-      
-   -E, --eicar  
-  
-      If set, an Eicar file(Anti Malware Testfile) will be uploaded only. WebShells will not be uploaded (Suitable for real environments).
-      Usage: -E / --eicar
-      
-   -v, --verbose 
-  
-      If set, details about the test will be printed on the screen
-      Usage: -v / --verbose   
-      
-  -r, --response
-  
-      If set, the HTTP response will be printed on the screen
-      Usage: -r / --response
+  Choose only one from the options below:
+  -s, --success      <MESSAGE>         Provide a failure message when a file is uploaded (ex: File was uploaded successfully)
+  -f, --failure      <MESSAGE>         Provide a failure message when a file is uploaded (ex: File is not allowed!)
+  -S, --status_code  <STATUS_CODE>     Provide a status code for a success upload (ex: 200)
 
-  --version  
+Mode Settings: 
+  -d, --detect          Upload harmless sample files (Suitable for a real penetration test)
+  -e, --exploit         Upload Web-Shells files when testing
+  -a, --anti_malware    Upload Anti-Malware Test file (Eicar) when testing
+      I.  If set with -E flag the program will test with the Eicar string along with the choosen extension
+      II. If set without the -E flag the program will test with Eicar string and a com extension
+
+Modules Settings:     
+  -l, --list            List all modules  
+  -i, --include_only <MODULES>   Include only modules to test from (ex: extension_shuffle, double_extension)
+  -x, --exclude      <MODULES>   Exclude modules (ex: svg_xxe, svg_xss)
+
+Request Settings: 
+  --base64              Encode the file data with Base64 algorithm
+  --allow_redirects     Follow redirects
+  -P, --put             Use the HTTP PUT method for the requests (Default is POST)
+  -R, --response        Print the response to the screen
+  -c, --continue        Continue testing all files, even if a few uploads encountered success
+  -rl, --rate_limit <NUMBER>  Set a rate-limit with a delay in milliseconds between each request
+
+Proxy Settings: 
+  -p, --proxy <PROXY>   Proxy to use for requests (ex: http(s)://host:port, socks5(h)://host:port)
+  -k, --insecure        Do not verify SSL certificates
+  --burp                Set --proxy to 127.0.0.1:8080 and set --insecure to false
+
+Optional Settings: 
+  -D, --upload_dir <UPLOAD_DIR>  Provide a remote path where the Web-Shell should be uploaded (ex: /uploads)
+  -o, --output  <OUTPUT_PATH>    Output file to write the results into - Default current directory (ex: ~/Desktop/results.txt)
+  --debug  <NUM>               Debug mode - Print the stack trace error to the screen and save it to a file (ex: --debug 1)
+      I.  Level 1 - Saves only the stack trace error (default).
+      II. Level 2 - Saves the stack trace error and user's arguments along with the request file.
   
-      Print the current version of the tool.     
-      
-  --update
-  
-      Checks for new updates. If there is a new update, it will be downloaded and updated automatically.     
-      
+Resume settings:
+  --resume  <STATE_FILE>  State file from which to resume a partially complete scan
+
+Update settings:
+  -u, --update  Update the program to the latest version
+```
+# Credits
+- Hacktricks - Special thanks for providing valuable techniques and insights used in this tool.  
+- Artemixer - Thank you for inspiring me with your lighter version of my tool to rewrite the entire code and make it modular!
+
 # Examples
-  ### Running the tool with Eicar and Bruteforce mode along with a verbose output     
-     python upload_bypass.py -b ~/Desktop/burp_output -s 'file upload successfully!' -e php -a jpeg --response -v --eicar --continue
-  ### Running the tool with Webshell mode along with a verbose output     
-     python upload_bypass.py -b ~/Desktop/burp_output -s 'file upload successfully!' -e asp -a zip -v
-  ### Running the tool with a Proxy client   
-     python upload_bypass.py -b ~/Desktop/burp_output -s 'file upload successfully!' -e jsp -a png -v --proxy http://127.0.0.1:8080 --insecure
+  ### Detection mode
+     python upload_bypass.py -r test -s 'File uploaded successfully' -E php -D /uploads --burp --detect
+  ### Exploitation mode
+     python upload_bypass.py -r test -s 'File uploaded successfully' -E php -D /uploads --burp --exploit
+  ### Anti_Malware mode
+     python upload_bypass.py -r test -s 'File uploaded successfully' -E php -D /uploads --burp --anti_malware   
