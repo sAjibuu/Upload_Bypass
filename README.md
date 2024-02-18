@@ -10,7 +10,7 @@
 ![2024-02-18_20h04_06](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/46251ded-e89d-4ce6-b2a5-c229850fdf06)
 
 ### 🚀 Updates
-- The code was almost written from scratch, which now utilizes better file parsing and eliminates most of the bugs.
+- The code almost written from scratch, which now utilizes better file parsing and eliminates most of the bugs.
 - Modular code! Now you can contribute to the code and add your own modules.
 - Introducing 3 different modes, detection, exploitation and anti_malware check, choose your weapon!
 - New state feature, you can now pause the code and resume from where you left off!
@@ -129,7 +129,7 @@ Update settings:
      python upload_bypass.py -r test -s 'File uploaded successfully' -E php -D /uploads --burp --anti_malware   
 
 # Issues
-#### If you encounter an issue, please use the debug mode with a flag of 2 and share it with me. If the file you are working with is a sensitive, use flag of 1.
+#### If you encounter an issue, please use the debug mode with a flag of 2 and share it with me. If the file you are working with is sensitive, use flag of 1.
 
 # Contribution
 #### If you would like to contirute to my code, please specify exactly what you added to the code and why, and make sure you performed multiple tests.
