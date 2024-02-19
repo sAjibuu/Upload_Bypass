@@ -258,6 +258,7 @@ if __name__ == "__main__":
 
         if version:
             version = get_current_version()
+            print("")
             print(version)
             sys.exit(0)
         
