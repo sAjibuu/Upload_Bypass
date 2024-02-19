@@ -42,7 +42,7 @@ def print_eicar_message(eicar_reflected, options, user_options, response, file_n
             warning("Check if the Eicar file is present on the system and didn't get deleted!")
             success(f"Eicar file uploaded successfully with: {file_name}")
 
-def check_eicar(response, file_name, current_time, url, content_type, options, allowed_extension, user_options, skip_module):
+def check_eicar(response, file_name, current_time, url, content_type, options, allowed_extension, user_options, skip_module, headers):
     is_magic_bytes = False
 
     upload_location = options.upload_dir
@@ -50,17 +50,18 @@ def check_eicar(response, file_name, current_time, url, content_type, options, a
     if upload_location != 'optional':
         parsed_url = urlparse(url)
         base_url = parsed_url.scheme + "://" + parsed_url.netloc
+        if options.upload_dir.endswith("=/"):
+            upload_location = upload_location[:-1]
         final_url = base_url + upload_location + file_name
 
         try:
             # Send the command request to the target machine and get the response
-            response = options.session.get(final_url, allow_redirects=False,
-                                           proxies=options.proxies, verify=options.verify)
+            response, _ = file_upload.send_get_request(headers, options, final_url)
+
         except SSLError:
             final_url = final_url.replace('https://', 'http://')  # Change protocol to http
             # Send the command request to the target machine and get the response
-            response = options.session.get(final_url, allow_redirects=False,
-                                           proxies=options.proxies, verify=False)
+            response, _ = file_upload.send_get_request(headers, options, final_url)
 
         eicar_file = "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
         eicar_encoded = "WDVPIVAlQEFQWzRcUFpYNTQoUF4pN0NDKTd9JEVJQ0FSLVNUQU5EQVJELUFOVElWSVJVUy1URVNULUZJTEUhJEgrSCo="
@@ -78,7 +79,7 @@ def check_eicar(response, file_name, current_time, url, content_type, options, a
         print_eicar_message(False, options, user_options, response, file_name, current_time, is_magic_bytes,
                                         skip_module, url, content_type, upload_location, allowed_extension)
 
-def eicar(response, file_name, url, content_type, options, allowed_extension, current_time, user_options, skip_module):
+def eicar(response, file_name, url, content_type, options, allowed_extension, current_time, user_options, skip_module, headers):
     # Initialize variable
     response_status = ""
 
@@ -86,7 +87,7 @@ def eicar(response, file_name, url, content_type, options, allowed_extension, cu
         # Check if response is match the status code in message
         if options.text_or_code == response.status_code:  # If status code is equals to the status code of the response
             check_eicar(response, file_name, current_time, url, content_type, options, allowed_extension, user_options,
-                        skip_module)
+                        skip_module, headers)
             response_status = "success"
         else:
             response_status = "fail"
@@ -95,7 +96,7 @@ def eicar(response, file_name, url, content_type, options, allowed_extension, cu
 
         if options.upload_message in response.text:  # If success text is present in the response body
             check_eicar(response, file_name, current_time, url, content_type, options, allowed_extension, user_options,
-                        skip_module)
+                        skip_module, headers)
             response_status = "success"
         else:
             response_status = "fail"
@@ -103,7 +104,7 @@ def eicar(response, file_name, url, content_type, options, allowed_extension, cu
     elif options.text_or_code == 'failure_message':
         if options.upload_message not in response.text:  # If success text is present in the response body
             check_eicar(response, file_name, current_time, url, content_type, options, allowed_extension, user_options,
-                        skip_module)
+                        skip_module, headers)
             response_status = "success"
         else:
             response_status = "fail"
