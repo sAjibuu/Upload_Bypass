@@ -18,7 +18,7 @@ def send_get_request(headers, options, url):
     keys_to_delete = []
     for key, value in headers.items():
         # Delete unnecessary headers except cookies and authorization header
-        if "Cookie" not in key or "Authorization" not in key:
+        if key != "Cookie" and key != "Authorization" and key != "Host":
             keys_to_delete.append(key)
 
     # Delete unnecessary headers
@@ -28,12 +28,12 @@ def send_get_request(headers, options, url):
     try:
         # Send the command request to the target machine and get the response
         response = options.session.get(url, allow_redirects=False,
-                                       proxies=options.proxies, verify=options.verify)
+                                       proxies=options.proxies, headers=headers, verify=options.verify)
     except SSLError:
         url = url.replace('https://', 'http://')  # Change protocol to http
 
         # Send the command request to the target machine and get the response
-        response = options.session.get(url, allow_redirects=False,
+        response = options.session.get(url, allow_redirects=False, headers=headers,
                                        proxies=options.proxies, verify=False)
 
     return response, url
@@ -302,7 +302,7 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
     if options.anti_malware:
         # Send response to Eicar function and checks if Bruteforce is active or not
         response_status = eicar_checker.eicar(response, file_name, url, content_type, options, allowed_extension,
-                                              current_time, user_options, skip_module)
+                                              current_time, user_options, skip_module, headers)
     else:
         # Send response to Success function and checks if Bruteforce is active or not
         response_status = interactive_shell.response_check(options, headers, file_name, content_type, location_url,
