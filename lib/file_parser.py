@@ -265,14 +265,11 @@ def parse_request_file(request_file, options, file_name, original_extension, mim
 
         # Replace the mimetype marker with the file's mimetype
         data = body.replace(config.mimetype_marker, mimetype)
-
-        if file_name == ".htaccess":
+        
+        try:
+            data = data.encode("latin-1")
+        except UnicodeDecodeError:
             data = data.encode("utf-8")
-        else:
-            try:
-                data = data.encode("latin-1")
-            except UnicodeDecodeError:
-                data = data.encode("utf-8")
 
         if "application/json" not in str(headers):
             data_type = "raw"
