@@ -5,7 +5,7 @@ data_marker = "*data*"
 mimetype_marker = "*mimetype*"
 
 # Configure HTTP Protocol
-protocol = 'http'
+protocol = 'https'
 
 # Configure modules name
 active_modules = [
