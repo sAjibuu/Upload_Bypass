@@ -63,7 +63,7 @@ def check_for_updates():
 
         # Check if the latest version is different from the current version
         if latest_version != current_version:
-            print('Downloading the latest version...')
+            print('\nDownloading the latest version...')
 
             # Get the URL for assets associated with the latest release
             assets_url = response.json()['assets_url']
@@ -108,10 +108,10 @@ def check_for_updates():
                                 # Extract the package contents
                                 os.system(f"unzip -q /tmp/{package_name} -d /tmp")
                                 # Sync the extracted files to the current directory
-                                os.system(f"rsync --force -a /tmp/Upload_Bypass/* ./")
+                                os.system(f"rsync --force -a /tmp/upload_bypass/* ./")
                                 # Clean up temporary files
                                 os.system(f"rm -rf /tmp/{package_name}")
-                                os.system(f"rm -rf /tmp/Upload_Bypass")
+                                os.system(f"rm -rf /tmp/upload_bypass")
 
                                 print("Download complete.")
                                 print(f"Upgraded to: {latest_version}")
