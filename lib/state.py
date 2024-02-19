@@ -7,7 +7,7 @@ import signal
 import sys
 import importlib
 import requests
-from .config import active_modules
+from .config import active_modules, dont_scan_module
 from .alerts import error, warning
 import datetime
 import argparse
@@ -138,11 +138,11 @@ def resume_state(resume_file):
 
                 leftover_modules = modules_to_test[:]
 
-            # Exclude irrelevant modules for a by the book eicar(Anti-Malware) check (According to eicar.org documentation)
-            elif options.anti_malware:
-                leftover_modules.remove("htaccess_overwrite")
-                leftover_modules.remove("svg_xss")
-                leftover_modules.remove("svg_xxe")
+            # Exclude irrelevant modules for Anti-Malware and Detection mode
+            elif options.anti_malware or options.detect:
+                for forbidden_module in dont_scan_module:
+                    if forbidden_module in leftover_modules:
+                        leftover_modules.remove(forbidden_module)
 
         for module in leftover_modules:
             getattr(modules, module)(request_file, options, allowed_extension, function_number, total_functions,
