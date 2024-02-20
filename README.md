@@ -44,14 +44,15 @@ To add a new file extension, add a sample.{ext} file to assets/sample_files, the
     pip install -r requirements.txt
 
 # Installation from a Docker Hub
-    docker pull sajibuu/upload_bypass 
+    sudo docker pull sajibuu/upload_bypass 
 
 # Installation from a local docker file
-    docker build -t upload_bypass .
+    sudo docker build -t upload_bypass .
 
 # Docker Usage
-    docker run upload_bypass -arg1 -arg2 -etc
-
+    # The docker is installed with Nano and Vim, so you can save the request file easily.
+    sudo docker run -it --entrypoint /bin/bash sajibuu/upload_bypass
+    
 # Limitations: 
   The tool will not function properly with the following:
   1. CAPTCHA implementation is in place.
