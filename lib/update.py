@@ -108,10 +108,10 @@ def check_for_updates():
                                 # Extract the package contents
                                 os.system(f"unzip -q /tmp/{package_name} -d /tmp")
                                 # Sync the extracted files to the current directory
-                                os.system(f"rsync --force -a /tmp/upload_bypass/* ./")
+                                os.system(f"rsync --force -a /tmp/Upload_Bypass/* ./")
                                 # Clean up temporary files
                                 os.system(f"rm -rf /tmp/{package_name}")
-                                os.system(f"rm -rf /tmp/upload_bypass")
+                                os.system(f"rm -rf /tmp/Upload_Bypass")
 
                                 print("Download complete.")
                                 print(f"Upgraded to: {latest_version}")
