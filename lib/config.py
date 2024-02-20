@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings('ignore')
+
 # Configure markers
 shell_path = "assets/shells/"
 filename_marker = "*filename*"
