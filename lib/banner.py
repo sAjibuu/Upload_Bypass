@@ -10,7 +10,7 @@ current_version = get_current_version()
 
 
 def banner():
-    tool_banner = rf"""\033[1m  
+    tool_banner = f"""\033[1m  
 _ _       _              _   ___                        
 | | | ___ | | ___  ___  _| | | . > _ _  ___  ___  ___ ___
 | ' || . \| |/ . \<_> |/ . | | . \| | || . \<_> |<_-<<_-<
