@@ -1,6 +1,6 @@
 # Upload_Bypass v3
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/) ![287245591-b1f3cdd6-3d00-4bbb-94c1-38a9204add71](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/d654bec4-134b-4396-8a02-2480984e5aa7)
+![GPL-3.0 License](https://img.shields.io/badge/License-GPL3.0-green.svg) ![287245591-b1f3cdd6-3d00-4bbb-94c1-38a9204add71](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/d654bec4-134b-4396-8a02-2480984e5aa7)
 
 # About
 
