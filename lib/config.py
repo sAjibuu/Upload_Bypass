@@ -1,6 +1,3 @@
-import warnings
-warnings.filterwarnings('ignore')
-
 # Configure markers
 shell_path = "assets/shells/"
 filename_marker = "*filename*"
@@ -41,7 +38,7 @@ extensions = {
 }
 
 # Anti-Malware test strings
-eicar = "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
+eicar = r"X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
 
 # Configure null bytes here
 null_bytes = [
