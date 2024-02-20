@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 from lib.update import get_current_version
+import warnings
+warnings.filterwarnings('ignore')
 
 # \033[1m is for a bold text
 # \033[0m for a reset
