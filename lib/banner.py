@@ -8,16 +8,16 @@ from lib.update import get_current_version
 
 current_version = get_current_version()
 
-
-def banner():
-    tool_banner = f"""\033[1m  
+logo = rf""" 
 _ _       _              _   ___                        
 | | | ___ | | ___  ___  _| | | . > _ _  ___  ___  ___ ___
 | ' || . \| |/ . \<_> |/ . | | . \| | || . \<_> |<_-<<_-<
 `___'|  _/|_|\___/<___|\___| |___/`_. ||  _/<___|/__//__/
-     |_|                          <___'|_|  {current_version}             
-\033[0m
+     |_|                          <___'|_|  {current_version}
+"""
 
+def banner():
+    tool_banner = f"""\033[1m{logo}\033[0m
 A Simple Tool for bypassing upload restriction in web applications by Sagiv Michael.
 
 Usage: Upload Bypass [OPTIONS]
