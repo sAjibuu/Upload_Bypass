@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 from lib.update import get_current_version
-import warnings
-warnings.filterwarnings('ignore')
 
 # \033[1m is for a bold text
 # \033[0m for a reset
@@ -12,7 +10,7 @@ current_version = get_current_version()
 
 
 def banner():
-    tool_banner = f"""\033[1m  
+    tool_banner = rf"""\033[1m  
 _ _       _              _   ___                        
 | | | ___ | | ___  ___  _| | | . > _ _  ___  ___  ___ ___
 | ' || . \| |/ . \<_> |/ . | | . \| | || . \<_> |<_-<<_-<
