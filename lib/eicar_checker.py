@@ -63,7 +63,7 @@ def check_eicar(response, file_name, current_time, url, content_type, options, a
             # Send the command request to the target machine and get the response
             response, _ = file_upload.send_get_request(headers, options, final_url)
 
-        eicar_file = "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
+        eicar_file = r"X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
         eicar_encoded = "WDVPIVAlQEFQWzRcUFpYNTQoUF4pN0NDKTd9JEVJQ0FSLVNUQU5EQVJELUFOVElWSVJVUy1URVNULUZJTEUhJEgrSCo="
 
         if eicar_file in response.text or eicar_encoded in response.text:
