@@ -104,6 +104,9 @@ def parse_headers(options, request):
 
         # Extract the host value from the 'Host' header
         host = [line.split(': ')[1] for line in lines if line.startswith('Host')][0].split()[0]
+        
+        # Just in case the user choose -A / --allowed flag
+        options.host = host
 
         # Extract the path from the first line of the request
         path = lines[0].split(' ')[1]
@@ -113,6 +116,9 @@ def parse_headers(options, request):
 
         # Construct the URL from the extracted components
         url = f'{protocol}://{host}{path}'
+
+        # Just in case the user choose -A / --allowed flag
+        options.url = url
 
         keys_to_delete = []
         for key, value in headers.items():

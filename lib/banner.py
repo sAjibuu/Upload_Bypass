@@ -29,6 +29,7 @@ Usage: Upload Bypass [OPTIONS]
 \033[1m\033[4mRequired Arguments:\033[0m 
   \033[1m-r, --request_file\033[0m <REQUEST_FILE>    Provide a request file to be proccessed
   \033[1m-E, --extension\033[0m    <EXTENSION>       Forbidden extension to check (ex: php)
+  \033[1m-A, --allowed\033[0m      <EXTENSION>       Allowed extension (ex: jpeg) - \033[1mOptional\033[0m - if not set the program will auto-detect the extension
 
   \033[1mChoose only one from the options below\033[0m:
   \033[1m-s, --success\033[0m      <MESSAGE>         Provide a failure message when a file is uploaded (ex: File was uploaded successfully)
@@ -64,7 +65,7 @@ Usage: Upload Bypass [OPTIONS]
 \033[1m\033[4mOptional Settings:\033[0m 
   \033[1m-D, --upload_dir\033[0m <UPLOAD_DIR>  Provide a remote path where the Web-Shell should be uploaded (ex: /uploads)
   \033[1m-o, --output\033[0m  <OUTPUT_PATH>    Output file to write the results into - Default current directory (ex: ~/Desktop/results.txt)
-  \033[1m--debug\033[0m  <NUM>               Debug mode - Print the stack trace error to the screen and save it to a file (ex: --debug 1)
+  \033[1m--debug\033[0m  <NUM>                 Debug mode - Print the stack trace error to the screen and save it to a file (ex: --debug 1)
       \033[1mI.\033[0m  Level 1 - Saves only the stack trace error (default).
       \033[1mII.\033[0m Level 2 - Saves the stack trace error and user's arguments along with the request file.
   

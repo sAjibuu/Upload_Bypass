@@ -51,6 +51,7 @@ class Upload_Bypass:
         self.file_extension = user_options.file_extension
         self.upload_dir = user_options.upload_dir
         self.burp = user_options.burp
+        self.allowed_extension = options.allowed_extension
         self.session = requests.Session()
         self.upload_message = ""
         self.message = ""
@@ -74,6 +75,7 @@ class Upload_Bypass:
         parser.add_argument('-e', "--exploit", action="store_true", required=False, dest="exploitation")
         parser.add_argument('-a', "--anti_malware", action="store_true", required=False, dest="anti_malware")
         parser.add_argument('-E', "--extension", type=str, default='not_set', dest="file_extension")
+        parser.add_argument('-A', "--allowed", type=str, default='not_set', dest="allowed_extension")
         parser.add_argument('-D', "--upload_dir", type=str, dest="upload_dir", required=False, default="optional")
         parser.add_argument('-o', "--output", type=str, dest="output_dir", required=False, default=False)
         parser.add_argument('-rl', "--rate_limit", type=int, dest="rateLimit", required=False, default=0)
@@ -90,7 +92,7 @@ class Upload_Bypass:
         parser.add_argument('--debug', type=int, default=False, required=False, dest="debug")
         parser.add_argument('--base64', action="store_true", required=False, dest="base64")
         parser.add_argument('--burp', action="store_true", required=False, dest="burp")
-        parser.add_argument("--status_code", type=int, required=False, dest="status_code", default=200)
+        parser.add_argument("-S, --status_code", type=int, required=False, dest="status_code", default=200)
         parser.add_argument("--allow_redirects", action="store_true", required=False, dest="allow_redirects")
         parser.add_argument("--version", action="store_true", dest="version")
         parser.add_argument('-u', '--update', action="store_true", dest="update")
@@ -195,12 +197,17 @@ class Upload_Bypass:
 
                 alerts.info("Detecting a permitted extension automatically...")
                 time.sleep(2)
-
-                # Determine which extension is permitted to be uploaded to the system
-                allowed_extension = format_detector.parse_request_file(self.request_file, self.session, self.options)
-                allowed_extension = "".join(allowed_extension)
-                if allowed_extension == "":
-                    alerts.error("Couldn't determine allowed extension to be uploaded, try to add more allowed extensions to config.py.")
+                
+                if allowed_extension != 'not_set':
+                    allowed_extension = self.allowed_extension
+                    if allowed_extension.startswith("."):
+                        allowed_extension = allowed_extension.replace(".", "")
+                else:
+                    # Determine which extension is permitted to be uploaded to the system
+                    allowed_extension = format_detector.parse_request_file(self.request_file, self.session, self.options)
+                    allowed_extension = "".join(allowed_extension)
+                    if allowed_extension == "":
+                        alerts.error("Couldn't determine allowed extension to be uploaded, try to add more allowed extensions to config.py.")
                 
                 # Include or Exclude modules
                 all_modules = config.active_modules
