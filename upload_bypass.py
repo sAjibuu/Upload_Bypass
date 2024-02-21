@@ -197,7 +197,8 @@ class Upload_Bypass:
 
                 alerts.info("Detecting a permitted extension automatically...")
                 time.sleep(2)
-                
+
+                allowed_extension = self.allowed_extension
                 if allowed_extension != 'not_set':
                     allowed_extension = self.allowed_extension
                     if allowed_extension.startswith("."):
