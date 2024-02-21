@@ -53,7 +53,7 @@ Usage: Upload Bypass [OPTIONS]
   \033[1m-P, --put\033[0m             Use the HTTP PUT method for the requests (Default is POST)
   \033[1m-R, --response\033[0m        Print the response to the screen
   \033[1m-c, --continue\033[0m        Continue testing all files, even if a few uploads encountered success
-  \033[1m-t, --time_out\033[0m <NUM>  Set the request timeout
+  \033[1m-t, --time_out\033[0m <NUM>  Set the request timeout (Default is 8)
   \033[1m-rl, --rate_limit\033[0m <NUMBER>  Set a rate-limit with a delay in milliseconds between each request
 
 \033[1m\033[4mProxy Settings:\033[0m 
