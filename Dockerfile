@@ -1,7 +1,7 @@
-FROM python:3.8-alpine
+FROM python:latest
+RUN apt-get update && apt-get install -y nano vim wget
 WORKDIR /opt
 COPY . /opt/upload_bypass
 WORKDIR /opt/upload_bypass
-RUN apk add gcc musl-dev
 RUN python3 -m pip install -r requirements.txt
 ENTRYPOINT ["python3","upload_bypass.py"]
