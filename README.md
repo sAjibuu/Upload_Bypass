@@ -78,6 +78,8 @@ How it should look like:
 
 ```console
 
+Usage: Upload Bypass [OPTIONS]
+
 Options:
   -h, --help     Print help (see more with '--help')
   -v, --version  Print version
@@ -85,6 +87,7 @@ Options:
 Required Arguments: 
   -r, --request_file <REQUEST_FILE>    Provide a request file to be proccessed
   -E, --extension    <EXTENSION>       Forbidden extension to check (ex: php)
+  -A, --allowed      <EXTENSION>       Allowed extension (ex: jpeg) - Optional - if not set the program will auto-detect the extension
 
   Choose only one from the options below:
   -s, --success      <MESSAGE>         Provide a failure message when a file is uploaded (ex: File was uploaded successfully)
@@ -109,6 +112,7 @@ Request Settings:
   -P, --put             Use the HTTP PUT method for the requests (Default is POST)
   -R, --response        Print the response to the screen
   -c, --continue        Continue testing all files, even if a few uploads encountered success
+  -t, --time_out <NUM>  Set the request timeout (Default is 8)
   -rl, --rate_limit <NUMBER>  Set a rate-limit with a delay in milliseconds between each request
 
 Proxy Settings: 
@@ -119,7 +123,7 @@ Proxy Settings:
 Optional Settings: 
   -D, --upload_dir <UPLOAD_DIR>  Provide a remote path where the Web-Shell should be uploaded (ex: /uploads)
   -o, --output  <OUTPUT_PATH>    Output file to write the results into - Default current directory (ex: ~/Desktop/results.txt)
-  --debug  <NUM>               Debug mode - Print the stack trace error to the screen and save it to a file (ex: --debug 1)
+  --debug  <NUM>                 Debug mode - Print the stack trace error to the screen and save it to a file (ex: --debug 1)
       I.  Level 1 - Saves only the stack trace error (default).
       II. Level 2 - Saves the stack trace error and user's arguments along with the request file.
   
