@@ -4,7 +4,7 @@
 
 # About
 
-**Upload Bypass** is a simple tool designed to assist Pentesters and Bug Hunters in testing file upload mechanisms. It leverages various bug bounty techniques to simplify the process of identifying and exploiting vulnerabilities, ensuring thorough assessments of web applications.
+**Upload Bypass** is a simple tool designed to assist penetration testers and bug hunters in testing file upload mechanisms. It leverages various bug bounty techniques to simplify the process of identifying and exploiting vulnerabilities, ensuring thorough assessments of web applications.
 
 #### Developed by Sagiv
 ![2024-02-18_20h04_06](https://github.com/sAjibuu/Upload_Bypass/assets/81802295/46251ded-e89d-4ce6-b2a5-c229850fdf06)
