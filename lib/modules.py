@@ -340,7 +340,7 @@ def htaccess_overwrite(request_file, options, allowed_extension, function_number
             warning(f"Trying to upload {file_name}")
             time.sleep(1.5)
             _, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
-                                                          magic_bytes, allowed_extension, mimetype, overall_progress)
+                                                          magic_bytes, allowed_extension, mimetype, module, overall_progress)
 
 
 def svg_xxe(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None,
