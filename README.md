@@ -19,6 +19,9 @@
 - Various test files provided for internal testing.
 - Debug mode. If you encounter a bug, you can save the stack trace and share it with me for further analysis.
 
+### Attension
+This tool is restricted in the OSCP exam!
+
 # Features 
 ### Detection Mode:
    Suitable for real-world penetration tests. This mode will upload harmless files and will not attempt to exploit the target.
