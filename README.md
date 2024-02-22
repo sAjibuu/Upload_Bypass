@@ -21,7 +21,7 @@
 
 # Features 
 ### Detection Mode:
-   Suitable for real-world penetration tests or exams, such as the OSCP (Offensive Security Certified Professional). This mode will upload harmless files and will not attempt to exploit the target.
+   Suitable for real-world penetration tests. This mode will upload harmless files and will not attempt to exploit the target.
 ### Exploitation Mode:
    Suitable when you want to exploit the target and upload an interactive Web-Shell (If an upload directory is provided), it will upload the file with a random UUID, so it will be harder for fuzzers to guess.    
 ### Anti-Malware mode:
