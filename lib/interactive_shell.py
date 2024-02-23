@@ -69,7 +69,7 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                 else:
                     alerts.warning("To exit interactive shell type exit or press CTRL + C")
                 filename = file_name.decode("ascii")
-                partial_url = urljoin(options.url, upload_dir)
+                partial_url = urljoin(options.url, options.upload_dir)
                 if parameter_exists:
                     final_url = f"{partial_url}{filename}&cmd=whoami"
                 else:
