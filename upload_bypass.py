@@ -84,7 +84,7 @@ class Upload_Bypass:
         parser.add_argument('-x', "--exclude", type=str, dest="exclude_modules", required=False, default=False)
         parser.add_argument('-p', "--proxy", type=str, dest="proxy", required=False, default="optional")
         parser.add_argument('-k', "--insecure", action="store_true", dest="insecure", required=False)
-        parser.add_argument('-c', "--continue", action="store_true", required=False, dest="bruteForce")
+        parser.add_argument('-c', "--continue", action="store_true", required=False, dest="brute_force")
         parser.add_argument('-R', "--response", action="store_true", required=False, dest="response")
         parser.add_argument('-t', "--time_out", type=int, default=8, required=False, dest="request_timeout")
         parser.add_argument('-P', "--put", action="store_true", required=False, dest="put_method")

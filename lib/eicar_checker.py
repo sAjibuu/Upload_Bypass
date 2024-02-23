@@ -10,7 +10,7 @@ warnings.filterwarnings("ignore")
 
 def print_eicar_message(eicar_reflected, options, user_options, response, file_name, current_time, is_magic_bytes,
                         skip_module, url, content_type, upload_location, allowed_extension):
-    if not options.bruteForce:
+    if not options.brute_force:
         # Reach 100% in the progress bar
         file_upload.printing(options, user_options, response, file_name, 100, current_time, options.current_module,
                              is_magic_bytes, options.current_mimetype)

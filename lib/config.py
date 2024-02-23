@@ -5,7 +5,7 @@ data_marker = "*data*"
 mimetype_marker = "*mimetype*"
 
 # Configure HTTP Protocol
-protocol = 'https'
+protocol = 'http'
 
 # Configure modules name
 active_modules = [
@@ -26,7 +26,7 @@ dont_scan_module = ['svg_xss', 'svg_xxe', 'htaccess_overwrite']
 # Configure extensions
 extensions = {
 
-    "allow_list": ["png", "jpg", "jpeg", "gif", "pdf", "mp3", "mp4", "txt", "csv", "svg", "xml", "xlsx"],
+    "allow_list": ["jpg", "jpeg", "png", "gif", "pdf", "mp3", "mp4", "txt", "csv", "svg", "xml", "xlsx"],
     "com": ["com"],
     "php": ["php", "php3", "phar", "phtml", "php5", "php6", "php7", "phps", "pht", "phtm", "php4", "pgif", "php2",
             "inc", "hphp", "ctp", "module"],

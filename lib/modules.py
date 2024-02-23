@@ -383,21 +383,21 @@ def svg_xxe(request_file, options, allowed_extension, function_number, total_fun
                 printing(options, user_options, response, file_name, 100, current_time, module, magic_bytes, mimetype)
                 success("XXE confirmed!")
                 info(f"URL: {final_url}")
-                if not options.bruteForce:
+                if not options.brute_force:
                     exit(1)
                 else:
                     return
             else:
                 printing(options, user_options, response, file_name, 100, current_time, module, magic_bytes, mimetype)
                 warning("Couldn't find XXE in response, you might want to check it manually.")
-                if not options.bruteForce:
+                if not options.brute_force:
                     exit(1)
                 else:
                     return
         else:
             printing(options, user_options, response, file_name, 100, current_time, module, magic_bytes, mimetype)
             warning("Manually check if the XXE is present in the uploaded path when accessed.")
-            if not options.bruteForce:
+            if not options.brute_force:
                 exit(1)
             else:
                 return
@@ -446,21 +446,21 @@ def svg_xss(request_file, options, allowed_extension, function_number, total_fun
 
                 success("XSS is reflected and confirmed!")
                 info(f"URL: {final_url}")
-                if not options.bruteForce:
+                if not options.brute_force:
                     exit(1)
                 else:
                     return
             else:
                 printing(options, user_options, response, file_name, 100, current_time, module, magic_bytes, mimetype)
                 warning("Couldn't find XSS in response, you might want to check it manually.")
-                if not options.bruteForce:
+                if not options.brute_force:
                     exit(1)
                 else:
                     return
         else:
             printing(options, user_options, response, file_name, 100, current_time, module, magic_bytes, mimetype)
             warning("Manually check if the XSS is present in the uploaded path when accessed.")
-            if not options.bruteForce:
+            if not options.brute_force:
                 exit(1)
             else:
                 return

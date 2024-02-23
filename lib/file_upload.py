@@ -9,6 +9,7 @@ from .ansi_colors import *
 import json
 from . import config
 from . import eicar_checker
+from . import random_string
 import datetime
 from requests.exceptions import SSLError
 
@@ -274,8 +275,8 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
     if options.base64:
         user_options += f"🔢 Base64 Encode: {options.base64}\n"
 
-    if options.bruteForce:
-        user_options += f"💪 BruteForce: {options.bruteForce}\n"
+    if options.brute_force:
+        user_options += f"💪 brute_force: {options.brute_force}\n"
 
     if options.allow_redirects:
         user_options += f"🚀 Allow Redirects {options.verify}\n"
@@ -300,13 +301,22 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
     printing(options, user_options, response, file_name, overall_progress, current_time, module, magic_bytes, mimetype)
 
     if options.anti_malware:
-        # Send response to Eicar function and checks if Bruteforce is active or not
+        # Send response to Eicar function and checks if brute_force is active or not
         response_status = eicar_checker.eicar(response, file_name, url, content_type, options, allowed_extension,
                                               current_time, user_options, skip_module, headers)
     else:
-        # Send response to Success function and checks if Bruteforce is active or not
-        response_status = interactive_shell.response_check(options, headers, file_name, content_type, location_url,
-                                                           magic_bytes, allowed_extension, current_time, response,
-                                                           user_options, skip_module)
+        # Send response to Success function and checks if brute_force is active or not
+        response_status, exploit_machine = interactive_shell.response_check(options, headers, file_name, content_type, location_url, magic_bytes, allowed_extension, current_time, response, user_options, skip_module)
+        if exploit_machine:
+            options.exploitation = True
+            options.detect = False
+            split_filename = file_name.split(".", 1)
+            split_extensions = split_filename[1]
+            new_name = random_string.generate_random_string(10)
+            file_name = new_name + split_extensions
+            
+            response, headers, url, content_type = file_parser.parse_request_file(request_file, options, file_name,
+                                                                                original_extension, mimetype, module,
+                                                                                magic_bytes, file_data)
 
     return headers, response_status, response, url, content_type, current_time, user_options
