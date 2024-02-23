@@ -1,0 +1,1 @@
+<% out.print("Is this message being rendered?"); %>

