@@ -262,10 +262,10 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
 
     if options.proxy != 'optional':
         proxy = options.proxy
-        user_options += f"🕵️  Proxy: {proxy}\n"
+        user_options += f"🕵️ Proxy: {proxy}\n"
     elif options.burp:
         proxy = "http(s)://127.0.0.1:8080"
-        user_options += f"🕵️  Proxy: {proxy}\n"
+        user_options += f"🕵️ Proxy: {proxy}\n"
 
     if options.debug:
         user_options += f"🐞 Debug Mode: {options.debug}\n"
@@ -276,7 +276,7 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
         user_options += f"🔢 Base64 Encode: {options.base64}\n"
 
     if options.brute_force:
-        user_options += f"💪 brute_force: {options.brute_force}\n"
+        user_options += f"💪 Brute Force: {options.brute_force}\n"
 
     if options.allow_redirects:
         user_options += f"🚀 Allow Redirects {options.verify}\n"
