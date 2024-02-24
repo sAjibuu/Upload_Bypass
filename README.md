@@ -25,10 +25,13 @@ This tool is restricted in the OSCP exam!
 # Features 
 ### Detection Mode:
    Suitable for real-world penetration tests. This mode will upload harmless files and will not attempt to exploit the target.
+*New* - If a destination folder for the uploaded files is provided, the program will determine if the uploaded sample file is rendered.
+For example, if you chose PHP, the program will try to determine if an echo command is executed and rendered successfully, if it does, it'll suggest to enter an interactive shell.
+
 ### Exploitation Mode:
-   Suitable when you want to exploit the target and upload an interactive Web-Shell (If an upload directory is provided), it will upload the file with a random UUID, so it will be harder for fuzzers to guess.    
+   Suitable when you want to exploit the target and upload an interactive Web-shell (If a destination upload directory is provided), it will upload the file with a random UUID, so it will be harder for fuzzers to guess.    
 ### Anti-Malware mode:
-   Suitable for an Anti-Malware presence test. Upload an Eicar(Anti-Malware test file) to the system, and if the user specifies the location of the uploaded file, the tool will check if the file uploaded successfully and exists in the system in order to determine if an Anti-Malware is present on the system. 
+   Suitable for an Anti-Malware presence test. Upload an Eicar(Anti-Malware test file) to the system, and if the user specifies the location of the uploaded file, the program will check if the file uploaded successfully and exists in the system in order to determine if an Anti-Malware is present on the system. 
 
 # Customisation
 
