@@ -25,6 +25,7 @@ This tool is restricted in the OSCP exam!
 # Features 
 ### Detection Mode:
    Suitable for real-world penetration tests. This mode will upload harmless files and will not attempt to exploit the target.
+
 *New* - If a destination folder for the uploaded files is provided, the program will determine if the uploaded sample file is rendered.
 For example, if you chose PHP, the program will try to determine if an echo command is executed and rendered successfully, if it does, it'll suggest to enter an interactive shell.
 
