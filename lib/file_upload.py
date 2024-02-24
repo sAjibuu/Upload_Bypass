@@ -276,7 +276,7 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
         user_options += f"🔢 Base64 Encode: {options.base64}\n"
 
     if options.brute_force:
-        user_options += f"💪 brute_force: {options.brute_force}\n"
+        user_options += f"💪 Brute Force: {options.brute_force}\n"
 
     if options.allow_redirects:
         user_options += f"🚀 Allow Redirects {options.verify}\n"
