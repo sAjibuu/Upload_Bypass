@@ -124,10 +124,11 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
         if not options.brute_force:
             file_upload.printing(options, user_options, response, file_name.decode('latin-1'), 100, current_time,
                                  options.current_module, is_magic_bytes, options.current_mimetype)
+            web_shell(options, headers, file_name, parameter_exists)
+            return False
+        else:
+            web_shell(options, headers, file_name, parameter_exists)
             
-        web_shell(options, headers, file_name, parameter_exists)
-        return False 
-    
     else:
         
         if options.upload_dir != 'optional' and not skip_module:
@@ -200,7 +201,6 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                 results(options.url, file_name, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
                         current_time)            
                 alerts.success(f"File uploaded successfully with: {file_name}")
-                exit(1)
 
 
 # Function for response checking
