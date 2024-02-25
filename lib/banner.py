@@ -32,7 +32,7 @@ Usage: Upload Bypass [OPTIONS]
   \033[1m-A, --allowed\033[0m      <EXTENSION>       Allowed extension (ex: jpeg) - \033[1mOptional\033[0m - if not set the program will auto-detect the extension
 
   \033[1mChoose only one from the options below\033[0m:
-  \033[1m-s, --success\033[0m      <MESSAGE>         Provide a failure message when a file is uploaded (ex: File was uploaded successfully)
+  \033[1m-s, --success\033[0m      <MESSAGE>         Provide a success message when a file is uploaded (ex: File was uploaded successfully)
   \033[1m-f, --failure\033[0m      <MESSAGE>         Provide a failure message when a file is uploaded (ex: File is not allowed!)
   \033[1m-S, --status_code\033[0m  <STATUS_CODE>     Provide a status code for a success upload (ex: 200)
 
