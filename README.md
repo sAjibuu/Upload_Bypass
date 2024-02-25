@@ -97,7 +97,7 @@ Required Arguments:
   -A, --allowed      <EXTENSION>       Allowed extension (ex: jpeg) - Optional - if not set the program will auto-detect the extension
 
   Choose only one from the options below:
-  -s, --success      <MESSAGE>         Provide a failure message when a file is uploaded (ex: File was uploaded successfully)
+  -s, --success      <MESSAGE>         Provide a success message when a file is uploaded (ex: File was uploaded successfully)
   -f, --failure      <MESSAGE>         Provide a failure message when a file is uploaded (ex: File is not allowed!)
   -S, --status_code  <STATUS_CODE>     Provide a status code for a success upload (ex: 200)
 
