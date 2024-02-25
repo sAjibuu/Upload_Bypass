@@ -119,16 +119,17 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
             if 'Default Gateway' in response.text:
                 alerts.warning("Interactive shell is activated, you can enter system commands: ")
             else:
-                return
+                exploit_machine
         
         if not options.brute_force:
             file_upload.printing(options, user_options, response, file_name.decode('latin-1'), 100, current_time,
                                  options.current_module, is_magic_bytes, options.current_mimetype)
             web_shell(options, headers, file_name, parameter_exists)
-            return False
+            exit(1)
         else:
             web_shell(options, headers, file_name, parameter_exists)
-            
+            return exploit_machine
+
     else:
         
         if options.upload_dir != 'optional' and not skip_module:
@@ -155,7 +156,8 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                     exploit_answer = input(f"\n{blue}[i]{reset} Would you like to exploit the system and upload an interactive shell? y/n: ").lower()
 
                     if exploit_answer == "y" or exploit_answer == 'yes':
-
+                        
+                        exploit_machine = True
                         return True
 
                     elif exploit_answer == "n" or exploit_answer == 'no': 
@@ -169,7 +171,7 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                                         current_time)
                                 exit(1)
                         else:
-                            return False
+                            return exploit_machine
                     
                     else:
                         info("Choose either y or n!")  
@@ -183,7 +185,7 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                     exit(1)
 
                 else:
-                    return False           
+                    return exploit_machine           
         else:
             if isinstance(file_name, bytes):
                 file_name = file_name.decode('latin-1')
@@ -201,6 +203,7 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                 results(options.url, file_name, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
                         current_time)            
                 alerts.success(f"File uploaded successfully with: {file_name}")
+                return exploit_machine
 
 
 # Function for response checking
@@ -208,6 +211,7 @@ def response_check(options, headers, file_name, content_type, upload_dir, is_mag
                    response, user_options, skip_module):
     text_or_code = options.text_or_code
     response_status = ""
+    exploit_machine = False
     if str(text_or_code).isdigit():
 
         # Check if response is match the status code in message
