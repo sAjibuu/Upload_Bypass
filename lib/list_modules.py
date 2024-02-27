@@ -25,7 +25,7 @@ def list_all_modules():
     print("_" * terminal_width)
     print(f"\033[1m\nreverse_double_extension\033[0m:\n\nBack-end extension concatenated with the allowed extension (ex: filename.php.jpeg).\n{red}\033[1mWarning\033[0m{reset} - it might result with a false-positive!")
     print("_" * terminal_width)
-    print(f"\033[1m\nstripping_extension\033[0m:\n\nSevers might strip forbidden extensions, for example .php will be stripped from the filename. Therefore, The program will try to upload filename.p.phphp which results in filename.php")
+    print(f"\033[1m\nstripping_extension\033[0m:\n\nSevers might strip forbidden extensions, for example .php will be stripped from the filename. Therefore, the program will try to upload filename.p.phphp which results in filename.php")
     print("_" * terminal_width)
     print(f"\033[1m\nnull_byte_cutoff\033[0m:\n\nAdding null bytes which ultimately should cut the rest of the extension (ex: filename.php%00.jpeg the result will be filename.php).\n{red}\033[1mWarning\033[0m{reset} - it might result with a false-positive!")
     print("_" * terminal_width)
