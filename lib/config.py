@@ -11,8 +11,10 @@ protocol = 'https'
 active_modules = [
     "extension_shuffle",
     "double_extension",
+    "discrepancy",
     "forward_double_extension",
     "reverse_double_extension",
+    "stripping_extension",
     "null_byte_cutoff",
     "name_overflow_cutoff",
     "htaccess_overwrite",
@@ -22,6 +24,9 @@ active_modules = [
 
 # Modules that you do not want to scan with Anti-Malware and Detection mode
 dont_scan_module = ['svg_xss', 'svg_xxe', 'htaccess_overwrite']
+
+# Modules that you want their orginal filename and extension - Don't touch unless you know what you are doing
+original_filenames = ['stripping_extension']
 
 # Configure extensions
 extensions = {

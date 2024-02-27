@@ -190,6 +190,102 @@ def reverse_double_extension(request_file, options, allowed_extension, function_
                        internal_total_iterations, total_functions, state_extensions)
 
 
+def stripping_extension(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None,
+                     internal_total_iterations=None, leftover_extensions=None):
+    # Save module name and extensions for a state file
+    module = "stripping_extension"
+    state_extensions = []
+
+    try:
+        info("Executing Stripping Extension module.")
+        extension_to_test = options.file_extension
+
+        internal_total_iterations = len(config.extensions[extension_to_test])
+
+        internal_progress = 0
+
+        for backend_extension in config.extensions[extension_to_test]:
+            
+            # Collect extensions for a resume state
+            state_extensions.append(backend_extension)
+
+            # Calculate the progress bar according to the number of functions and iterations
+            internal_progress += 1
+            overall_progress = (function_number - 1) / total_functions * 100 + (
+                        internal_progress / internal_total_iterations) / total_functions * 100
+
+            # A state condition to remove extensions that the program already checked
+            if leftover_extensions is not None and backend_extension in leftover_extensions:
+                continue
+
+            # Send a request
+            # Ex: exploit.p.phphp will be after stripping exploit.php
+            file_extension = f".{backend_extension[0]}.{backend_extension}{backend_extension[1:]}"
+            file_name = generate_random_string(10) + file_extension
+            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+                                allowed_extension, overall_progress, backend_extension)
+
+            # Ex: exploit.pphphp will be after stripping exploit.php
+            file_extension = f".{backend_extension[0]}{backend_extension}{backend_extension[1:]}"
+            file_name = generate_random_string(10) + file_extension
+            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+                                allowed_extension, overall_progress, backend_extension)
+
+    except KeyboardInterrupt:
+        # Save the state when keyboard exception is caught
+        if len(state_extensions) > 0:
+            save_state(options, module, allowed_extension, function_number, internal_progress,
+                       internal_total_iterations, total_functions, state_extensions)
+
+def discrepancy(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None,
+                     internal_total_iterations=None, leftover_extensions=None):
+    # Save module name and extensions for a state file
+    module = "discrepancy"
+    state_extensions = []
+
+    try:
+        info("Executing Discrepancy module.")
+        extension_to_test = options.file_extension
+
+        internal_total_iterations = len(config.extensions[extension_to_test])
+
+        internal_progress = 0
+
+        for backend_extension in config.extensions[extension_to_test]:
+            
+            # Collect extensions for a resume state
+            state_extensions.append(backend_extension)
+
+            # Calculate the progress bar according to the number of functions and iterations
+            internal_progress += 1
+            overall_progress = (function_number - 1) / total_functions * 100 + (
+                        internal_progress / internal_total_iterations) / total_functions * 100
+
+            # A state condition to remove extensions that the program already checked
+            if leftover_extensions is not None and backend_extension in leftover_extensions:
+                continue
+
+            # Send a request
+            # Replacing a dot with a URL encode
+            file_extension = f".{backend_extension}"
+            file_extension = file_extension.replace(".", r"%2e")
+            file_name = generate_random_string(10) + file_extension
+            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+                                allowed_extension, overall_progress)
+
+            # Replacing a dot with a double URL encode
+            file_extension = f".{backend_extension}"
+            file_extension = file_extension.replace(".", r"%252e")
+            file_name = generate_random_string(10) + file_extension
+            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+                                allowed_extension, overall_progress)
+            
+    except KeyboardInterrupt:
+        # Save the state when keyboard exception is caught
+        if len(state_extensions) > 0:
+            save_state(options, module, allowed_extension, function_number, internal_progress,
+                       internal_total_iterations, total_functions, state_extensions)
+                           
 def null_byte_cutoff(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None,
                      internal_total_iterations=None, leftover_extensions=None):
     # Save module name and extensions for a state file

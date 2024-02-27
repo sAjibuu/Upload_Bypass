@@ -196,9 +196,6 @@ class Upload_Bypass:
                 # Define session withing the argsparse namespace, for an ease use later
                 options.session = self.session
 
-                alerts.info("Detecting a permitted extension automatically...")
-                time.sleep(2)
-
                 allowed_extension = self.allowed_extension
                 if allowed_extension != 'not_set':
                     allowed_extension = self.allowed_extension
@@ -206,6 +203,8 @@ class Upload_Bypass:
                         allowed_extension = allowed_extension.replace(".", "")
                 else:
                     # Determine which extension is permitted to be uploaded to the system
+                    alerts.info("Detecting a permitted extension automatically...")
+                    time.sleep(2)
                     allowed_extension = format_detector.parse_request_file(self.request_file, self.session, self.options)
                     allowed_extension = "".join(allowed_extension)
                     if allowed_extension == "":
