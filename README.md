@@ -64,6 +64,7 @@ To add a new file extension, add a sample.{ext} file to assets/sample_files, the
   The tool will not function properly with the following:
   1. CAPTCHA implementation is in place.
   2. A requirement for a CSRF token for each request.
+  3. A destination folder is provided for the uploaded files, but, the uploaded files are saved with a GUID (Globally Unique Identifier) instead of their actual filenames, the program won't be able to work with it.
 
 ## Disclaimer
 
