@@ -57,11 +57,12 @@ To add a new file extension, add a sample.{ext} file to assets/sample_files, the
     sudo docker build -t sajibuu/upload_bypass .
 
 # Docker Usage examples
-    ### Example without proxy:
+### Example without proxy:
     sudo docker run -v $(pwd)/request:/Upload_Bypass/{your_request_file} -it sajibuu/upload_bypass -r request -s 'file was uploaded successfully' -E php -e
 
-    ### Example with proxy:
-    **Make sure to listen to port 8080 on all interfaces**
+### Example with proxy:
+ **Make sure to listen to port 8080 on all interfaces!**
+
     sudo docker run -v $(pwd)/request:/Upload_Bypass/{your_request_file} -it sajibuu/upload_bypass -r request -s 'file was uploaded successfully' -E php -e -p http://{docker_interface_IP}:8080
 
 # Limitations: 
