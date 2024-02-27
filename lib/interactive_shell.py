@@ -78,12 +78,12 @@ def web_shell(options, headers, file_name, parameter_exists):
 def interactive_shell(options, headers, file_name, content_type, upload_dir, is_magic_bytes, allowed_extension,
                       current_time, response, user_options, skip_module, module, exploit_machine = False):
     
-    file_name = file_name.encode("latin-1")
+    file_name_to_save_in_file = file_name.encode("latin-1")
 
     if not isinstance(is_magic_bytes, bool):
         is_magic_bytes = base64.b64encode(is_magic_bytes).decode('latin-1')
 
-    if exploit_machine or options.upload_dir != 'optional' and options.exploitation:# and not skip_module:
+    if exploit_machine or options.upload_dir != 'optional' and options.exploitation and not skip_module:
         parameter_exists = False
         if options.upload_dir.endswith("=/"):
             options.upload_dir = options.upload_dir[:-1]
@@ -92,10 +92,6 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
         if "?" in options.upload_dir:
             parameter_exists = True
 
-        results(options.url, file_name, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
-        current_time)
-
-        file_name = file_name.decode("ascii")
         file_name = unquote(file_name)
 
         # Removing trailing extension
@@ -122,6 +118,8 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                                 options.current_module, is_magic_bytes, options.current_mimetype) 
             
             alerts.warning("Interactive shell is activated, you can enter system commands: ")
+            results(options.url, file_name_to_save_in_file, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
+            current_time)
             web_shell(options, headers, file_name, parameter_exists)
 
         # Validating the shell
@@ -138,7 +136,10 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                 file_upload.printing(options, user_options, response, file_name, 100, current_time,
                                     options.current_module, is_magic_bytes, options.current_mimetype) 
                 alerts.warning("Interactive shell is activated, you can enter system commands: ")
+                results(options.url, file_name_to_save_in_file, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
+                current_time)
                 web_shell(options, headers, file_name, parameter_exists)
+
             else:
                 exploit_machine
 
@@ -154,7 +155,7 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
             if "?" in options.upload_dir:
                 parameter_exists = True      
 
-            file_name = file_name.decode("ascii")
+            file_name_to_save_in_file = file_name.encode("latin-1")
             file_name = unquote(file_name)
             
             # Removing trailing extension
@@ -189,7 +190,7 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                             # Display upload successful message and location to access the file
                             alerts.success(f"File uploaded successfully with: {file_name}")
                             if not skip_module:
-                                results(options.url, file_name, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
+                                results(options.url, file_name_to_save_in_file, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
                                         current_time)
                                 exit(1)
                         else:
@@ -199,8 +200,8 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                         info("Choose either y or n!")  
      
         else:
-            if isinstance(file_name, bytes):
-                file_name = file_name.decode('latin-1')
+            
+            file_name_to_save_in_file = file_name.encode('latin-1')
 
             if not options.brute_force:
                 if isinstance(file_name, bytes):
@@ -210,11 +211,11 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                 # Display upload successful message and location to access the file
                 alerts.success(f"File uploaded successfully with: {file_name}")
                 if not skip_module:
-                    results(options.url, file_name, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
+                    results(options.url, file_name_to_save_in_file, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
                             current_time)
                     exit(1)
             else:
-                results(options.url, file_name, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
+                results(options.url, file_name_to_save_in_file, content_type, upload_dir, is_magic_bytes, options.output_dir, allowed_extension,
                         current_time)            
                 alerts.success(f"File uploaded successfully with: {file_name}")
                 return exploit_machine

@@ -236,7 +236,15 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
     if options.upload_dir != 'optional':
         parsed_url = urlparse(url)
         base_url = parsed_url.scheme + "://" + parsed_url.netloc
-        location_url = base_url + options.upload_dir + file_name
+
+        # Removing trailing extension
+        if module in config.original_filenames:
+            split_file_name = file_name.split(".", 1)
+            tmp_file_name = split_file_name[0]
+            new_file_name = tmp_file_name + "." + options.current_extension_tested
+            
+        location_url = base_url + options.upload_dir + new_file_name
+
     else:
         location_url = "Not specified"
 
