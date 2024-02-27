@@ -25,7 +25,7 @@ import importlib
 import traceback
 import time
 from lib import config
-from lib.banner import banner
+from lib.banner import banner, program_usage
 from lib.update import *
 from lib.state import resume_state
 from lib import format_detector
@@ -68,34 +68,35 @@ class Upload_Bypass:
             sys.exit()
 
         # User Options
-        parser.add_argument('-r', "--request_file", default='not_set', dest="request_file")
-        parser.add_argument('-s', "--success", type=str, required=False, dest="success_message", default="not_selected")
-        parser.add_argument('-f', "--failure", type=str, required=False, dest="failure_message", default="not_selected")
-        parser.add_argument('-d', "--detect", action="store_true", required=False, dest="detect")
-        parser.add_argument('-e', "--exploit", action="store_true", required=False, dest="exploitation")
-        parser.add_argument('-a', "--anti_malware", action="store_true", required=False, dest="anti_malware")
-        parser.add_argument('-E', "--extension", type=str, default='not_set', dest="file_extension")
-        parser.add_argument('-A', "--allowed", type=str, default='not_set', dest="allowed_extension")
-        parser.add_argument('-D', "--upload_dir", type=str, dest="upload_dir", required=False, default="optional")
-        parser.add_argument('-o', "--output", type=str, dest="output_dir", required=False, default=False)
-        parser.add_argument('-rl', "--rate_limit", type=int, dest="rateLimit", required=False, default=0)
-        parser.add_argument('-l', "--list", dest="list_modules", required=False, action="store_true")
-        parser.add_argument('-i', "--include_only", type=str, dest="include_modules", required=False, default=False)
-        parser.add_argument('-x', "--exclude", type=str, dest="exclude_modules", required=False, default=False)
-        parser.add_argument('-p', "--proxy", type=str, dest="proxy", required=False, default="optional")
-        parser.add_argument('-k', "--insecure", action="store_true", dest="insecure", required=False)
-        parser.add_argument('-c', "--continue", action="store_true", required=False, dest="brute_force")
-        parser.add_argument('-R', "--response", action="store_true", required=False, dest="response")
-        parser.add_argument('-t', "--time_out", type=int, default=8, required=False, dest="request_timeout")
-        parser.add_argument('-P', "--put", action="store_true", required=False, dest="put_method")
-        parser.add_argument('--resume', default=False, required=False, dest="state")
-        parser.add_argument('--debug', type=int, default=False, required=False, dest="debug")
-        parser.add_argument('--base64', action="store_true", required=False, dest="base64")
-        parser.add_argument('--burp', action="store_true", required=False, dest="burp")
-        parser.add_argument("-S, --status_code", type=int, required=False, dest="status_code", default=200)
+        parser.add_argument("-r", "--request_file", default="not_set", dest="request_file")
+        parser.add_argument("-s", "--success", type=str, required=False, dest="success_message", default="not_selected")
+        parser.add_argument("-f", "--failure", type=str, required=False, dest="failure_message", default="not_selected")
+        parser.add_argument("-d", "--detect", action="store_true", required=False, dest="detect")
+        parser.add_argument("-e", "--exploit", action="store_true", required=False, dest="exploitation")
+        parser.add_argument("-a", "--anti_malware", action="store_true", required=False, dest="anti_malware")
+        parser.add_argument("-E", "--extension", type=str, default="not_set", dest="file_extension")
+        parser.add_argument("-A", "--allowed", type=str, default="not_set", dest="allowed_extension")
+        parser.add_argument("-D", "--upload_dir", type=str, dest="upload_dir", required=False, default="optional")
+        parser.add_argument("-o", "--output", type=str, dest="output_dir", required=False, default=False)
+        parser.add_argument("-rl", "--rate_limit", type=int, dest="rateLimit", required=False, default=0)
+        parser.add_argument("-l", "--list", dest="list_modules", required=False, action="store_true")
+        parser.add_argument("-i", "--include_only", type=str, dest="include_modules", required=False, default=False)
+        parser.add_argument("-x", "--exclude", type=str, dest="exclude_modules", required=False, default=False)
+        parser.add_argument("-p", "--proxy", type=str, dest="proxy", required=False, default="optional")
+        parser.add_argument("-k", "--insecure", action="store_true", dest="insecure", required=False)
+        parser.add_argument("-c", "--continue", action="store_true", required=False, dest="brute_force")
+        parser.add_argument("-R", "--response", action="store_true", required=False, dest="response")
+        parser.add_argument("-t", "--time_out", type=int, default=8, required=False, dest="request_timeout")
+        parser.add_argument("-P", "--put", action="store_true", required=False, dest="put_method")
+        parser.add_argument("--resume", default=False, required=False, dest="state")
+        parser.add_argument("--debug", type=int, default=False, required=False, dest="debug")
+        parser.add_argument("--base64", action="store_true", required=False, dest="base64")
+        parser.add_argument("--burp", action="store_true", required=False, dest="burp")
+        parser.add_argument("-S", "--status_code", type=int, required=False, dest="status_code", default=200)
         parser.add_argument("--allow_redirects", action="store_true", required=False, dest="allow_redirects")
         parser.add_argument("--version", action="store_true", dest="version")
-        parser.add_argument('-u', '--update', action="store_true", dest="update")
+        parser.add_argument("-U", "--usage", action="store_true", dest="usage")
+        parser.add_argument("-u", "--update", action="store_true", dest="update")
 
         return parser.parse_args()
     
@@ -273,6 +274,7 @@ if __name__ == "__main__":
         
         version = options.version
         update = options.update
+        usage = options.usage
         session = requests.Session()
 
         if update:
@@ -283,6 +285,10 @@ if __name__ == "__main__":
             version = get_current_version()
             print("")
             print(version)
+            sys.exit(0)
+
+        if usage:
+            print(program_usage())
             sys.exit(0)
         
         try:
