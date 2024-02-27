@@ -54,12 +54,16 @@ To add a new file extension, add a sample.{ext} file to assets/sample_files, the
     sudo docker pull sajibuu/upload_bypass 
 
 # Installation from a local docker file
-    sudo docker build -t upload_bypass .
+    sudo docker build -t sajibuu/upload_bypass .
 
-# Docker Usage
-    # The docker is installed with Nano and Vim, so you can save the request file easily.
-    sudo docker run -it --entrypoint /bin/bash sajibuu/upload_bypass
-    
+# Docker Usage examples
+    ### Example without proxy:
+    sudo docker run -v $(pwd)/request:/Upload_Bypass/{your_request_file} -it sajibuu/upload_bypass -r request -s 'file was uploaded successfully' -E php -e
+
+    ### Example with proxy:
+    **Make sure to listen to port 8080 on all interfaces**
+    sudo docker run -v $(pwd)/request:/Upload_Bypass/{your_request_file} -it sajibuu/upload_bypass -r request -s 'file was uploaded successfully' -E php -e -p http://{docker_interface_IP}:8080
+
 # Limitations: 
   The tool will not function properly with the following:
   1. CAPTCHA implementation is in place.
