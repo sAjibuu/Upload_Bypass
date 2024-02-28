@@ -180,7 +180,7 @@ Update settings:
 If you encounter an issue, please use the debug mode with a flag value of 2 and share it with me (the debug file is saved with the user supplied arguments, the provided request file, and the stack-trace error). If the file contains sensitive information, you can use flag value of 1, which only saves the stack-trace error to the file.
 
 # Contribution
-If you would like to contirute to my code, please specify exactly what you added to the code and why, and make sure you perform multiple tests before submitting the merge request.
+If you want to contribute to my code, please specify exactly what you added to the code and why, and make sure you perform multiple tests before submitting the merge request.
 
 # Credits
 - Hacktricks - Special thanks for providing valuable techniques and insights used in this tool.  
