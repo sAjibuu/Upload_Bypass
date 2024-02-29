@@ -35,11 +35,11 @@ extensions = {
     "com": ["com"],
     "php": ["php", "php3", "phar", "phtml", "php5", "php6", "php7", "phps", "pht", "phtm", "php4", "pgif", "php2",
             "inc", "hphp", "ctp", "module"],
-    "asp": [".asp", ".aspx", ".config", ".ashx", ".asmx", ".aspq", ".axd", ".cshtm", ".cshtml", ".rem", ".soap",
-            ".vbhtm", ".vbhtml", ".asa", ".cer", ".shtml"],
-    "jsp": [".jsp", ".jspx", ".jsw", ".jsv", ".jspf", ".wss", ".do", ".action"],
-    "coldfusion": [".cfm", ".cfml", ".cfc", ".dbm", ".cFm", ".cFml", ".cFc", ".dBm"],
-    "perl": [".pl", ".cgi"]
+    "asp": ["asp", "aspx", "config", "ashx", "asmx", "aspq", "axd", "cshtm", "cshtml", "rem", "soap",
+            "vbhtm", "vbhtml", "asa", "cer", "shtml"],
+    "jsp": ["jsp", "jspx", "jsw", "jsv", "jspf", "wss", "do", "action"],
+    "coldfusion": ["cfm", "cfml", "cfc", "dbm", "cFm", "cFml", "cFc", "dBm"],
+    "perl": ["pl", "cgi"]
 }
 
 # Anti-Malware test strings
