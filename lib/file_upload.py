@@ -12,7 +12,7 @@ from . import eicar_checker
 from . import random_string
 import datetime
 from requests.exceptions import SSLError
-
+import time
 
 # Function to send GET request
 def send_get_request(headers, options, url):
@@ -214,7 +214,8 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
                                                                           original_extension, mimetype, module,
                                                                           magic_bytes, file_data)
 
-    user_options = ""
+    rate_limit_seconds = options.rateLimit / 1000
+    time.sleep(rate_limit_seconds)
 
     # Remove trailing forward slash from the URL
     if url.endswith('/'):
