@@ -243,7 +243,9 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
             tmp_file_name = split_file_name[0]
             new_file_name = tmp_file_name + "." + options.current_extension_tested
             
-        location_url = base_url + options.upload_dir + new_file_name
+            location_url = base_url + options.upload_dir + new_file_name
+        else:
+            location_url = base_url + options.upload_dir + file_name
 
     else:
         location_url = "Not specified"
