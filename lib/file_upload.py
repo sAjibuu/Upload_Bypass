@@ -213,7 +213,8 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
     response, headers, url, content_type = file_parser.parse_request_file(request_file, options, file_name,
                                                                           original_extension, mimetype, module,
                                                                           magic_bytes, file_data)
-
+    user_options = ""
+    
     rate_limit_seconds = options.rateLimit / 1000
     time.sleep(rate_limit_seconds)
 
