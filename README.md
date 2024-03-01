@@ -152,7 +152,8 @@ Request Settings:
 Proxy Settings: 
   -p, --proxy <PROXY>   Proxy to use for requests (ex: http(s)://host:port, socks5(h)://host:port)
   -k, --insecure        Do not verify SSL certificates
-  --burp                Set --proxy to 127.0.0.1:8080 and set --insecure to false
+  --burp_http           Set --proxy to 127.0.0.1:8080 and set --insecure to true (For HTTP requests)
+  --burp_https          Set --proxy to 127.0.0.1:8080 and set --insecure to false (For HTTPs requests)
 
 Optional Settings: 
   -D, --upload_dir <UPLOAD_DIR>  Provide a remote path where the Web-Shell should be uploaded (ex: /uploads)
