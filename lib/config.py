@@ -11,8 +11,10 @@ protocol = 'https'
 active_modules = [
     "extension_shuffle",
     "double_extension",
+    "discrepancy",
     "forward_double_extension",
     "reverse_double_extension",
+    "stripping_extension",
     "null_byte_cutoff",
     "name_overflow_cutoff",
     "htaccess_overwrite",
@@ -23,18 +25,21 @@ active_modules = [
 # Modules that you do not want to scan with Anti-Malware and Detection mode
 dont_scan_module = ['svg_xss', 'svg_xxe', 'htaccess_overwrite']
 
+# Modules that you want their orginal filename and extension - Don't touch unless you know what you are doing
+original_filenames = ['stripping_extension']
+
 # Configure extensions
 extensions = {
 
-    "allow_list": ["png", "jpg", "jpeg", "gif", "pdf", "mp3", "mp4", "txt", "csv", "svg", "xml", "xlsx"],
+    "allow_list": ["jpg", "jpeg", "png", "gif", "pdf", "mp3", "mp4", "txt", "csv", "svg", "xml", "xlsx"],
     "com": ["com"],
     "php": ["php", "php3", "phar", "phtml", "php5", "php6", "php7", "phps", "pht", "phtm", "php4", "pgif", "php2",
             "inc", "hphp", "ctp", "module"],
-    "asp": [".asp", ".aspx", ".config", ".ashx", ".asmx", ".aspq", ".axd", ".cshtm", ".cshtml", ".rem", ".soap",
-            ".vbhtm", ".vbhtml", ".asa", ".cer", ".shtml"],
-    "jsp": [".jsp", ".jspx", ".jsw", ".jsv", ".jspf", ".wss", ".do", ".action"],
-    "coldfusion": [".cfm", ".cfml", ".cfc", ".dbm", ".cFm", ".cFml", ".cFc", ".dBm"],
-    "perl": [".pl", ".cgi"]
+    "asp": ["asp", "aspx", "config", "ashx", "asmx", "aspq", "axd", "cshtm", "cshtml", "rem", "soap",
+            "vbhtm", "vbhtml", "asa", "cer", "shtml"],
+    "jsp": ["jsp", "jspx", "jsw", "jsv", "jspf", "wss", "do", "action"],
+    "coldfusion": ["cfm", "cfml", "cfc", "dbm", "cFm", "cFml", "cFc", "dBm"],
+    "perl": ["pl", "cgi"]
 }
 
 # Anti-Malware test strings

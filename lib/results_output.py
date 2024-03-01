@@ -23,12 +23,12 @@ def results(url, file_name, content_type, upload_location, magic_byte, output_fo
     if not magic_byte:
         f.write("-------------------------------------------------------------------------------------------\n")
         f.write(
-            f"File uploaded successfully with Extension: {file_name}\nContent-Type: {content_type}\nUpload Location: {upload_location}\nDate & Time: {current_time}\n")
+            f"File uploaded successfully with the extension: {file_name}\nContent-Type: {content_type}\nUpload Location: {upload_location}\nDate & Time: {current_time}\n")
         f.close()
     else:
         f.write("-------------------------------------------------------------------------------------------\n")
         f.write(
-            f"File uploaded successfully with Extension: {file_name}\nContent-Type: {content_type}\nUpload Location: {upload_location}\nMagic Bytes: {magic_bytes[allowed_extension]}\nDate & Time: {current_time}\n\n")
+            f"File uploaded successfully with the extension: {file_name}\nContent-Type: {content_type}\nUpload Location: {upload_location}\nMagic Bytes: {magic_bytes[allowed_extension]}\nDate & Time: {current_time}\n\n")
         f.close()
 
 

@@ -10,7 +10,7 @@ warnings.filterwarnings("ignore")
 
 def print_eicar_message(eicar_reflected, options, user_options, response, file_name, current_time, is_magic_bytes,
                         skip_module, url, content_type, upload_location, allowed_extension):
-    if not options.bruteForce:
+    if not options.brute_force:
         # Reach 100% in the progress bar
         file_upload.printing(options, user_options, response, file_name, 100, current_time, options.current_module,
                              is_magic_bytes, options.current_mimetype)
@@ -23,14 +23,14 @@ def print_eicar_message(eicar_reflected, options, user_options, response, file_n
         success(f"Eicar file uploaded successfully with: {file_name}")
 
         if not skip_module:
-                    
-            results(url, file_name, content_type, upload_location, is_magic_bytes, options.output_dir, allowed_extension,
+            results(url, file_name, content_type, upload_location, is_magic_bytes, options.output_dir,
+                    allowed_extension,
                     current_time)
 
             exit(1)
 
     else:
-                
+
         results(url, file_name, content_type, upload_location, is_magic_bytes, options.output_dir, allowed_extension,
                 current_time)
 
@@ -42,7 +42,9 @@ def print_eicar_message(eicar_reflected, options, user_options, response, file_n
             warning("Check if the Eicar file is present on the system and didn't get deleted!")
             success(f"Eicar file uploaded successfully with: {file_name}")
 
-def check_eicar(response, file_name, current_time, url, content_type, options, allowed_extension, user_options, skip_module, headers):
+
+def check_eicar(response, file_name, current_time, url, content_type, options, allowed_extension, user_options,
+                skip_module, headers):
     is_magic_bytes = False
 
     upload_location = options.upload_dir
@@ -77,9 +79,11 @@ def check_eicar(response, file_name, current_time, url, content_type, options, a
     else:
         upload_location = "Not specified by the user"
         print_eicar_message(False, options, user_options, response, file_name, current_time, is_magic_bytes,
-                                        skip_module, url, content_type, upload_location, allowed_extension)
+                            skip_module, url, content_type, upload_location, allowed_extension)
 
-def eicar(response, file_name, url, content_type, options, allowed_extension, current_time, user_options, skip_module, headers):
+
+def eicar(response, file_name, url, content_type, options, allowed_extension, current_time, user_options, skip_module,
+          headers):
     # Initialize variable
     response_status = ""
 

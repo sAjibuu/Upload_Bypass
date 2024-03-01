@@ -2,7 +2,7 @@
 
 # Made by Sagiv
 
-# Upload Bypass is a simple tool designed to assist Pentesters and Bug Hunters in testing file upload mechanisms.
+# Upload Bypass is a simple tool designed to assist penetration testers and bug hunters in testing file upload mechanisms.
 
 # Copyright (C) 2024 Sagiv Michael
 
@@ -25,7 +25,7 @@ import importlib
 import traceback
 import time
 from lib import config
-from lib.banner import banner
+from lib.banner import banner, program_usage
 from lib.update import *
 from lib.state import resume_state
 from lib import format_detector
@@ -36,7 +36,7 @@ from lib.list_modules import list_all_modules
 
 class Upload_Bypass:
     def __init__(self, user_options) -> None:
-        
+
         # Initialize variables
         self.options = user_options
         self.resume_file = user_options.state
@@ -44,18 +44,19 @@ class Upload_Bypass:
         self.success_message = user_options.success_message
         self.failureMessage = user_options.failure_message
         self.status_code = user_options.status_code
-        self.tls = user_options.insecure
+        self.verify_tls = user_options.insecure
         self.proxy = user_options.proxy
         self.upload_dir = user_options.upload_dir
         self.request_file = user_options.request_file
         self.file_extension = user_options.file_extension
         self.upload_dir = user_options.upload_dir
-        self.burp = user_options.burp
+        self.burp_http = user_options.burp_http
+        self.burp_https = user_options.burp_https
         self.allowed_extension = options.allowed_extension
         self.session = requests.Session()
         self.upload_message = ""
         self.message = ""
-        
+
     # User arguments
     @staticmethod
     def args():
@@ -68,42 +69,44 @@ class Upload_Bypass:
             sys.exit()
 
         # User Options
-        parser.add_argument('-r', "--request_file", default='not_set', dest="request_file")
-        parser.add_argument('-s', "--success", type=str, required=False, dest="success_message", default="not_selected")
-        parser.add_argument('-f', "--failure", type=str, required=False, dest="failure_message", default="not_selected")
-        parser.add_argument('-d', "--detect", action="store_true", required=False, dest="detect")
-        parser.add_argument('-e', "--exploit", action="store_true", required=False, dest="exploitation")
-        parser.add_argument('-a', "--anti_malware", action="store_true", required=False, dest="anti_malware")
-        parser.add_argument('-E', "--extension", type=str, default='not_set', dest="file_extension")
-        parser.add_argument('-A', "--allowed", type=str, default='not_set', dest="allowed_extension")
-        parser.add_argument('-D', "--upload_dir", type=str, dest="upload_dir", required=False, default="optional")
-        parser.add_argument('-o', "--output", type=str, dest="output_dir", required=False, default=False)
-        parser.add_argument('-rl', "--rate_limit", type=int, dest="rateLimit", required=False, default=0)
-        parser.add_argument('-l', "--list", dest="list_modules", required=False, action="store_true")
-        parser.add_argument('-i', "--include_only", type=str, dest="include_modules", required=False, default=False)
-        parser.add_argument('-x', "--exclude", type=str, dest="exclude_modules", required=False, default=False)
-        parser.add_argument('-p', "--proxy", type=str, dest="proxy", required=False, default="optional")
-        parser.add_argument('-k', "--insecure", action="store_true", dest="insecure", required=False)
-        parser.add_argument('-c', "--continue", action="store_true", required=False, dest="bruteForce")
-        parser.add_argument('-R', "--response", action="store_true", required=False, dest="response")
-        parser.add_argument('-t', "--time_out", type=int, default=8, required=False, dest="request_timeout")
-        parser.add_argument('-P', "--put", action="store_true", required=False, dest="put_method")
-        parser.add_argument('--resume', default=False, required=False, dest="state")
-        parser.add_argument('--debug', type=int, default=False, required=False, dest="debug")
-        parser.add_argument('--base64', action="store_true", required=False, dest="base64")
-        parser.add_argument('--burp', action="store_true", required=False, dest="burp")
-        parser.add_argument("-S, --status_code", type=int, required=False, dest="status_code", default=200)
+        parser.add_argument("-r", "--request_file", default="not_set", dest="request_file")
+        parser.add_argument("-s", "--success", type=str, required=False, dest="success_message", default="not_selected")
+        parser.add_argument("-f", "--failure", type=str, required=False, dest="failure_message", default="not_selected")
+        parser.add_argument("-d", "--detect", action="store_true", required=False, dest="detect")
+        parser.add_argument("-e", "--exploit", action="store_true", required=False, dest="exploitation")
+        parser.add_argument("-a", "--anti_malware", action="store_true", required=False, dest="anti_malware")
+        parser.add_argument("-E", "--extension", type=str, default="not_set", dest="file_extension")
+        parser.add_argument("-A", "--allowed", type=str, default="not_set", dest="allowed_extension")
+        parser.add_argument("-D", "--upload_dir", type=str, dest="upload_dir", required=False, default="optional")
+        parser.add_argument("-o", "--output", type=str, dest="output_dir", required=False, default=False)
+        parser.add_argument("-rl", "--rate_limit", type=int, dest="rateLimit", required=False, default=0)
+        parser.add_argument("-l", "--list", dest="list_modules", required=False, action="store_true")
+        parser.add_argument("-i", "--include_only", type=str, dest="include_modules", required=False, default=False)
+        parser.add_argument("-x", "--exclude", type=str, dest="exclude_modules", required=False, default=False)
+        parser.add_argument("-p", "--proxy", type=str, dest="proxy", required=False, default="optional")
+        parser.add_argument("-k", "--insecure", action="store_false", dest="insecure", required=False)
+        parser.add_argument("-c", "--continue", action="store_true", required=False, dest="brute_force")
+        parser.add_argument("-R", "--response", action="store_true", required=False, dest="response")
+        parser.add_argument("-t", "--time_out", type=int, default=8, required=False, dest="request_timeout")
+        parser.add_argument("-P", "--put", action="store_true", required=False, dest="put_method")
+        parser.add_argument("--resume", default=False, required=False, dest="state")
+        parser.add_argument("--debug", type=int, default=False, required=False, dest="debug")
+        parser.add_argument("--base64", action="store_true", required=False, dest="base64")
+        parser.add_argument("--burp_http", action="store_true", required=False, dest="burp_http")
+        parser.add_argument("--burp_https", action="store_false", required=False, dest="burp_https")
+        parser.add_argument("-S", "--status_code", type=int, required=False, dest="status_code", default=200)
         parser.add_argument("--allow_redirects", action="store_true", required=False, dest="allow_redirects")
         parser.add_argument("--version", action="store_true", dest="version")
-        parser.add_argument('-u', '--update', action="store_true", dest="update")
+        parser.add_argument("-U", "--usage", action="store_true", dest="usage")
+        parser.add_argument("-u", "--update", action="store_true", dest="update")
 
         return parser.parse_args()
-    
+
     def main(self):
         try:
-            
+
             if not self.resume_file:
-                
+
                 if options.list_modules:
                     list_all_modules()
 
@@ -112,19 +115,20 @@ class Upload_Bypass:
 
                 if self.request_file == 'not_set':
                     alerts.error(f"-r, --request_file is a required argument!")
-                
+
                 if self.file_extension == 'not_set' and options.anti_malware:
                     options.file_extension = 'com'
-                
+
                 elif self.file_extension == 'not_set':
                     alerts.error(f"-E, --extension is a required argument, unless --anti_malware flag is active.")
 
                 if "." in self.file_extension:
                     options.file_extension = self.file_extension.replace(".", "")
                     options.file_extension = self.file_extension.lower()
-                
+
                 if self.success_message == 'not_selected' and self.failureMessage == 'not_selected':
-                    alerts.warning(f"Success / Failure message isn't set, a successfull upload will be based on {options.status_code} status code.")
+                    alerts.warning(
+                        f"Success / Failure message isn't set, a successful upload will be based on {options.status_code} status code.")
                     options.upload_message = 'not_selected'
                     options.text_or_code = options.status_code
                     time.sleep(3)
@@ -137,13 +141,13 @@ class Upload_Bypass:
                     options.text_or_code = 'failure_message'
                     options.upload_message = self.failureMessage
 
-                if self.tls:
+                if not self.verify_tls:
                     # Disable SSL verification 
-                    options.verify = False
+                    options.verify_tls = False
 
                 else:
                     # Enable SSL verification 
-                    options.verify = True
+                    options.verify_tls = True
 
                 if self.upload_dir != 'optional':
                     if not self.upload_dir.startswith("/"):
@@ -177,15 +181,14 @@ class Upload_Bypass:
                     options.proxies = options.proxies = {
                         'http': None,
                         'https': None,
-                        }  
-                       
-                if self.burp:
+                    }
+
+                if self.burp_http or self.burp_https:
                     alerts.info(f"Proxy is running on 127.0.0.1:8080")
                     options.proxies = {
                         'http': "127.0.0.1:8080",
                         'https': "127.0.0.1:8080",
                     }
-                    options.verify = False
 
                 # Check if arguments supplied by the user is less than 2
                 if len(sys.argv) < 2:
@@ -195,9 +198,6 @@ class Upload_Bypass:
                 # Define session withing the argsparse namespace, for an ease use later
                 options.session = self.session
 
-                alerts.info("Detecting a permitted extension automatically...")
-                time.sleep(2)
-
                 allowed_extension = self.allowed_extension
                 if allowed_extension != 'not_set':
                     allowed_extension = self.allowed_extension
@@ -205,19 +205,23 @@ class Upload_Bypass:
                         allowed_extension = allowed_extension.replace(".", "")
                 else:
                     # Determine which extension is permitted to be uploaded to the system
-                    allowed_extension = format_detector.parse_request_file(self.request_file, self.session, self.options)
+                    alerts.info("Detecting a permitted extension automatically...")
+                    time.sleep(2)
+                    allowed_extension = format_detector.parse_request_file(self.request_file, self.session,
+                                                                           self.options)
                     allowed_extension = "".join(allowed_extension)
                     if allowed_extension == "":
-                        alerts.error("Couldn't determine allowed extension to be uploaded, try to add more allowed extensions to config.py.")
-                
+                        alerts.error(
+                            "Couldn't determine allowed extension to be uploaded, use the --insecure flag if you are targeting HTTPs requests or check if the allowed extension exists in config.py.")
+
                 # Include or Exclude modules
                 all_modules = config.active_modules
                 modules_to_test = []
-                
+
                 if options.exclude_modules:
                     if "," in options.exclude_modules:
                         exclude_modules = options.exclude_modules.replace(" ", "").split(",")
-                    else: 
+                    else:
                         exclude_modules = options.exclude_modules
                         exclude_modules = exclude_modules.split()
                     for exclude_module in exclude_modules:
@@ -226,21 +230,21 @@ class Upload_Bypass:
                 elif options.include_modules:
                     if "," in options.include_modules:
                         include_modules = options.include_modules.replace(" ", "").split(",")
-                    else: 
+                    else:
                         include_modules = options.include_modules
                         include_modules = include_modules.split()
                     for include_module in include_modules:
                         modules_to_test.append(include_module)
-                    
+
                     all_modules = modules_to_test[:]
 
                 # Exclude irrelevant modules for a by the book eicar(Anti-Malware) check (According to eicar.org documentation)
                 elif options.anti_malware or options.detect:
                     for forbidden_module in config.dont_scan_module:
                         all_modules.remove(forbidden_module)
-                
+
                 current_progress = 0  # Setting number of modules to 0 for the progress bar
-                
+
                 # Import all modules (based on number of functions)
                 final_modules = importlib.import_module("lib.modules")
                 total_functions = len(all_modules)
@@ -248,7 +252,8 @@ class Upload_Bypass:
                 for module in all_modules:
                     current_progress += 1
                     # Execute each module with its necessary arguments
-                    getattr(final_modules, module)(self.request_file, self.options, allowed_extension, current_progress, total_functions)
+                    getattr(final_modules, module)(self.request_file, self.options, allowed_extension, current_progress,
+                                                   total_functions)
 
         except KeyboardInterrupt:
             alerts.error("Caught CTRL + C. Exiting...")
@@ -267,12 +272,13 @@ class Upload_Bypass:
 
 # Main function with all its arguments parsing
 if __name__ == "__main__":
-    
+
     try:
         options = Upload_Bypass.args()
-        
+
         version = options.version
         update = options.update
+        usage = options.usage
         session = requests.Session()
 
         if update:
@@ -284,12 +290,16 @@ if __name__ == "__main__":
             print("")
             print(version)
             sys.exit(0)
-        
+
+        if usage:
+            print(program_usage())
+            sys.exit(0)
+
         try:
 
             # Get the current and latest version of the program
             current_version, latest_version = get_current_and_latest_version()
-            
+
             # Read the current configuration
             with open("config/version.json", "r") as file:
                 version = json.load(file)
@@ -308,14 +318,14 @@ if __name__ == "__main__":
 
         if resume_file:
             resume_state(resume_file)
-        
+
         # Create an instance of Upload_Bypass Class
         Upload_Bypass = Upload_Bypass(options)
         # Call main function
         Upload_Bypass.main()
-        
+
     except Exception as e:
-        
+
         if options.debug:
 
             # Check if debug mode is activated
@@ -327,6 +337,6 @@ if __name__ == "__main__":
             save_stack_trace(debug_mode, sys.argv, options.request_file)
         else:
             alerts.error(f'{e}\n{red}[-]{reset} For a full stack trace error use the --debug flag')
-   
+
     except KeyboardInterrupt:
         alerts.error("Caught CTRL + C. Exiting...")

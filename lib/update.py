@@ -114,8 +114,8 @@ def check_for_updates():
                                 os.system(f"rm -rf /tmp/Upload_Bypass")
 
                                 print("Download complete.")
-                                print(f"Upgraded to: {latest_version}")
-                                print("Release Notes:\n" + description)
+                                print(f"\nUpgraded to: {latest_version}")
+                                print("\nRelease Notes:\n" + description)
                                 break
 
                             # Handle Windows platform

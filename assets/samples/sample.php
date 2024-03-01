@@ -1,1 +1,1 @@
-<?php echo 123 ?>
+<?php echo "Is this message being rendered?"; ?>

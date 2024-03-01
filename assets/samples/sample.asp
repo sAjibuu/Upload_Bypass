@@ -1,0 +1,1 @@
+<% Response.Write("Is this message being rendered?") %>
