@@ -29,7 +29,7 @@ def list_all_modules():
     print("_" * terminal_width)
     print(f"\033[1m\nnull_byte_cutoff\033[0m:\n\nAdding null bytes which ultimately should cut the rest of the extension (ex: filename.php%00.jpeg the result will be filename.php).\n{red}\033[1mWarning\033[0m{reset} - it might result with a false-positive!")
     print("_" * terminal_width)
-    print(f"\033[1m\nname_overflow_cutoff\033[0m:\n\nOverflowing the exceeding limit to cut the allowed extension (ex: Linux limit is 255 chars, A*251.php.jpeg = A*255.php - total 255 chars).")
+    print(f"\033[1m\nname_overflow_cutoff\033[0m:\n\nOverflowing the exceeding limit to cut the allowed extension (ex: Linux limit is 255 chars, A*251.php.jpeg = A*251.php - total 255 chars).")
     print("_" * terminal_width)
     print(f"\033[1m\nhtaccess_overwrite\033[0m:\n\nOver-writing the .htaccess rules to allow arbitrary file extension in the current directory and its sub-directories.")
     print("_" * terminal_width)
