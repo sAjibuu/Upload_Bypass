@@ -395,7 +395,7 @@ def name_overflow_cutoff(request_file, options, allowed_extension, function_numb
                        internal_total_iterations, total_functions, state_extensions)
 
 
-def htaccess_overwrite(request_file, options, allowed_extension, function_number, total_functions):
+def htaccess_overwrite(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None, internal_total_iterations=None, leftover_extensions=None):
     extension_to_test = options.file_extension
     module = 'htaccess_overwrite'
     # Check if the file extension being tested is PHP (it works only with php)
@@ -443,7 +443,7 @@ def htaccess_overwrite(request_file, options, allowed_extension, function_number
                                                           overall_progress)
 
 
-def svg_xxe(request_file, options, allowed_extension, function_number, total_functions):
+def svg_xxe(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None, internal_total_iterations=None, leftover_extensions=None):
     module = 'svg_xxe'
 
     info("Executing XML External Entity with SVG module.")
@@ -508,7 +508,7 @@ def svg_xxe(request_file, options, allowed_extension, function_number, total_fun
                 return
 
 
-def svg_xss(request_file, options, allowed_extension, function_number, total_functions):
+def svg_xss(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None, internal_total_iterations=None, leftover_extensions=None):
     module = 'svg_xss'
 
     info("Executing Cross-Site Scripting with SVG module.")
