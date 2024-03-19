@@ -93,7 +93,7 @@ class Upload_Bypass:
         parser.add_argument("--debug", type=int, default=False, required=False, dest="debug")
         parser.add_argument("--base64", action="store_true", required=False, dest="base64")
         parser.add_argument("--burp_http", action="store_true", required=False, dest="burp_http")
-        parser.add_argument("--burp_https", action="store_false", required=False, dest="burp_https")
+        parser.add_argument("--burp_https", action="store_true", required=False, dest="burp_https")
         parser.add_argument("-S", "--status_code", type=int, required=False, dest="status_code", default=200)
         parser.add_argument("--allow_redirects", action="store_true", required=False, dest="allow_redirects")
         parser.add_argument("--version", action="store_true", dest="version")
