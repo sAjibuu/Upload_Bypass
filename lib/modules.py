@@ -358,7 +358,7 @@ def name_overflow_cutoff(request_file, options, allowed_extension, function_numb
         info("Executing Name Overflow Cutoff Module")
         extension_to_test = options.file_extension
 
-        overflow_lengths = [255, 236]  # You may adjust this based on the system's allowed characters length
+        overflow_lengths = [255]  # You may adjust this based on the system's allowed characters length
 
         internal_total_iterations = len(config.extensions[extension_to_test])
 
