@@ -190,6 +190,11 @@ class Upload_Bypass:
                         'https': "127.0.0.1:8080",
                     }
 
+                    if self.burp_http:
+                        options.verify_tls = True
+                    elif self.burp_https:
+                        options.verify_tls = False
+
                 # Check if arguments supplied by the user is less than 2
                 if len(sys.argv) < 2:
                     print("Try '-h or --help' for more information.")
@@ -239,9 +244,10 @@ class Upload_Bypass:
                     all_modules = modules_to_test[:]
 
                 # Exclude irrelevant modules for a by the book eicar(Anti-Malware) check (According to eicar.org documentation)
-                elif options.anti_malware or options.detect:
+                if options.anti_malware or options.detect:
                     for forbidden_module in config.dont_scan_module:
-                        all_modules.remove(forbidden_module)
+                        if forbidden_module in all_modules:
+                            all_modules.remove(forbidden_module)
 
                 current_progress = 0  # Setting number of modules to 0 for the progress bar
 
@@ -249,6 +255,8 @@ class Upload_Bypass:
                 final_modules = importlib.import_module("lib.modules")
                 total_functions = len(all_modules)
 
+                if len(all_modules) == 0:
+                    alerts.error("The module/s you chose does not support detection/anti-malware mode.")
                 for module in all_modules:
                     current_progress += 1
                     # Execute each module with its necessary arguments
