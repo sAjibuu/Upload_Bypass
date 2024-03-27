@@ -523,7 +523,7 @@ def svg_xss(request_file, options, allowed_extension, function_number, total_fun
     with open("assets/samples/svg_xss.svg", 'r') as file:
         file_data = file.read()
 
-    xss_payload = "<script type=\"text/javascript\">alert(\"document.domain\");</script>"  # XSS payload to check in the response
+    xss_payload = "<script type=\"text/javascript\">alert(document.domain);</script>"  # XSS payload to check in the response
     skip_module = True  # Do not exit when a successful upload is occurred
     headers, upload_status, response, url, _, current_time, user_options = file_upload(request_file, file_name,
                                                                                        file_extension, options,
