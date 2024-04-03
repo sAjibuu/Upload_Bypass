@@ -33,6 +33,8 @@ def list_all_modules():
     print("_" * terminal_width)
     print(f"\033[1m\nhtaccess_overwrite\033[0m:\n\nOver-writing the .htaccess rules to allow arbitrary file extension in the current directory and its sub-directories.")
     print("_" * terminal_width)
+    print(f"\033[1m\npath_traversal\033[0m:\n\nBypassing .htaccess rules that apply in the current directory by uploading a file in a parent directory using path traversal vulnerability.")
+    print("_" * terminal_width)    
     print(f"\033[1m\nsvg_xxe\033[0m:\n\nUploading SVG with XML-External-Entity that reads the passwd file system.")
     print("_" * terminal_width)
     print(f"\033[1m\nsvg_xss\033[0m:\n\nUploading SVG with Cross-Site Scripting that executes an alert popup.")

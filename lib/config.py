@@ -18,12 +18,13 @@ active_modules = [
     "null_byte_cutoff",
     "name_overflow_cutoff",
     "htaccess_overwrite",
+    "path_traversal",
     "svg_xxe",
     "svg_xss"
 ]
 
 # Modules that you do not want to scan with Anti-Malware and Detection mode
-dont_scan_module = ['svg_xss', 'svg_xxe', 'htaccess_overwrite']
+dont_scan_module = ['svg_xss', 'svg_xxe', 'htaccess_overwrite', "path_traversal"]
 
 # Modules that you want their orginal filename and extension - Don't touch unless you know what you are doing
 original_filenames = ['stripping_extension']
