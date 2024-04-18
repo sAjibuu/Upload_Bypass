@@ -36,7 +36,7 @@ def make_request(data, headers, options, url, data_type):
                 url_http = url.replace('https://', 'http://')  # Change protocol to http
                 if data_type == "raw":  # Check if data is anything but json
                     response = options.session.post(url_http, data=data, headers=headers, proxies=options.proxies,
-                                                    allow_redirects=options.allow_redirects, verify=False, timeout=5)
+                                                    allow_redirects=options.allow_redirects, verify=False, timeout=options.request_timeout)
                 else:  # Send a JSON request
                     response = options.session.post(url_http, json=data, headers=headers, proxies=options.proxies,
                                                     allow_redirects=options.allow_redirects,
@@ -59,7 +59,7 @@ def make_request(data, headers, options, url, data_type):
                 url_http = url.replace('https://', 'http://')  # Change protocol to http
                 if data_type == "raw":  # Check if data is anything but json
                     response = options.session.put(url_http, data=data, headers=headers, proxies=options.proxies,
-                                                   allow_redirects=options.allow_redirects, verify=False, timeout=5)
+                                                   allow_redirects=options.allow_redirects, verify=False, timeout=options.request_timeout)
                 else:  # Send a JSON request
                     response = options.session.put(url_http, json=data, headers=headers, proxies=options.proxies,
                                                    allow_redirects=options.allow_redirects,
