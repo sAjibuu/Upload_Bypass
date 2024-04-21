@@ -10,11 +10,13 @@ def results(url, file_name, content_type, upload_location, magic_byte, output_fo
     domain = get_domain_name(url)
 
     if not output_folder:
-        if not os.path.exists(f'{os.getcwd()}/{domain}'):
-            os.system(f'mkdir {os.getcwd()}/{domain}')
+        folder_path = os.path.join(os.getcwd(), domain)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path, exist_ok=True)
 
         # Save the results to results.txt
-        f = open(f"{os.getcwd()}/{domain}/results.txt", "a")
+        file_path = os.path.join(folder_path, "results.txt")
+        f = open(f"{file_path}", "a")
         success(f"Results saved in {os.getcwd()}/{domain}/results.txt")
 
     else:
