@@ -224,7 +224,8 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
         url = url[:-1]
 
     user_options += f"🌐 Target URL: {url}\n"
-    user_options += f"🧩 Extension: {options.file_extension}\n"
+    user_options += f"🔗 Backend Extension: {options.file_extension}\n"
+    user_options += f"🔗 Allowed Extension: {allowed_extension}\n"
 
     # Determine mode based on options
     if options.exploitation:

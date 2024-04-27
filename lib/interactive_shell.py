@@ -167,7 +167,7 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
 
             if "Is this message being rendered?" in response.text and file_data not in response.text:
                 success(
-                    f"The sample file was rendered successfully as {config.mimetypes[options.file_extension]}, congrats!")
+                    f"The sample file was executed and rendered successfully as {config.mimetypes[options.file_extension]}, congrats!")
                 while True:
                     exploit_answer = input(
                         f"\n{blue}[i]{reset} Would you like to exploit the system and upload an interactive shell? y/n: ").lower()

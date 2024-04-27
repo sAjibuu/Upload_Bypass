@@ -115,7 +115,7 @@ Usage: Upload Bypass [OPTIONS]
 
 Options:
   -h, --help     Print help (see more with '--help')
-  'U', --usage   Print the how to save the request file instructions.
+  -U, --usage   Print the how to save the request file instructions.
   -v, --version  Print version
 
 Required Arguments: 

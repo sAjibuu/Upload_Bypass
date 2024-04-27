@@ -26,7 +26,7 @@ Usage: Upload Bypass [OPTIONS]
 
 \033[1m\033[4mOptions:\033[0m
   \033[1m-h, --help\033[0m     Print help (see more with '--help')
-  \033[1m'U', --usage\033[0m   Print the how to save the request file instructions.
+  \033[1m-U, --usage\033[0m   Print the how to save the request file instructions.
   \033[1m-v, --version\033[0m  Print version
 
 \033[1m\033[4mRequired Arguments:\033[0m 
