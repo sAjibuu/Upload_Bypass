@@ -20,6 +20,7 @@ def web_shell(options, headers, file_name, parameter_exists):
                 alerts.warning("To exit interactive shell type exit, to continue the scan CTRL + C")
             else:
                 alerts.warning("To exit interactive shell type exit or press CTRL + C")
+
             file_name = unquote(file_name)
             partial_url = urljoin(options.url, options.upload_dir)
             if parameter_exists:
@@ -77,11 +78,14 @@ def web_shell(options, headers, file_name, parameter_exists):
 
 # Function for interactive shell
 def interactive_shell(options, headers, file_name, content_type, upload_dir, is_magic_bytes, allowed_extension,
-                      current_time, response, user_options, skip_module, module, exploit_machine=False):
+                      current_time, response, user_options, skip_module, module, exploit_machine=None, filename_without_nullbyte=None):
     file_name_to_save_in_file = file_name.encode("latin-1")
 
     if not isinstance(is_magic_bytes, bool):
         is_magic_bytes = base64.b64encode(is_magic_bytes).decode('latin-1')
+
+    if filename_without_nullbyte:
+        file_name = filename_without_nullbyte
 
     if exploit_machine or options.upload_dir != 'optional' and options.exploitation and not skip_module:
         parameter_exists = False
@@ -225,10 +229,11 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
 # Function for response checking
 def response_check(options, headers, file_name, content_type, upload_dir, is_magic_bytes, allowed_extension,
                    current_time,
-                   response, user_options, skip_module, module):
+                   response, user_options, skip_module, module, filename_without_nullbyte=None):
     text_or_code = options.text_or_code
     response_status = ""
     exploit_machine = False
+  
     if str(text_or_code).isdigit():
 
         # Check if response is match the status code in message
@@ -236,7 +241,7 @@ def response_check(options, headers, file_name, content_type, upload_dir, is_mag
             response_status = "success"
             exploit_machine = interactive_shell(options, headers, file_name, content_type, upload_dir, is_magic_bytes,
                                                 allowed_extension, current_time, response, user_options, skip_module,
-                                                module)
+                                                module, exploit_machine, filename_without_nullbyte)
 
         else:
             response_status = "fail"
@@ -248,7 +253,7 @@ def response_check(options, headers, file_name, content_type, upload_dir, is_mag
             response_status = "success"
             exploit_machine = interactive_shell(options, headers, file_name, content_type, upload_dir, is_magic_bytes,
                                                 allowed_extension, current_time, response, user_options, skip_module,
-                                                module)
+                                                module, exploit_machine, filename_without_nullbyte)
 
         else:
             response_status = "fail"
@@ -260,7 +265,7 @@ def response_check(options, headers, file_name, content_type, upload_dir, is_mag
             response_status = "success"
             exploit_machine = interactive_shell(options, headers, file_name, content_type, upload_dir, is_magic_bytes,
                                                 allowed_extension, current_time, response, user_options, skip_module,
-                                                module)
+                                                module, exploit_machine, filename_without_nullbyte)
 
         else:
             response_status = "fail"
