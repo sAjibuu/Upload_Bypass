@@ -43,7 +43,7 @@ def send_get_request(headers, options, url):
 
 # Function to send request
 def send_request(current_extension, request_file, file_name, extension_to_test, options, module, allowed_extension,
-                 overall_progress, current_extension_tested=None):
+                 overall_progress, current_extension_tested=None, filename_without_nullbyte=None):
     # Check for anti-malware option and file extension
     if options.anti_malware and options.file_extension == 'com':
         # Send request with given parameters
@@ -52,44 +52,45 @@ def send_request(current_extension, request_file, file_name, extension_to_test, 
 
         headers, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
                                                             magic_bytes, allowed_extension, mimetype, module,
-                                                            overall_progress, None, None, current_extension_tested)
+                                                            overall_progress, None, None, current_extension_tested, filename_without_nullbyte)
 
         # Send request with allowed extension mimetype
         mimetype = config.mimetypes[allowed_extension]
         magic_bytes = False
         headers, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
                                                             magic_bytes, allowed_extension, mimetype, module,
-                                                            overall_progress, None, None, current_extension_tested)
+                                                            overall_progress, None, None, current_extension_tested, filename_without_nullbyte)
 
     else:
         current_extension = current_extension.replace(".", "").lower()
         # Send request with given parameters
         magic_bytes = False
         mimetype = config.mimetypes[current_extension]
+        
         headers, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
                                                             magic_bytes, allowed_extension, mimetype, module,
-                                                            overall_progress, None, None, current_extension_tested)
+                                                            overall_progress, None, None, current_extension_tested, filename_without_nullbyte)
 
         # Send request with magic bytes of the allowed extension
         magic_bytes = config.magic_bytes[allowed_extension]
         mimetype = config.mimetypes[current_extension]
         headers, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
                                                             magic_bytes, allowed_extension, mimetype, module,
-                                                            overall_progress, None, None, current_extension_tested)
+                                                            overall_progress, None, None, current_extension_tested, filename_without_nullbyte)
 
         # Send request with the allowed extension mimetype
         mimetype = config.mimetypes[allowed_extension]
         magic_bytes = False
         headers, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
                                                             magic_bytes, allowed_extension, mimetype, module,
-                                                            overall_progress, None, None, current_extension_tested)
+                                                            overall_progress, None, None, current_extension_tested, filename_without_nullbyte)
 
         # Send request with the allowed extension mimetype and magic_bytes
         mimetype = config.mimetypes[allowed_extension]
         magic_bytes = config.magic_bytes[allowed_extension]
         headers, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
                                                             magic_bytes, allowed_extension, mimetype, module,
-                                                            overall_progress, None, None, current_extension_tested)
+                                                            overall_progress, None, None, current_extension_tested, filename_without_nullbyte)
 
     return headers, upload_status
 
@@ -204,7 +205,7 @@ def printing(options, user_options, response, file_name, overall_progress, curre
 
 # Function for file upload
 def file_upload(request_file, file_name, original_extension, options, magic_bytes, allowed_extension, mimetype, module,
-                overall_progress, file_data=None, skip_module=None, current_extension_tested=None):
+                overall_progress, file_data=None, skip_module=None, current_extension_tested=None, filename_without_nullbyte=None):
     # Declaring these variables for ease an ease access later
     options.current_mimetype = mimetype
     options.current_module = module
@@ -316,6 +317,9 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
     # Print various details
     printing(options, user_options, response, file_name, overall_progress, current_time, module, magic_bytes, mimetype)
 
+    if filename_without_nullbyte:
+        filename_nullbyte = file_name
+        
     if options.anti_malware:
 
         # Send response to Eicar function and checks if brute_force is active or not
@@ -326,22 +330,35 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
         response_status, exploit_machine = interactive_shell.response_check(options, headers, file_name, content_type,
                                                                             location_url, magic_bytes,
                                                                             allowed_extension, current_time, response,
-                                                                            user_options, skip_module, module)
+                                                                            user_options, skip_module, module, filename_without_nullbyte)
         if exploit_machine:
+
             options.exploitation = True
             options.detect = False
-            split_filename = file_name.split(".", 1)
-            split_extensions = split_filename[1]
-            new_name = random_string.generate_random_string(10)
-            file_name = new_name + "." + split_extensions
+
+            if filename_without_nullbyte:
+                split_file_name = filename_nullbyte.split(".")
+                new_name = random_string.generate_random_string(10)
+                del split_file_name[0]
+                filename_without_nullbyte = new_name + "." + original_extension
+                extension_nullbyte = ".".join(split_file_name)
+                file_name = new_name + "." + extension_nullbyte
+                
+
+            else:
+                split_filename = file_name.split(".", 1)
+                split_extensions = split_filename[1]
+                new_name = random_string.generate_random_string(10)
+                file_name = new_name + "." + split_extensions
 
             response, headers, url, content_type = file_parser.parse_request_file(request_file, options, file_name,
                                                                                   original_extension, mimetype,
                                                                                   magic_bytes, file_data)
             _, _ = interactive_shell.response_check(options, headers, file_name, content_type, location_url,
                                                     magic_bytes, allowed_extension, current_time, response,
-                                                    user_options, skip_module, module)
+                                                    user_options, skip_module, module, filename_without_nullbyte)
 
             return
+
 
     return headers, response_status, response, url, content_type, current_time, user_options
