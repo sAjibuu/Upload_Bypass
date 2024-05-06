@@ -333,11 +333,13 @@ def null_byte_cutoff(request_file, options, allowed_extension, function_number, 
                         null_progress / null_total_iterations) * internal_progress_increment
 
                 # Send the request
-                file_extension = f".{backend_extension}{null_byte}.{allowed_extension}"
-                file_name = generate_random_string(10) + file_extension
+                file_extension_with_nullbyte = f".{backend_extension}{null_byte}.{allowed_extension}"
+                random_string = generate_random_string(10)
+                file_name = random_string + file_extension_with_nullbyte
+                filename_without_nullbyte = random_string + "." + backend_extension
 
                 _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
-                                    allowed_extension, overall_progress)
+                                    allowed_extension, overall_progress, None, filename_without_nullbyte)
 
             internal_progress += 1
 
@@ -530,6 +532,7 @@ def path_traversal(request_file, options, allowed_extension, function_number, to
                 warning(f"It seems like the app is not vulnerable to path traversal.")
                 return   
         
+
 def svg_xxe(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None, internal_total_iterations=None, leftover_extensions=None):
     module = 'svg_xxe'
 
