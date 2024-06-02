@@ -43,7 +43,58 @@ def make_request(data, session, headers, options, url, data_type):
 
     try:
 
-        if not options.put_method:
+        if options.put_method:
+            try:
+                if data_type == "raw":  # Check if data is anything but json
+                    response = session.put(url, data=data, headers=headers, proxies=options.proxies,
+                                           allow_redirects=options.allow_redirects,
+                                           verify=options.verify_tls, timeout=options.request_timeout)
+                else:  # Send a JSON request
+                    response = session.put(url, json=data, headers=headers, proxies=options.proxies,
+                                           allow_redirects=options.allow_redirects,
+                                           verify=options.verify_tls, timeout=options.request_timeout)
+            # Fall back to HTTP
+            except SSLError:
+                url_http = url.replace('https://', 'http://')  # Change protocol to http
+                if data_type == "raw":  # Check if data is anything but json
+                    response = session.put(url_http, data=data, headers=headers, proxies=options.proxies,
+                                           allow_redirects=options.allow_redirects, verify=False, timeout=options.request_timeout)
+                else:  # Send a JSON request
+                    response = session.put(url_http, json=data, headers=headers, proxies=options.proxies,
+                                           allow_redirects=options.allow_redirects,
+                                           verify=options.verify_tls, timeout=options.request_timeout)
+            except requests.exceptions.ProxyError:
+                error(
+                    f"You are having issue with your proxy, check if your proxy program is well configured. If you are trying "
+                    f"to access an HTTP website, configure Upload Bypass to use the HTTP protocol inside the config.py.")
+
+        elif options.patch_method:
+            try:
+                if data_type == "raw":  # Check if data is anything but json
+                    response = session.patch(url, data=data, headers=headers, proxies=options.proxies,
+                                            allow_redirects=options.allow_redirects,
+                                            verify=options.verify_tls, timeout=options.request_timeout)
+                else:  # Send a JSON request
+                    response = session.patch(url, json=data, headers=headers, proxies=options.proxies,
+                                            allow_redirects=options.allow_redirects,
+                                            verify=options.verify_tls, timeout=options.request_timeout)
+                    # Fall back to HTTP
+            except SSLError:
+                url_http = url.replace('https://', 'http://')  # Change protocol to http
+                if data_type == "raw":  # Check if data is anything but json
+                    response = session.patch(url_http, data=data, headers=headers, proxies=options.proxies,
+                                            allow_redirects=options.allow_redirects, verify=False, timeout=options.request_timeout)
+                else:  # Send a JSON request
+                    response = session.patch(url_http, json=data, headers=headers, proxies=options.proxies,
+                                            allow_redirects=options.allow_redirects,
+                                            verify=options.verify_tls, timeout=options.request_timeout)
+
+            except requests.exceptions.ProxyError:
+                error(
+                    f"You are having issue with your proxy, check if your proxy program is well configured. If you are trying "
+                    f"to access an HTTP website, configure Upload Bypass to use the HTTP protocol inside the config.py.")
+                                   
+        else:
             try:
                 if data_type == "raw":  # Check if data is anything but json
                     response = session.post(url, data=data, headers=headers, proxies=options.proxies,
@@ -64,30 +115,6 @@ def make_request(data, session, headers, options, url, data_type):
                                             allow_redirects=options.allow_redirects,
                                             verify=options.verify_tls, timeout=options.request_timeout)
 
-            except requests.exceptions.ProxyError:
-                error(
-                    f"You are having issue with your proxy, check if your proxy program is well configured. If you are trying "
-                    f"to access an HTTP website, configure Upload Bypass to use the HTTP protocol inside the config.py.")
-        else:
-            try:
-                if data_type == "raw":  # Check if data is anything but json
-                    response = session.put(url, data=data, headers=headers, proxies=options.proxies,
-                                           allow_redirects=options.allow_redirects,
-                                           verify=options.verify_tls, timeout=options.request_timeout)
-                else:  # Send a JSON request
-                    response = session.put(url, json=data, headers=headers, proxies=options.proxies,
-                                           allow_redirects=options.allow_redirects,
-                                           verify=options.verify_tls, timeout=options.request_timeout)
-            # Fall back to HTTP
-            except SSLError:
-                url_http = url.replace('https://', 'http://')  # Change protocol to http
-                if data_type == "raw":  # Check if data is anything but json
-                    response = session.put(url_http, data=data, headers=headers, proxies=options.proxies,
-                                           allow_redirects=options.allow_redirects, verify=False, timeout=options.request_timeout)
-                else:  # Send a JSON request
-                    response = session.put(url_http, json=data, headers=headers, proxies=options.proxies,
-                                           allow_redirects=options.allow_redirects,
-                                           verify=options.verify_tls, timeout=options.request_timeout)
             except requests.exceptions.ProxyError:
                 error(
                     f"You are having issue with your proxy, check if your proxy program is well configured. If you are trying "

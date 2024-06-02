@@ -89,6 +89,7 @@ class Upload_Bypass:
         parser.add_argument("-R", "--response", action="store_true", required=False, dest="response")
         parser.add_argument("-t", "--time_out", type=int, default=8, required=False, dest="request_timeout")
         parser.add_argument("-P", "--put", action="store_true", required=False, dest="put_method")
+        parser.add_argument("-Pa", "--patch", action="store_true", required=False, dest="patch_method")
         parser.add_argument("--resume", default=False, required=False, dest="state")
         parser.add_argument("--debug", type=int, default=False, required=False, dest="debug")
         parser.add_argument("--base64", action="store_true", required=False, dest="base64")
@@ -121,6 +122,9 @@ class Upload_Bypass:
 
                 elif self.file_extension == 'not_set':
                     alerts.error(f"-E, --extension is a required argument, unless --anti_malware flag is active.")
+
+                if sum([bool(options.anti_malware), bool(options.detect), bool(options.exploitation)]) > 1:
+                    alerts.error(f"You must choose only one mode at a time (Detection, Exploitation, Anti-Malware)!")
 
                 if "." in self.file_extension:
                     options.file_extension = self.file_extension.replace(".", "")

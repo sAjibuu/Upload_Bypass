@@ -19,30 +19,7 @@ warnings.filterwarnings("ignore")
 def make_request(data, headers, options, url, data_type):
     response = None
     try:
-        if not options.put_method:
-            try:
-                if data_type == "raw":  # Check if data is anything but json
-                    response = options.session.post(url, data=data, headers=headers, proxies=options.proxies,
-                                                    allow_redirects=options.allow_redirects,
-                                                    verify=options.verify_tls, timeout=options.request_timeout)
-                else:  # Send a JSON request
-                    response = options.session.post(url, json=data, headers=headers, proxies=options.proxies,
-                                                    allow_redirects=options.allow_redirects,
-                                                    verify=options.verify_tls, timeout=options.request_timeout)
-                options.protocol = 'https'
-
-                    # Fall back to HTTP
-            except SSLError:
-                url_http = url.replace('https://', 'http://')  # Change protocol to http
-                if data_type == "raw":  # Check if data is anything but json
-                    response = options.session.post(url_http, data=data, headers=headers, proxies=options.proxies,
-                                                    allow_redirects=options.allow_redirects, verify=False, timeout=options.request_timeout)
-                else:  # Send a JSON request
-                    response = options.session.post(url_http, json=data, headers=headers, proxies=options.proxies,
-                                                    allow_redirects=options.allow_redirects,
-                                                    verify=options.verify_tls, timeout=options.request_timeout)
-                options.protocol = 'http'
-        else:
+        if options.put_method:
             try:
                 if data_type == "raw":  # Check if data is anything but json
                     response = options.session.put(url, data=data, headers=headers, proxies=options.proxies,
@@ -65,6 +42,55 @@ def make_request(data, headers, options, url, data_type):
                                                    allow_redirects=options.allow_redirects,
                                                    verify=options.verify_tls, timeout=options.request_timeout)
 
+                options.protocol = 'http'
+
+        elif options.patch_method:        
+            try:
+                if data_type == "raw":  # Check if data is anything but json
+                    response = options.session.patch(url, data=data, headers=headers, proxies=options.proxies,
+                                                   allow_redirects=options.allow_redirects,
+                                                   verify=options.verify_tls, timeout=options.request_timeout)
+                else:  # Send a JSON request
+                    response = options.session.patch(url, json=data, headers=headers, proxies=options.proxies,
+                                                   allow_redirects=options.allow_redirects,
+                                                   verify=options.verify_tls, timeout=options.request_timeout)
+                options.protocol = 'https'
+
+            # Fall back to HTTP
+            except SSLError:
+                url_http = url.replace('https://', 'http://')  # Change protocol to http
+                if data_type == "raw":  # Check if data is anything but json
+                    response = options.session.patch(url_http, data=data, headers=headers, proxies=options.proxies,
+                                                   allow_redirects=options.allow_redirects, verify=False, timeout=options.request_timeout)
+                else:  # Send a JSON request
+                    response = options.session.patch(url_http, json=data, headers=headers, proxies=options.proxies,
+                                                   allow_redirects=options.allow_redirects,
+                                                   verify=options.verify_tls, timeout=options.request_timeout)
+
+                options.protocol = 'http'
+        else:
+
+            try:
+                if data_type == "raw":  # Check if data is anything but json
+                    response = options.session.post(url, data=data, headers=headers, proxies=options.proxies,
+                                                    allow_redirects=options.allow_redirects,
+                                                    verify=options.verify_tls, timeout=options.request_timeout)
+                else:  # Send a JSON request
+                    response = options.session.post(url, json=data, headers=headers, proxies=options.proxies,
+                                                    allow_redirects=options.allow_redirects,
+                                                    verify=options.verify_tls, timeout=options.request_timeout)
+                options.protocol = 'https'
+
+                    # Fall back to HTTP
+            except SSLError:
+                url_http = url.replace('https://', 'http://')  # Change protocol to http
+                if data_type == "raw":  # Check if data is anything but json
+                    response = options.session.post(url_http, data=data, headers=headers, proxies=options.proxies,
+                                                    allow_redirects=options.allow_redirects, verify=False, timeout=options.request_timeout)
+                else:  # Send a JSON request
+                    response = options.session.post(url_http, json=data, headers=headers, proxies=options.proxies,
+                                                    allow_redirects=options.allow_redirects,
+                                                    verify=options.verify_tls, timeout=options.request_timeout)
                 options.protocol = 'http'
 
     except Exception as e:
