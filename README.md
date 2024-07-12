@@ -144,6 +144,7 @@ Request Settings:
   --base64              Encode the file data with Base64 algorithm
   --allow_redirects     Follow redirects
   -P, --put             Use the HTTP PUT method for the requests (Default is POST)
+  -Pa, --patch\033[0m   Use the HTTP Patch method for the requests (Default is POST)
   -R, --response        Print the response to the screen
   -c, --continue        Continue testing all files, even if a few uploads encountered success
   -t, --time_out <NUM>  Set the request timeout (Default is 8)
