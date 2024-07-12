@@ -18,7 +18,7 @@ def print_eicar_message(eicar_reflected, options, user_options, response, file_n
             warning("The uploaded Eicar (Anti-Malware test file) was found on the system!")
             warning("There is no sign of Anti-Malware on the system.")
         else:
-            warning("Check if the Eicar file is present on the system and didn't get deleted!")
+            warning("Anti-Malware is enabled on the system, EICAR file not found!")
 
         success(f"Eicar file uploaded successfully with: {file_name}")
 
@@ -39,7 +39,7 @@ def print_eicar_message(eicar_reflected, options, user_options, response, file_n
             warning("There is no sign of Anti-Malware on the system.")
 
         else:
-            warning("Check if the Eicar file is present on the system and didn't get deleted!")
+            warning("Anti-Malware is enabled on the system, EICAR file not found!")
             success(f"Eicar file uploaded successfully with: {file_name}")
 
 
