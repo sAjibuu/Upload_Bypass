@@ -55,6 +55,7 @@ Usage: Upload Bypass [OPTIONS]
   \033[1m--base64\033[0m              Encode the file data with Base64 algorithm
   \033[1m--allow_redirects\033[0m     Follow redirects
   \033[1m-P, --put\033[0m             Use the HTTP PUT method for the requests (Default is POST)
+  \033[1m-Pa, --patch\033[0m          Use the HTTP Patch method for the requests (Default is POST)
   \033[1m-R, --response\033[0m        Print the response to the screen
   \033[1m-c, --continue\033[0m        Continue testing all files, even if a few uploads encountered success
   \033[1m-t, --time_out\033[0m <NUM>  Set the request timeout (Default is 8)
