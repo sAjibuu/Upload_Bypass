@@ -8,6 +8,7 @@ from .config import magic_bytes
 
 def results(url, file_name, content_type, upload_location, magic_byte, output_folder, allowed_extension, current_time):
     domain = get_domain_name(url)
+    domain = domain.split(":")[0] # Windows cannot create a directory with a filename containing the colon sign (:) which notes the port number (i.e 127.0.0.1:8008)
 
     if not output_folder:
         folder_path = os.path.join(os.getcwd(), domain)
