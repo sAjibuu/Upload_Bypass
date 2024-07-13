@@ -221,12 +221,10 @@ def parse_request_file(request_file, options, file_name, original_extension, mim
 
         # Check for exploitation mode
         elif options.exploitation:
-            try:
-                if not file_data:
-                    with open(f"assets/shells/webshell.{original_extension}", 'rb') as file:
-                        file_data = file.read()
-            except FileNotFoundError:
-                error(f"File not found: assets/shells/webshell.{original_extension}")
+       
+            if not file_data:
+                file_data_b64 = config.webshells[original_extension]
+                file_data = base64.b64decode(file_data_b64)
 
                 # Checks for anti_malware detection mode
         elif options.anti_malware:
