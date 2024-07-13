@@ -170,7 +170,7 @@ def check_for_updates():
 								os.system(f'xcopy "{temp_directory}" "{current_script_path}" /E /H /C /I /Q')
 								os.system(f'rmdir /S /Q "{temp_directory}"')
 
-								#print("\033c", end="")
+								print("\033c", end="")
 								info("Download complete.")
 								info(f"Upgraded to: {latest_version}")
 								info(f"Upload Bypass is extracted and is available to use")
