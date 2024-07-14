@@ -24,16 +24,20 @@ def handler(signal, frame, data_to_save, host):
     """Signal handler for CTRL + C."""
     now = datetime.datetime.now()
     current_time = now.strftime("%d.%m.%Y_%H:%M:%S")
+    host = host.split(":")[0] # Windows cannot create a directory with a filename containing the colon sign (:) which notes the port number (i.e 127.0.0.1:8008)
 
-    if not os.path.exists(f'{os.getcwd()}/{host}'):
-        os.system(f'mkdir {os.getcwd()}/{host}')
+    directory = os.path.join(os.getcwd(), host)        
+    if not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
+
+    json_file = os.path.join(directory, f"{current_time}_{host}_state.json")
 
     # Save state to a JSON file
-    with open(f"{host}/{current_time}_{host}_state.json", "w") as f:
+    with open(json_file, "w") as f:
         json.dump(data_to_save, f)
 
     # Print a message
-    print(f"\n🚨 Caught Ctrl + C 🚨 saving state to {host}/{current_time}_{host}_state.json")
+    print(f"\n🚨 Caught Ctrl + C 🚨 saving state to {json_file}")
 
     sys.exit(0)
 

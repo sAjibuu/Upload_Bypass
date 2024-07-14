@@ -184,7 +184,7 @@ def check_for_updates():
 
 		# If the latest version matches the current version
 		else:
-			info("The tool is up to date!")
+			info("You are already running the latest version.")
 
 	# If unable to retrieve the latest version from GitHub
 	else:
