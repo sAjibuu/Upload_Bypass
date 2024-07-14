@@ -23,7 +23,7 @@ warnings.filterwarnings("ignore")
 def handler(signal, frame, data_to_save, host):
     """Signal handler for CTRL + C."""
     now = datetime.datetime.now()
-    current_time = now.strftime("%d.%m.%Y_%H:%M:%S")
+    current_time = now.strftime("%d.%m.%Y_%H_%M_%S")
     host = host.split(":")[0] # Windows cannot create a directory with a filename containing the colon sign (:) which notes the port number (i.e 127.0.0.1:8008)
 
     directory = os.path.join(os.getcwd(), host)        
