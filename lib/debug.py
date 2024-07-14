@@ -10,7 +10,7 @@ def save_stack_trace(debug_level, arguments, request_file):
     # Get the current directory
     current_directory = os.getcwd()
     now = datetime.datetime.now()
-    current_time = now.strftime("%d.%m.%Y_%H:%M:%S")
+    current_time = now.strftime("%d.%m.%Y_%H_%M_%S")
 
     # Create a 'debug' directory if it doesn't exist
     debug_directory = os.path.join(current_directory, 'debug')
