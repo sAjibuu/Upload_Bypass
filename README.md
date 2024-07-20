@@ -37,7 +37,7 @@ For example, if you chose PHP, the program will try to determine if an echo comm
 # Customisation
 
 ###
-Check out config.py in lib directory, you can add new extensions, mimetypes, magicbytes, configure your HTTP method and etc'...
+Check out config.py in lib directory, you can add new extensions, mimetypes, magicbytes, configure the use of HTTP/HTTPs protocol and etc'...
 ###
 To add a new module, simply add a function with your desired functionality to modules.py then add the function by name into the list "active_modules" in config.py
 ###
