@@ -25,14 +25,14 @@ def print_eicar_message(eicar_reflected, options, user_options, response, file_n
         if not skip_module:
             results(url, file_name, content_type, upload_location, is_magic_bytes, options.output_dir,
                     allowed_extension,
-                    current_time)
+                    current_time, options.current_module)
 
             exit(1)
 
     else:
 
         results(url, file_name, content_type, upload_location, is_magic_bytes, options.output_dir, allowed_extension,
-                current_time)
+                current_time, options.current_module)
 
         if eicar_reflected:
             warning("The uploaded Eicar (Anti-Malware test file) was found on the system!")

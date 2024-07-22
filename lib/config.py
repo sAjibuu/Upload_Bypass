@@ -9,6 +9,7 @@ protocol = 'https'
 
 # Configure modules name
 active_modules = [
+    "polyglot",
     "extension_shuffle",
     "double_extension",
     "discrepancy",

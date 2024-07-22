@@ -50,49 +50,48 @@ def send_request(current_extension, request_file, file_name, extension_to_test, 
         magic_bytes = False
         mimetype = config.mimetypes["com"]
 
-        headers, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
+        file_upload(request_file, file_name, extension_to_test, options,
                                                             magic_bytes, allowed_extension, mimetype, module,
                                                             overall_progress, None, None, current_extension_tested, filename_without_nullbyte)
 
         # Send request with allowed extension mimetype
         mimetype = config.mimetypes[allowed_extension]
         magic_bytes = False
-        headers, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
+        file_upload(request_file, file_name, extension_to_test, options,
                                                             magic_bytes, allowed_extension, mimetype, module,
                                                             overall_progress, None, None, current_extension_tested, filename_without_nullbyte)
-
+        
     else:
         current_extension = current_extension.replace(".", "").lower()
         # Send request with given parameters
         magic_bytes = False
         mimetype = config.mimetypes[current_extension]
         
-        headers, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
+        file_upload(request_file, file_name, extension_to_test, options,
                                                             magic_bytes, allowed_extension, mimetype, module,
                                                             overall_progress, None, None, current_extension_tested, filename_without_nullbyte)
 
         # Send request with magic bytes of the allowed extension
         magic_bytes = config.magic_bytes[allowed_extension]
         mimetype = config.mimetypes[current_extension]
-        headers, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
+        file_upload(request_file, file_name, extension_to_test, options,
                                                             magic_bytes, allowed_extension, mimetype, module,
                                                             overall_progress, None, None, current_extension_tested, filename_without_nullbyte)
 
         # Send request with the allowed extension mimetype
         mimetype = config.mimetypes[allowed_extension]
         magic_bytes = False
-        headers, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
+        file_upload(request_file, file_name, extension_to_test, options,
                                                             magic_bytes, allowed_extension, mimetype, module,
                                                             overall_progress, None, None, current_extension_tested, filename_without_nullbyte)
+
 
         # Send request with the allowed extension mimetype and magic_bytes
         mimetype = config.mimetypes[allowed_extension]
         magic_bytes = config.magic_bytes[allowed_extension]
-        headers, upload_status, _, _, _, _, _ = file_upload(request_file, file_name, extension_to_test, options,
+        file_upload(request_file, file_name, extension_to_test, options,
                                                             magic_bytes, allowed_extension, mimetype, module,
                                                             overall_progress, None, None, current_extension_tested, filename_without_nullbyte)
-
-    return headers, upload_status
 
 
 # Function for version comparison
@@ -214,7 +213,7 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
     # Parse request file
     response, headers, url, content_type = file_parser.parse_request_file(request_file, options, file_name,
                                                                           original_extension, mimetype,
-                                                                          magic_bytes, file_data)
+                                                                          magic_bytes, file_data, module)
     user_options = ""
 
     rate_limit_seconds = options.rateLimit / 1000
@@ -352,8 +351,9 @@ def file_upload(request_file, file_name, original_extension, options, magic_byte
                 file_name = new_name + "." + split_extensions
 
             response, headers, url, content_type = file_parser.parse_request_file(request_file, options, file_name,
-                                                                                  original_extension, mimetype,
-                                                                                  magic_bytes, file_data)
+                                                                    original_extension, mimetype,
+                                                                    magic_bytes, file_data, module)
+
             _, _ = interactive_shell.response_check(options, headers, file_name, content_type, location_url,
                                                     magic_bytes, allowed_extension, current_time, response,
                                                     user_options, skip_module, module, filename_without_nullbyte)

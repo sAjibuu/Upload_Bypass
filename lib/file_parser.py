@@ -184,7 +184,7 @@ def parse_headers(options, request):
 
 
 def parse_request_file(request_file, options, file_name, original_extension, mimetype, magic_bytes=None,
-                       file_data=None):
+                       file_data=None, module=None):
     try:
         try:
             request = ""  # Initialize an empty string to store the decoded request
@@ -213,7 +213,10 @@ def parse_request_file(request_file, options, file_name, original_extension, mim
         # Check for a detection mode
         if options.detect:
             try:
-                if not file_data:
+                if module == 'polyglot':
+                    with open(f"assets/samples/polyglot_sample.php", 'rb') as file:
+                        file_data = file.read()
+                elif not file_data:
                     with open(f"assets/samples/sample.{original_extension}", 'rb') as file:
                         file_data = file.read()
             except FileNotFoundError:
@@ -221,8 +224,10 @@ def parse_request_file(request_file, options, file_name, original_extension, mim
 
         # Check for exploitation mode
         elif options.exploitation:
-       
-            if not file_data:
+            if module == 'polyglot':
+                with open(f"assets/samples/polyglot_shell.php", 'rb') as file:
+                    file_data = file.read()
+            elif not file_data:
                 file_data_b64 = config.webshells[original_extension]
                 file_data = base64.b64decode(file_data_b64)
 

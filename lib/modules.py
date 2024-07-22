@@ -42,14 +42,14 @@ def extension_shuffle(request_file, options, allowed_extension, function_number,
             # Send the request
             file_extension = f".{backend_extension}"
             file_name = generate_random_string(10) + file_extension
-            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+            send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                 allowed_extension, overall_progress)
 
             # Change the extension to a random casing
             extension_random = capitalise_random(backend_extension)
             file_extension = f".{extension_random}"
             file_name = generate_random_string(10) + file_extension
-            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+            send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                 allowed_extension, overall_progress)
 
     except KeyboardInterrupt:
@@ -91,16 +91,62 @@ def double_extension(request_file, options, allowed_extension, function_number, 
             # Send the request
             file_extension = f".{backend_extension}.{backend_extension}"
             file_name = generate_random_string(10) + file_extension
-            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+            send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                 allowed_extension, overall_progress)
 
             # Send the request with a random capitalization
             extension_random = capitalise_random(backend_extension)
             file_extension = f".{extension_random}"
             file_name = generate_random_string(10) + file_extension
-            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+            send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                 allowed_extension, overall_progress)
 
+    except KeyboardInterrupt:
+        # Save the state when keyboard exception is caught
+        if len(state_extensions) > 0:
+            save_state(options, module, allowed_extension, function_number, internal_progress,
+                       internal_total_iterations, total_functions, state_extensions)
+
+def polyglot(request_file, options, allowed_extension, function_number, total_functions, internal_progress=None,
+                     internal_total_iterations=None, leftover_extensions=None):
+    # Save module name and extensions for a state file
+    module = "polyglot"
+    state_extensions = []
+
+    try:
+        extension_to_test = options.file_extension
+        
+        if extension_to_test == 'php' and allowed_extension == "jpeg" or extension_to_test == 'php' and allowed_extension == "jpg":
+
+            info(f"Executing Polyglot module.")
+
+            internal_total_iterations = len(config.extensions[extension_to_test])
+
+            internal_progress = 0
+
+            for backend_extension in config.extensions[extension_to_test]:
+
+                # Collect extensions for a resume state
+                state_extensions.append(backend_extension)
+
+                # Calculate the progress bar according to the number of functions and iterations
+                internal_progress += 1
+                overall_progress = (function_number - 1) / total_functions * 100 + (
+                        internal_progress / internal_total_iterations) / total_functions * 100
+
+                # A state condition to remove extensions that the program already checked
+                if leftover_extensions is not None and backend_extension in leftover_extensions:
+                    continue
+
+                # Send the request
+                file_extension = f".{backend_extension}"
+                file_name = generate_random_string(10) + file_extension
+                send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+                                    allowed_extension, overall_progress)
+
+        else:
+            return
+        
     except KeyboardInterrupt:
         # Save the state when keyboard exception is caught
         if len(state_extensions) > 0:
@@ -139,7 +185,7 @@ def forward_double_extension(request_file, options, allowed_extension, function_
             # Send a request
             file_extension = f".{allowed_extension}.{backend_extension}"
             file_name = generate_random_string(10) + file_extension
-            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+            send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                 allowed_extension, overall_progress)
 
     except KeyboardInterrupt:
@@ -180,7 +226,7 @@ def reverse_double_extension(request_file, options, allowed_extension, function_
             # Send a request
             file_extension = f".{backend_extension}.{allowed_extension}"
             file_name = generate_random_string(10) + file_extension
-            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+            send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                 allowed_extension, overall_progress)
 
     except KeyboardInterrupt:
@@ -223,13 +269,13 @@ def stripping_extension(request_file, options, allowed_extension, function_numbe
             # Ex: exploit.p.phphp will be after stripping exploit.php
             file_extension = f".{backend_extension[0]}.{backend_extension}{backend_extension[1:]}"
             file_name = generate_random_string(10) + file_extension
-            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+            send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                 allowed_extension, overall_progress, backend_extension)
 
             # Ex: exploit.pphphp will be after stripping exploit.php
             file_extension = f".{backend_extension[0]}{backend_extension}{backend_extension[1:]}"
             file_name = generate_random_string(10) + file_extension
-            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+            send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                 allowed_extension, overall_progress, backend_extension)
 
     except KeyboardInterrupt:
@@ -272,14 +318,14 @@ def discrepancy(request_file, options, allowed_extension, function_number, total
             file_extension = f".{backend_extension}"
             file_extension = file_extension.replace(".", r"%2e")
             file_name = generate_random_string(10) + file_extension
-            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+            send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                 allowed_extension, overall_progress)
 
             # Replacing a dot with a double URL encode
             file_extension = f".{backend_extension}"
             file_extension = file_extension.replace(".", r"%252e")
             file_name = generate_random_string(10) + file_extension
-            _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+            send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                 allowed_extension, overall_progress)
 
     except KeyboardInterrupt:
@@ -338,7 +384,7 @@ def null_byte_cutoff(request_file, options, allowed_extension, function_number, 
                 file_name = random_string + file_extension_with_nullbyte
                 filename_without_nullbyte = random_string + "." + backend_extension
 
-                _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+                send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                     allowed_extension, overall_progress, None, filename_without_nullbyte)
 
             internal_progress += 1
@@ -387,7 +433,7 @@ def name_overflow_cutoff(request_file, options, allowed_extension, function_numb
                 # Double A with the overflow length and subtracts the extension and finally adds the full extension
                 # You can read about it in Hacktricks(File upload)
                 file_name = ("A" * (overflow_length - (len(backend_extension) + 1))) + file_extension
-                _, _ = send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
+                send_request(backend_extension, request_file, file_name, extension_to_test, options, module,
                                     allowed_extension, overall_progress)
 
     except KeyboardInterrupt:

